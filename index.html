@@ -30,7 +30,6 @@
     <p>📍 Trung Mầu - Cổng Phụ Bá Thiện 2 | ☎ 0964 391 834 or 0928 020 777</p>
   </header>
 
-  <!-- Thêm ảnh menu -->
   <img src="https://via.placeholder.com/800x300?text=Bii+Coffee+Menu" alt="Menu Bii Coffee" class="menu-image">
 
   <div class="menu-group">
@@ -46,19 +45,11 @@
 <div class="item">
       <span>Trà quất</span>
       <select>
-        <option value="Trà chanh - M - 10k">Size M - 10k</option>
-        <option value="Trà chanh - L - 15k">Size L - 15k</option>
+        <option value="Trà quất - M - 10k">Size M - 10k</option>
+        <option value="Trà quất - L - 15k">Size L - 15k</option>
       </select>
       <button onclick="addToCart(this)">Thêm</button>
     </div>
-
-
-
-
-
-
-
-
     <div class="item">
       <span>Trà đào</span>
       <select>
@@ -95,7 +86,7 @@
     <div id="cart-total" class="total">Tổng tiền: 0đ</div>
     <textarea id="orderText" rows="4" placeholder="Đơn hàng sẽ hiển thị ở đây..." readonly></textarea><br/>
     <button onclick="copyOrder()">📋 Sao chép đơn</button>
-    <a id="zaloLink" href="#" target="_blank"><button style="background:#0088cc">📤 Gửi Zalo</button></a>
+    <button onclick="sendToZalo()" style="background:#0088cc">📤 Gửi Zalo</button>
   </div>
 
   <script>
@@ -113,7 +104,6 @@
     }
 
     function extractPrice(itemText) {
-      // Lấy giá từ chuỗi (ví dụ: "Size M - 20k" → 20)
       const priceMatch = itemText.match(/(\d+)k/);
       return priceMatch ? parseInt(priceMatch[1]) : 0;
     }
@@ -154,10 +144,6 @@
       
       textArea.value = content;
       totalElement.innerText = `Tổng tiền: ${total}k`;
-      
-      const zaloMessage = encodeURIComponent("Xin chào, mình muốn đặt:\n" + content + `\nTổng tiền: ${total}k`);
-      const zaloPhone = "0964391834"; // SĐT nhận đơn
-      document.getElementById("zaloLink").href = `https://zalo.me/${zaloPhone}?message=${zaloMessage}`;
     }
 
     function copyOrder() {
@@ -165,6 +151,24 @@
       text.select();
       document.execCommand("copy");
       alert("Đã sao chép đơn hàng!");
+    }
+
+    function sendToZalo() {
+      if (cart.length === 0) {
+        alert("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
+        return;
+      }
+      
+      const textArea = document.getElementById("orderText");
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      const orderMessage = `Xin chào, mình muốn đặt:\n${textArea.value}\nTổng tiền: ${total}k`;
+      
+      const zaloPhone = "0964391834"; // SĐT nhận đơn
+      const encodedMessage = encodeURIComponent(orderMessage);
+      const zaloUrl = `https://zalo.me/${zaloPhone}?text=${encodedMessage}`;
+      
+      // Mở Zalo trong cửa sổ mới
+      window.open(zaloUrl, '_blank');
     }
   </script>
 </body>
