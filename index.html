@@ -8,27 +8,22 @@
     body { 
       font-family: Arial, sans-serif; 
       margin: 0; 
-      background: #f9f9f9; 
-      display: flex;
-      flex-direction: column;
+      background: #f9f9f9;
+      padding-bottom: 120px; /* Tạo khoảng trống cho giỏ hàng */
     }
     header { 
       background: #007BFF; 
       color: white; 
       padding: 1em; 
-      text-align: center; 
+      text-align: center;
       position: sticky;
       top: 0;
       z-index: 10;
     }
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-    }
     .menu-group { 
-      flex: 1;
-      min-width: 300px;
       padding: 1em; 
+      max-width: 800px;
+      margin: 0 auto;
     }
     h2 { 
       color: #007BFF; 
@@ -48,16 +43,39 @@
       margin-left: 10px; 
     }
     #cart { 
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
       width: 350px;
       background: white; 
-      padding: 1em; 
+      padding: 0;
       border-radius: 10px; 
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 80px;
-      align-self: flex-start;
-      margin: 1em;
-      max-height: 80vh;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      z-index: 100;
+      max-height: 60vh;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    #cart.collapsed {
+      height: 50px;
+    }
+    #cart-header {
+      background: #007BFF;
+      color: white;
+      padding: 12px 15px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #cart-header h2 {
+      margin: 0;
+      color: white;
+      font-size: 1.2em;
+    }
+    #cart-content {
+      padding: 15px;
+      max-height: 50vh;
       overflow-y: auto;
     }
     button { 
@@ -128,7 +146,7 @@
       color: #007BFF; 
       font-weight: bold; 
     }
-    .cart-header { 
+    .cart-header-row { 
       font-weight: bold; 
       background: #007BFF; 
       color: white; 
@@ -154,43 +172,33 @@
     .notification.show {
       opacity: 1;
     }
+    #cart-toggle {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
     
-    @media screen and (max-width: 768px) {
-      .container {
-        flex-direction: column;
-      }
+    @media screen and (max-width: 600px) {
       #cart {
-        position: fixed;
-        bottom: 0;
-        top: auto;
-        left: 0;
-        right: 0;
-        width: auto;
-        max-height: 50vh;
-        margin: 0;
-        border-radius: 10px 10px 0 0;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-        z-index: 100;
+        width: calc(100% - 40px);
+        left: 20px;
+        right: 20px;
       }
-      #cart h2 {
-        cursor: pointer;
-        margin: 0;
-        padding: 10px;
-        background: #007BFF;
-        color: white;
-        border-radius: 10px 10px 0 0;
+      
+      .item { 
+        flex-direction: column; 
+        align-items: flex-start; 
       }
-      #cart .cart-content {
-        padding: 10px;
-        max-height: 40vh;
-        overflow-y: auto;
+      .item-controls { 
+        margin-top: 10px; 
+        width: 100%; 
       }
-      #cart.collapsed .cart-content {
-        display: none;
-      }
-      #cart.collapsed h2::after {
-        content: "🛒";
-        float: right;
+      .note-input { 
+        margin-left: 0; 
+        margin-top: 5px; 
+        width: 100%; 
       }
     }
   </style>
@@ -200,9 +208,9 @@
     <h1>🧋 Bii Coffee - Menu Đặt Món</h1>
     <p>📍 Trung Mầu - Cổng Phụ Bá Thiện 2 | ☎ 0964 391 834 or 0928 020 777</p>
   </header>
+
   <img src="https://via.placeholder.com/800x300?text=Bii+Coffee+Menu" alt="Menu Bii Coffee" class="menu-image">
 
-  <div class="container">
   <div class="menu-group">
     <h2>TRÀ</h2>
     <div class="item">
@@ -1402,19 +1410,21 @@
       </div>
     </div>
 
-<div id="cart">
-      <h2 onclick="toggleCart()">🛒 Giỏ hàng</h2>
-      <div class="cart-content">
-        <div class="cart-header">
-          <span>Sản phẩm</span>
-          <span>Đơn giá</span>
-        </div>
-        <ul id="cart-list"></ul>
-        <div id="cart-total" class="total">Tổng tiền: 0đ</div>
-        <textarea id="orderText" rows="4" placeholder="Đơn hàng sẽ hiển thị ở đây..." readonly></textarea><br/>
-        <button onclick="copyOrder()">📋 Sao chép đơn</button>
-        <button onclick="sendToZalo()" style="background:#0088cc">📤 Gửi Zalo</button>
+<div id="cart" class="collapsed">
+    <div id="cart-header" onclick="toggleCart()">
+      <h2>🛒 Giỏ hàng (<span id="cart-count">0</span>)</h2>
+      <button id="cart-toggle">▼</button>
+    </div>
+    <div id="cart-content">
+      <div class="cart-header-row">
+        <span>Sản phẩm</span>
+        <span>Đơn giá</span>
       </div>
+      <ul id="cart-list"></ul>
+      <div id="cart-total" class="total">Tổng tiền: 0đ</div>
+      <textarea id="orderText" rows="4" placeholder="Đơn hàng sẽ hiển thị ở đây..." readonly></textarea><br/>
+      <button onclick="copyOrder()">📋 Sao chép đơn</button>
+      <button onclick="sendToZalo()" style="background:#0088cc">📤 Gửi Zalo</button>
     </div>
   </div>
 
@@ -1424,10 +1434,10 @@
     let cart = [];
     
     function toggleCart() {
-      if (window.innerWidth <= 768) {
-        const cart = document.getElementById('cart');
-        cart.classList.toggle('collapsed');
-      }
+      const cart = document.getElementById('cart');
+      const toggleBtn = document.getElementById('cart-toggle');
+      cart.classList.toggle('collapsed');
+      toggleBtn.textContent = cart.classList.contains('collapsed') ? '▲' : '▼';
     }
     
     function showNotification(message) {
@@ -1466,6 +1476,10 @@
       updateCart();
       noteInput.value = '';
       showNotification(`Đã thêm ${name} vào giỏ hàng!`);
+      
+      // Mở giỏ hàng khi thêm món
+      document.getElementById('cart').classList.remove('collapsed');
+      document.getElementById('cart-toggle').textContent = '▼';
     }
 
     function removeFromCart(index) {
@@ -1477,6 +1491,7 @@
       const list = document.getElementById("cart-list");
       const textArea = document.getElementById("orderText");
       const totalElement = document.getElementById("cart-total");
+      const countElement = document.getElementById("cart-count");
       
       list.innerHTML = "";
       let content = "Đơn hàng của bạn:\n";
@@ -1530,6 +1545,7 @@
       
       textArea.value = content;
       totalElement.innerText = `Tổng tiền: ${total}k`;
+      countElement.textContent = cart.length;
     }
 
     function copyOrder() {
@@ -1556,9 +1572,11 @@
       window.open(zaloUrl, '_blank');
     }
     
+    // Mở giỏ hàng nếu có sản phẩm khi tải trang
     window.addEventListener('DOMContentLoaded', () => {
-      if (window.innerWidth <= 768) {
-        document.getElementById('cart').classList.add('collapsed');
+      if (cart.length > 0) {
+        document.getElementById('cart').classList.remove('collapsed');
+        document.getElementById('cart-toggle').textContent = '▼';
       }
     });
   </script>
