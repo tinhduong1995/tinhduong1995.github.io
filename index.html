@@ -206,31 +206,21 @@
       cursor: pointer;
     }
     
-    /* Cập nhật CSS cho search container */
+    /* New styles for search and delivery */
     #search-container {
       padding: 10px;
       background: #fff;
       position: sticky;
-      top: 80px; /* Đặt dưới header */
+      top: 100px;
       z-index: 5;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    
     #search-input {
       width: 100%;
-      padding: 8px 15px;
+      padding: 8px;
       border: 1px solid #ddd;
-      border-radius: 20px;
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.3s;
+      border-radius: 4px;
     }
-    
-    #search-input:focus {
-      border-color: #007BFF;
-      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
-    }
-    
     .delivery-info {
       margin-top: 15px;
       padding: 15px;
@@ -241,8 +231,7 @@
       margin-top: 0;
       color: #007BFF;
     }
-    .delivery-info input, 
-    .delivery-info textarea {
+    .delivery-info input, .delivery-info textarea {
       width: 100%;
       padding: 8px;
       margin-bottom: 10px;
@@ -282,16 +271,6 @@
         font-size: 1.2em;
         margin-left: 15px;
       }
-      
-      /* Điều chỉnh cho mobile */
-      #search-container {
-        top: 70px; /* Giảm khoảng cách trên mobile */
-        padding: 8px 10px;
-      }
-      #search-input {
-        padding: 6px 12px;
-        font-size: 14px;
-      }
     }
   </style>
 </head>
@@ -301,12 +280,12 @@
     <p>📍 Trung Mầu - Cổng Phụ Bá Thiện 2 | ☎ 0964 391 834 or 0928 020 777</p>
   </header>
 
-  <!-- Search box - Cố định khi cuộn -->
+  <!-- Search box -->
   <div id="search-container">
     <input type="text" id="search-input" placeholder="🔍 Tìm kiếm món...">
   </div>
 
-  <!-- Delivery info -->
+  <!-- Delivery info (hidden by default) -->
   <div id="delivery-section" class="delivery-info hidden">
     <h3>Thông tin giao hàng</h3>
     <input type="text" id="customer-name" placeholder="Họ tên">
@@ -314,6 +293,7 @@
     <textarea id="delivery-address" placeholder="Địa chỉ giao hàng"></textarea>
     <button onclick="toggleDeliveryInfo()">Đóng</button>
   </div>
+
   <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
@@ -1733,7 +1713,7 @@
       </div>
     </div>
 
-  <div id="cart" class="collapsed">
+<div id="cart" class="collapsed">
     <div id="cart-header" onclick="toggleCart()">
       <h2>🛒 Giỏ hàng (<span id="cart-count">0</span>)</h2>
       <button id="cart-toggle">▼</button>
@@ -1757,16 +1737,12 @@
   <script>
     let cart = [];
     
-    // Load cart from localStorage when page loads
+    // Load cart from localStorage
     function loadCart() {
       const savedCart = localStorage.getItem('biiCoffeeCart');
       if (savedCart) {
         cart = JSON.parse(savedCart);
         updateCart();
-        if (cart.length > 0) {
-          document.getElementById('cart').classList.remove('collapsed');
-          document.getElementById('cart-toggle').textContent = '▼';
-        }
       }
     }
     
@@ -1791,98 +1767,73 @@
           }
         });
         
-        // Show/hide category titles based on visible items
-        const categories = document.querySelectorAll('.menu-title');
-        categories.forEach(category => {
-          const categoryItems = category.nextElementSibling.querySelectorAll('.item');
-          const hasVisibleItems = Array.from(categoryItems).some(item => 
-            item.style.display !== 'none'
-          );
-          
-          if (hasVisibleItems) {
-            category.style.display = 'block';
-            category.nextElementSibling.style.display = 'block';
-          } else {
-            category.style.display = 'none';
-            category.nextElementSibling.style.display = 'none';
-          }
+        // Show/hide category titles
+        document.querySelectorAll('.menu-title').forEach(title => {
+          const hasVisibleItems = Array.from(title.nextElementSibling.querySelectorAll('.item'))
+            .some(item => item.style.display !== 'none');
+          title.style.display = hasVisibleItems ? 'block' : 'none';
         });
       });
     }
     
-    // Delivery info toggle
+    // Toggle delivery info
     function toggleDeliveryInfo() {
-      const deliverySection = document.getElementById('delivery-section');
-      deliverySection.classList.toggle('hidden');
+      document.getElementById('delivery-section').classList.toggle('hidden');
+      updateCart();
     }
     
     function toggleCart() {
       const cart = document.getElementById('cart');
-      const toggleBtn = document.getElementById('cart-toggle');
       cart.classList.toggle('collapsed');
-      toggleBtn.textContent = cart.classList.contains('collapsed') ? '▲' : '▼';
+      document.getElementById('cart-toggle').textContent = 
+        cart.classList.contains('collapsed') ? '▲' : '▼';
     }
     
     function changeQuantity(btn, delta) {
       const input = btn.parentElement.querySelector('.quantity-input');
       let newValue = parseInt(input.value) + delta;
-      if (newValue < 1) newValue = 1;
-      input.value = newValue;
+      input.value = newValue < 1 ? 1 : newValue;
     }
     
     function showNotification(message) {
       const notification = document.getElementById('notification');
       notification.textContent = message;
       notification.classList.add('show');
-      
-      setTimeout(() => {
-        notification.classList.remove('show');
-      }, 2000);
+      setTimeout(() => notification.classList.remove('show'), 2000);
     }
 
     function addToCart(button) {
-      const item = button.parentElement.parentElement;
-      const select = item.querySelector('select');
-      const quantityInput = item.querySelector('.quantity-input');
-      const noteInput = item.querySelector('.note-input');
+      const item = button.closest('.item');
+      const [select, quantityInput, noteInput] = [
+        item.querySelector('select'),
+        item.querySelector('.quantity-input'),
+        item.querySelector('.note-input')
+      ];
       
-      const selectedOption = select.options[select.selectedIndex];
-      const value = selectedOption.value;
-      const name = item.querySelector('.item-name').textContent;
-      const quantity = parseInt(quantityInput.value);
-      const note = noteInput.value;
+      const option = select.options[select.selectedIndex];
+      const price = parseInt(option.value.match(/(\d+)k/)[1]);
       
-      const priceMatch = value.match(/(\d+)k/);
-      const price = priceMatch ? parseInt(priceMatch[1]) : 0;
+      const cartItem = {
+        name: item.querySelector('.item-name').textContent,
+        text: option.value,
+        price: price,
+        quantity: parseInt(quantityInput.value),
+        note: noteInput.value
+      };
       
-      // Check if item already exists in cart
-      const existingItemIndex = cart.findIndex(item => item.text === value && item.note === note);
-      
-      if (existingItemIndex >= 0) {
-        // Update quantity if same item with same note exists
-        cart[existingItemIndex].quantity += quantity;
-        showNotification(`Đã cập nhật số lượng ${name} trong giỏ hàng!`);
+      const existingIndex = cart.findIndex(i => i.text === cartItem.text && i.note === cartItem.note);
+      if (existingIndex >= 0) {
+        cart[existingIndex].quantity += cartItem.quantity;
+        showNotification(`Đã cập nhật số lượng ${cartItem.name}`);
       } else {
-        // Add new item to cart
-        cart.push({
-          name: name,
-          text: value,
-          price: price,
-          quantity: quantity,
-          note: note
-        });
-        showNotification(`Đã thêm ${name} vào giỏ hàng!`);
+        cart.push(cartItem);
+        showNotification(`Đã thêm ${cartItem.name} vào giỏ`);
       }
       
-      updateCart();
       noteInput.value = '';
-      
-      // Save to localStorage
+      updateCart();
       saveCart();
-      
-      // Open cart when adding items
       document.getElementById('cart').classList.remove('collapsed');
-      document.getElementById('cart-toggle').textContent = '▼';
     }
 
     function removeFromCart(index) {
@@ -1892,16 +1843,18 @@
     }
 
     function updateCart() {
-      const list = document.getElementById("cart-list");
-      const textArea = document.getElementById("orderText");
-      const totalElement = document.getElementById("cart-total");
-      const countElement = document.getElementById("cart-count");
+      const [list, textArea, totalElement, countElement] = [
+        document.getElementById("cart-list"),
+        document.getElementById("orderText"),
+        document.getElementById("cart-total"),
+        document.getElementById("cart-count")
+      ];
       
       list.innerHTML = "";
       let content = "Đơn hàng của bạn:\n";
       let total = 0;
       
-      // Add delivery info if available
+      // Thêm thông tin giao hàng nếu có
       const customerName = document.getElementById('customer-name').value;
       const customerPhone = document.getElementById('customer-phone').value;
       const deliveryAddress = document.getElementById('delivery-address').value;
@@ -1914,93 +1867,60 @@
         content += "\n";
       }
       
-      // Add cart items
+      // Thêm các món vào đơn hàng
       cart.forEach((item, index) => {
         const itemTotal = item.price * item.quantity;
         total += itemTotal;
         
         content += `${index + 1}. ${item.text} x${item.quantity} - ${itemTotal}k`;
-        if (item.note) {
-          content += ` (Ghi chú: ${item.note})`;
-        }
+        if (item.note) content += ` (Ghi chú: ${item.note})`;
         content += "\n";
         
         const li = document.createElement("li");
         li.className = "cart-item";
-        
-        const itemInfo = document.createElement("div");
-        itemInfo.className = "cart-item-details";
-        
-        const itemName = document.createElement("div");
-        itemName.className = "cart-item-name";
-        itemName.innerText = item.name;
-        
-        const itemDesc = document.createElement("div");
-        itemDesc.innerText = `${item.text} x${item.quantity}`;
-        if (item.note) {
-          const itemNote = document.createElement("div");
-          itemNote.className = "cart-note";
-          itemNote.innerText = `Ghi chú: ${item.note}`;
-          itemDesc.appendChild(itemNote);
-        }
-        
-        const itemPrice = document.createElement("div");
-        itemPrice.className = "cart-item-price";
-        itemPrice.innerText = `${itemTotal}k`;
-        
-        const removeBtn = document.createElement("button");
-        removeBtn.className = "remove-btn";
-        removeBtn.innerText = "Xóa";
-        removeBtn.onclick = () => removeFromCart(index);
-        
-        itemInfo.appendChild(itemName);
-        itemInfo.appendChild(itemDesc);
-        li.appendChild(itemInfo);
-        li.appendChild(itemPrice);
-        li.appendChild(removeBtn);
+        li.innerHTML = `
+          <div class="cart-item-details">
+            <div class="cart-item-name">${item.name}</div>
+            <div>${item.text} x${item.quantity}
+              ${item.note ? `<div class="cart-note">Ghi chú: ${item.note}</div>` : ''}
+            </div>
+          </div>
+          <div class="cart-item-price">${itemTotal}k</div>
+          <button class="remove-btn" onclick="removeFromCart(${index})">Xóa</button>
+        `;
         list.appendChild(li);
       });
       
       textArea.value = content;
-      totalElement.innerText = `Tổng tiền: ${total}k`;
+      totalElement.textContent = `Tổng tiền: ${total}k`;
       countElement.textContent = cart.length;
     }
 
     function copyOrder() {
-      const text = document.getElementById("orderText");
-      text.select();
+      document.getElementById("orderText").select();
       document.execCommand("copy");
       showNotification("Đã sao chép đơn hàng!");
     }
 
     function sendToZalo() {
-      if (cart.length === 0) {
-        showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
+      if (!cart.length) {
+        showNotification("Vui lòng thêm món vào giỏ hàng!");
         return;
       }
       
-      const textArea = document.getElementById("orderText");
+      const text = document.getElementById("orderText").value;
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const message = encodeURIComponent(`${text}\nTổng tiền: ${total}k`);
       
-      // Add delivery info to message
-      let orderMessage = `Xin chào, mình muốn đặt:\n${textArea.value}\nTổng tiền: ${total}k`;
-      
-      const zaloPhone = "0964391834";
-      const encodedMessage = encodeURIComponent(orderMessage);
-      const zaloUrl = `https://zalo.me/${zaloPhone}?text=${encodedMessage}`;
-      
-      window.open(zaloUrl, '_blank');
+      window.open(`https://zalo.me/0964391834?text=${message}`, '_blank');
     }
     
-    // Initialize when page loads
+    // Khởi tạo khi trang tải xong
     window.addEventListener('DOMContentLoaded', () => {
       loadCart();
       setupSearch();
-      
-      // Show cart if not empty
-      if (cart.length > 0) {
+      if (cart.length) {
         document.getElementById('cart').classList.remove('collapsed');
-        document.getElementById('cart-toggle').textContent = '▼';
       }
     });
   </script>
