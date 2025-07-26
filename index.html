@@ -20,6 +20,30 @@
       top: 0;
       z-index: 10;
     }
+    .nav-bar {
+      position: sticky;
+      top: 80px;
+      background: white;
+      padding: 10px 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 9;
+      display: flex;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .nav-item {
+      padding: 8px 15px;
+      margin: 0 5px;
+      background: #f0f0f0;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+    }
+    .nav-item:hover, .nav-item.active {
+      background: #007BFF;
+      color: white;
+    }
     .menu-container {
       display: flex;
       flex-direction: column;
@@ -28,6 +52,7 @@
     }
     .menu-section {
       margin-bottom: 20px;
+      scroll-margin-top: 140px;
     }
     .menu-title {
       color: #007BFF; 
@@ -59,6 +84,35 @@
     }
     .item select, .item button, .item input { 
       margin-left: 10px; 
+    }
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+    }
+    .quantity-btn {
+      width: 25px;
+      height: 25px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .quantity-input { 
+      width: 40px; 
+      text-align: center; 
+      margin: 0 5px;
+    }
+    .note-input { 
+      flex-grow: 1; 
+      margin-left: 10px; 
+      padding: 5px; 
+      border: 1px solid #ddd; 
+      border-radius: 4px; 
+      font-size: 0.9em;
     }
     #cart { 
       position: fixed;
@@ -127,35 +181,6 @@
       padding-top: 10px; 
       border-top: 1px dashed #ccc; 
     }
-    .quantity-controls {
-      display: flex;
-      align-items: center;
-    }
-    .quantity-btn {
-      width: 25px;
-      height: 25px;
-      background: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .quantity-input { 
-      width: 40px; 
-      text-align: center; 
-      margin: 0 5px;
-    }
-    .note-input { 
-      flex-grow: 1; 
-      margin-left: 10px; 
-      padding: 5px; 
-      border: 1px solid #ddd; 
-      border-radius: 4px; 
-      font-size: 0.9em;
-    }
     .cart-note { 
       font-size: 0.8em; 
       color: #666; 
@@ -205,6 +230,32 @@
       font-size: 1.2em;
       cursor: pointer;
     }
+    .order-methods {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .order-methods button {
+      flex: 1;
+      min-width: 120px;
+    }
+    #server-response {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
     
     @media screen and (max-width: 600px) {
       #cart {
@@ -235,6 +286,12 @@
         font-size: 1.2em;
         margin-left: 15px;
       }
+      .nav-bar {
+        top: 70px;
+      }
+      .menu-section {
+        scroll-margin-top: 120px;
+      }
     }
   </style>
 </head>
@@ -244,1426 +301,159 @@
     <p>📍 Trung Mầu - Cổng Phụ Bá Thiện 2 | ☎ 0964 391 834 or 0928 020 777</p>
   </header>
 
-  <div class="menu-group">
-    <h2>TRÀ</h2>
-        <div class="item">
-      <span class="item-name">Trà chanh</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà chanh - M - 10k">Size M - 10k</option>
-          <option value="Trà chanh - L - 15k">Size L - 15k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
+  <!-- Thanh điều hướng -->
+  <div class="nav-bar" id="navBar">
+    <!-- Các nút sẽ được thêm bằng JavaScript -->
+  </div>
+
+  <div class="menu-container">
+    <!-- Nhóm Trà -->
+    <div class="menu-section" id="tra">
+      <h2 class="menu-title">Trà</h2>
+      <div class="item">
+        <span class="item-name">Trà chanh</span>
+        <div class="item-controls">
+          <select>
+            <option value="Trà chanh - M - 10k">Size M - 10k</option>
+            <option value="Trà chanh - L - 15k">Size L - 15k</option>
+          </select>
+          <div class="quantity-controls">
+            <button class="quantity-btn minus" onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" class="quantity-input" value="1" min="1">
+            <button class="quantity-btn plus" onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <input type="text" class="note-input" placeholder="Ghi chú...">
+          <button onclick="addToCart(this)">Thêm</button>
+        </div>
+      </div>
+      <div class="item">
+        <span class="item-name">Trà đào</span>
+        <div class="item-controls">
+          <select>
+            <option value="Trà đào - M - 20k">Size M - 20k</option>
+            <option value="Trà đào - L - 25k">Size L - 25k</option>
+          </select>
+          <div class="quantity-controls">
+            <button class="quantity-btn minus" onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" class="quantity-input" value="1" min="1">
+            <button class="quantity-btn plus" onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <input type="text" class="note-input" placeholder="Ghi chú...">
+          <button onclick="addToCart(this)">Thêm</button>
         </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-    <div class="item">
-      <span class="item-name">Trà chanh nha đam</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà chanh nha đam - M - 15k">Size M - 15k</option>
-          <option value="Trà chanh nha đam - L - 20k">Size L - 20k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-    <div class="item">
-      <span class="item-name">Trà quất</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà quất - M - 10k">Size M - 10k</option>
-          <option value="Trà quất - L - 15k">Size L - 15k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-<div class="item">
-      <span class="item-name">Trà quất nha đam</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà quất nha đam - M - 15k">Size M - 15k</option>
-          <option value="Trà quất nha đam - L - 20k">Size L - 20k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-    <div class="item">
-      <span class="item-name">Trà dưa lưới</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà dưa lưới - M - 20k">Size M - 20k</option>
-          <option value="Trà dưa lưới - L - 25k">Size L - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-    <div class="item">
-      <span class="item-name">Trà đào</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà đào - M - 20k">Size M - 20k</option>
-          <option value="Trà đào - L - 25k">Size L - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà đào cam xả</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà đào cam xả - M - 25k">Size M - 25k</option>
-          <option value="Trà đào cam xả - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà quất lắc sữa</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà quất lắc sữa - M - 25k">Size M - 25k</option>
-          <option value="Trà quất lắc sữa - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà táo xanh</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà táo xanh - M - 25k">Size M - 25k</option>
-          <option value="Trà táo xanh - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà vải</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà vải - M - 25k">Size M - 25k</option>
-          <option value="Trà vải - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà dâu</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà dâu - M - 25k">Size M - 25k</option>
-          <option value="Trà dâu - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà hoa quả nhiệt đới</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà hoa quả nhiệt đới - M - 25k">Size M - 25k</option>
-          <option value="Trà hoa quả nhiệt đới - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà chanh bạc hà</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà chanh bạc hà - M - 20k">Size M - 20k</option>
-          <option value="Trà chanh bạc hà - L - 25k">Size L - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà chanh dâu</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà chanh dâu - M - 20k">Size M - 20k</option>
-          <option value="Trà chanh dâu - L - 25k">Size L - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà xoài chanh leo</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà xoài chanh leo - M - 20k">Size M - 20k</option>
-          <option value="Trà xoài chanh leo - L - 25k">Size L - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà đào chanh dây</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà đào chanh dây - M - 20k">Size M - 20k</option>
-          <option value="Trà đào chanh dây - L - 25k">Size L - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà đào nhài</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà đào nhài - M - 20k">Size M - 20k</option>
-          <option value="Trà đào nhài - L - 25k">Size L - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà chanh leo</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà chanh leo - M - 20k">Size M - 20k</option>
-          <option value="Trà chanh leo - L - 25k">Size L - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-<h2>SODA</h2>
-        <div class="item">
-      <span class="item-name">Soda việt quất</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Soda việt quất - M - 20k">Size M - 20k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Soda bạc hà</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Soda bạc hà - M - 20k">Size M - 20k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Soda dâu</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Soda dâu - M - 20k">Size M - 20k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Soda dưa lưới</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Soda dưa lưới - M - 20k">Size M - 20k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-<h2>SINH TỐ</h2>
-        <div class="item">
-      <span class="item-name">Sinh tố bơ</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Sinh tố bơ - M - 30k">Size M - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Sinh tố xoài</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Sinh tố xoài - M - 30k">Size M - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Sinh tố dâu tây</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Sinh tố dâu tây - M - 30k">Size M - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-<h2>ĐÁ XAY</h2>
-        <div class="item">
-      <span class="item-name">Đá xay việt quất</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Đá xay việt quất - M - 35k">Size M - 35k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Đá xay matcha</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Đá xay matcha - M - 35k">Size M - 35k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Đá xay bạc hà</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Đá xay bạc hà - M - 35k">Size M - 35k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Đá xay khoai môn</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Đá xay khoai môn - M - 35k">Size M - 35k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-<h2>CÀ PHÊ</h2>
-        <div class="item">
-      <span class="item-name">Cà phê bạc xỉu</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Cà phê bạc xỉu - M - 25k">Size M - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Cà phê nâu sữa</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Cà phê nâu sữa - M - 20k">Size M - 20k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Cà phê nâu nóng</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Cà phê nâu nóng - M - 20k">Size M - 20k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-<h2>TRÀ SỮA</h2>
-        <div class="item">
-      <span class="item-name">Trà sữa khoai môn</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa khoai môn - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa khoai môn - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa sốt xoài</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa sốt xoài - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa sốt xoài - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa socola</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa socala - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa socola - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa matcha</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa matcha - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa matcha - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa dưa lưới</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa dưa lưới - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa dưa lưới - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa hồng trà sữa</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa hồng trà sữa - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa hồng trà sữa - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa dâu</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa dâu - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa dâu - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa đào</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa đào - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa đào - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa dừa</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa dừa - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa dừa - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa lá nếp</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa lá nếp - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa lá nếp - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa táo xanh</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa táo xanh - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa táo xanh - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa caramen</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa caramen - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa caramen - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa hạt dẻ</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa hạt dẻ - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa hạt dẻ - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa socola</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa cacao - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa cacao - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa việt quất</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa việt quất - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa việt quất - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa matcha latte</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa matcha latte - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa matcha latte - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa bạc hà</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa bạc hà - M - 25k">Size M - 25k</option>
-          <option value="Trà sữa bạc hà - L - 30k">Size L - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa khoai lang tím</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa khoai lang tím - M - 30k">Size M - 30k</option>
-          <option value="Trà sữa khoai lang tím - L - 35k">Size L - 35k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa trân châu đường đen</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa trân châu đường đen - M - 30k">Size M - 30k</option>
-          <option value="Trà sữa trân châu đường đen - L - 35k">Size L - 35k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa kem trứng dừa nướng</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa kem trứng dừa nướng - M - 30k">Size M - 30k</option>
-          <option value="Trà sữa kem trứng dừa nướng - L - 35k">Size L - 35k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa sốt xoài kem bông</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa sốt xoài kem bông - M - 30k">Size M - 30k</option>
-          <option value="Trà sữa sốt xoài kem bông - L - 35k">Size L - 35k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa xoài matcha</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa xoài matcha - M - 30k">Size M - 30k</option>
-          <option value="Trà sữa xoài matcha - L - 35k">Size L - 35k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa khoai môn kem dừa nướng</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa khoai môn kem dừa nướng - M - 30k">Size M - 30k</option>
-          <option value="Trà sữa khoai môn kem dừa nướng - L - 35k">Size L - 35k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa đường đen kem dừa nướng</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa đường đen kem dừa nướng - M - 30k">Size M - 30k</option>
-          <option value="Trà sữa đường đen kem dừa nướng - L - 35k">Size L - 35k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Trà sữa khoai lang tím kem trứng</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà sữa khoai lang tím kem trứng - M - 35k">Size M - 35k</option>
-          <option value="Trà sữa khoai lang tím kem trứng - L - 40k">Size L - 40k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-<h2>SỮA CHUA</h2>
-        <div class="item">
-      <span class="item-name">Sữa chua lắc dâu</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Sữa chua lắc dâu - M - 25k">Size M - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Sữa chua lắc xoài</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Sữa chua lắc xoài - M - 25k">Size M - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Sữa chua lắc việt quất</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Sữa chua lắc việt quất - M - 25k">Size M - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Sữa chua hoa quả</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Sữa chua hoa quả - M - 30k">Size M - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-<h2>NƯỚC ÉP</h2>
-        <div class="item">
-      <span class="item-name">Nước ép cam</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Nước ép cam - M - 25k">Size M - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Nước ép dưa hấu</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Nước ép dưa hấu - M - 25k">Size M - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Nước ép dứa</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Nước ép dứa - M - 25k">Size M - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-<h2>PIZZA</h2>
-        <div class="item">
-      <span class="item-name">Pizza xúc xích</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Pizza xúc xích - size 18 - 60k">Size 18 - 60k</option>
-          <option value="Pizza xúc xích - size 21 - 85k">Size 21 - 85k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Pizza bò ngô</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Pizza bò ngô - size 18 - 60k">Size 18 - 60k</option>
-          <option value="Pizza bò ngô - size 21 - 90k">Size 21 - 90k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Pizza thập cẩm</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Pizza thập cẩm - size 18 - 60k">Size 18 - 60k</option>
-          <option value="Pizza thập cẩm - size 21 - 90k">Size 21 - 90k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-<h2>ĐỒ ĂN VẶT</h2>
-        <div class="item">
-      <span class="item-name">Xúc xích</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Xúc xích - size 1 - 08k">Size 1 - 08k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Lạp xưởng</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Lạp xưởng - size 1 - 08k">Size 1 - 08k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Phô mai que</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Phô mai que - size 1 - 08k">Size 1 - 08k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Hướng dương</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Hướng dương đen - size 1 - 15k">Đen - 15k</option>
-          <option value="Hướng dương trắng - size 1 - 15k">Trắng - 15k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Khoai lang kén</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Khoai lang kén - size 1 - 25k">Đĩa - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Khoai tây chiên</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Khoai tây chiên - size 1 - 25k">Đĩa - 25k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Nem chua rán</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Nem chua rán - size 1 - 30k">Đĩa - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Khoai môn lệ phố</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Khoai môn lệ phố - size 1 - 30k">Đĩa - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Mực vòng chiên</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Mực vòng chiên - size 1 - 30k">Đĩa - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-    <div class="item">
-      <span class="item-name">Gà viên chiên</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Gà viên chiên - size 1 - 30k">Thường - 30k</option>
-          <option value="Gà viên chiên - size 1 - 35k">Sốt cay - 35k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Đùi gà KFC</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Đùi gà KFC - size 1 - 25k">Thường - 25k</option>
-          <option value="Đùi gà gà KFC - size 1 - 30k">Sốt cay - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Cánh gà KFC</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Cánh gà KFC - size 1 - 25k">Thường - 25k</option>
-          <option value="Cánh gà KFC - size 1 - 30k">Sốt cay - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Cá viên chiên</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Cá viên chiên - size 1 - 25k">Thường - 25k</option>
-          <option value="Cá viên chiên - size 1 - 30k">Sốt cay - 30k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-<h2>MỲ CAY</h2>
-        <div class="item">
-      <span class="item-name">Mỳ xúc xích</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 0 - 40k</option>
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 1 - 40k</option>
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 2 - 40k</option>
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 3 - 40k</option>
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 4 - 40k</option>
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 5 - 40k</option>
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 6 - 40k</option>
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 7 - 40k</option>
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 8 - 40k</option>
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 9 - 40k</option>
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 10 - 40k</option>
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 11 - 40k</option>
-          <option value="Mỳ xúc xích - size 1 - 40k">Cấp 12 - 40k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Mỳ bò</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Mỳ bò - size 1 - 45k">Cấp 0 - 45k</option>
-          <option value="Mỳ bò - size 1 - 45k">Cấp 1 - 45k</option>
-          <option value="Mỳ bò - size 1 - 45k">Cấp 2 - 45k</option>
-          <option value="Mỳ bò - size 1 - 45k">Cấp 3 - 45k</option>
-          <option value="Mỳ bò - size 1 - 45k">Cấp 4 - 45k</option>
-          <option value="Mỳ bò - size 1 - 45k">Cấp 5 - 45k</option>
-          <option value="Mỳ bò - size 1 - 45k">Cấp 6 - 45k</option>
-          <option value="Mỳ bò - size 1 - 45k">Cấp 7 - 45k</option>
-          <option value="Mỳ bò - size 1 - 45k">Cấp 8 - 45k</option>
-          <option value="Mỳ bò - size 1 - 45k">Cấp 9 - 45k</option>
-          <option value="Mỳ bò - size 1 - 45k">Cấp 10 - 45k</option>
-          <option value="Mỳ bò - size 1 - 45k">Cấp 11 - 45k</option>
-          <option value="Mỳ bò - size 1 - 45k">Cấp 12 - 45k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Mỳ sường sụn</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 0 - 45k</option>
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 1 - 45k</option>
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 2 - 45k</option>
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 3 - 45k</option>
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 4 - 45k</option>
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 5 - 45k</option>
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 6 - 45k</option>
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 7 - 45k</option>
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 8 - 45k</option>
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 9 - 45k</option>
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 10 - 45k</option>
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 11 - 45k</option>
-          <option value="Mỳ sườn sụn - size 1 - 45k">Cấp 12 - 4k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">hải sản</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 0 - 50k</option>
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 1 - 50k</option>
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 2 - 50k</option>
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 3 - 50k</option>
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 4 - 50k</option>
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 5 - 50k</option>
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 6 - 50k</option>
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 7 - 50k</option>
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 8 - 50k</option>
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 9 - 50k</option>
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 10 - 50k</option>
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 11 - 50k</option>
-          <option value="Mỳ hải sản - size 1 - 50k">Cấp 12 - 50k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-        <div class="item">
-      <span class="item-name">Mỳ thập cẩm</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 0 - 55k</option>
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 1 - 55k</option>
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 2 - 55k</option>
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 3 - 55k</option>
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 4 - 55k</option>
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 5 - 55k</option>
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 6 - 55k</option>
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 7 - 55k</option>
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 8 - 55k</option>
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 9 - 55k</option>
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 10 - 55k</option>
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 11 - 55k</option>
-          <option value="Mỳ thập cẩm - size 1 - 55k">Cấp 12 - 55k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
-      </div>
-    </div>
-<h2>BÚN ĐẬU</h2>
-        <div class="item">
-      <span class="item-name">Bún đậu</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Bún đậu - size 1 - 35k">Đầy đủ - 35k</option>
-          <option value="Bún đậu - size 1 - 40k">Thêm bún - 40k</option>
-          <option value="Bún đậu - size 1 - 40k">Thêm đậu  -40k</option>
-          <option value="Bún đậu - size 1 - 45k">Thêm chả cốm - 45k</option>
-          <option value="Bún đậu - size 1 - 45k">Thêm dồi sụn - 45k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
-        </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
       </div>
     </div>
 
-<div id="cart" class="collapsed">
+    <!-- Nhóm Trà sữa -->
+    <div class="menu-section" id="tra-sua">
+      <h2 class="menu-title">Trà sữa</h2>
+      <div class="item">
+        <span class="item-name">Trà sữa truyền thống</span>
+        <div class="item-controls">
+          <select>
+            <option value="Trà sữa truyền thống - M - 25k">Size M - 25k</option>
+            <option value="Trà sữa truyền thống - L - 30k">Size L - 30k</option>
+          </select>
+          <div class="quantity-controls">
+            <button class="quantity-btn minus" onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" class="quantity-input" value="1" min="1">
+            <button class="quantity-btn plus" onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <input type="text" class="note-input" placeholder="Ghi chú...">
+          <button onclick="addToCart(this)">Thêm</button>
+        </div>
+      </div>
+      <div class="item">
+        <span class="item-name">Trà sữa trân châu</span>
+        <div class="item-controls">
+          <select>
+            <option value="Trà sữa trân châu - M - 30k">Size M - 30k</option>
+            <option value="Trà sữa trân châu - L - 35k">Size L - 35k</option>
+          </select>
+          <div class="quantity-controls">
+            <button class="quantity-btn minus" onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" class="quantity-input" value="1" min="1">
+            <button class="quantity-btn plus" onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <input type="text" class="note-input" placeholder="Ghi chú...">
+          <button onclick="addToCart(this)">Thêm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nhóm Coffee -->
+    <div class="menu-section" id="coffee">
+      <h2 class="menu-title">Coffee</h2>
+      <div class="item">
+        <span class="item-name">Cà phê đen</span>
+        <div class="item-controls">
+          <select>
+            <option value="Cà phê đen - 20k">20k</option>
+          </select>
+          <div class="quantity-controls">
+            <button class="quantity-btn minus" onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" class="quantity-input" value="1" min="1">
+            <button class="quantity-btn plus" onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <input type="text" class="note-input" placeholder="Ghi chú...">
+          <button onclick="addToCart(this)">Thêm</button>
+        </div>
+      </div>
+      <div class="item">
+        <span class="item-name">Bạc xỉu</span>
+        <div class="item-controls">
+          <select>
+            <option value="Bạc xỉu - 25k">25k</option>
+          </select>
+          <div class="quantity-controls">
+            <button class="quantity-btn minus" onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" class="quantity-input" value="1" min="1">
+            <button class="quantity-btn plus" onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <input type="text" class="note-input" placeholder="Ghi chú...">
+          <button onclick="addToCart(this)">Thêm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nhóm Sinh tố -->
+    <div class="menu-section" id="sinh-to">
+      <h2 class="menu-title">Sinh tố</h2>
+      <div class="item">
+        <span class="item-name">Sinh tố bơ</span>
+        <div class="item-controls">
+          <select>
+            <option value="Sinh tố bơ - 30k">30k</option>
+          </select>
+          <div class="quantity-controls">
+            <button class="quantity-btn minus" onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" class="quantity-input" value="1" min="1">
+            <button class="quantity-btn plus" onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <input type="text" class="note-input" placeholder="Ghi chú...">
+          <button onclick="addToCart(this)">Thêm</button>
+        </div>
+      </div>
+      <div class="item">
+        <span class="item-name">Sinh tố dâu</span>
+        <div class="item-controls">
+          <select>
+            <option value="Sinh tố dâu - 30k">30k</option>
+          </select>
+          <div class="quantity-controls">
+            <button class="quantity-btn minus" onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" class="quantity-input" value="1" min="1">
+            <button class="quantity-btn plus" onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <input type="text" class="note-input" placeholder="Ghi chú...">
+          <button onclick="addToCart(this)">Thêm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Giỏ hàng -->
+  <div id="cart" class="collapsed">
     <div id="cart-header" onclick="toggleCart()">
       <h2>🛒 Giỏ hàng (<span id="cart-count">0</span>)</h2>
       <button id="cart-toggle">▼</button>
@@ -1675,9 +465,20 @@
       </div>
       <ul id="cart-list"></ul>
       <div id="cart-total" class="total">Tổng tiền: 0đ</div>
-      <textarea id="orderText" rows="4" placeholder="Đơn hàng sẽ hiển thị ở đây..." readonly></textarea><br/>
-      <button onclick="copyOrder()">📋 Sao chép đơn</button>
-      <button onclick="sendToZalo()" style="background:#0088cc">📤 Gửi Zalo</button>
+      <textarea id="orderText" rows="4" placeholder="Đơn hàng sẽ hiển thị ở đây..." readonly></textarea>
+      
+      <div style="margin-top: 10px;">
+        <input type="text" id="customer-name" placeholder="Tên khách hàng" style="width: 100%; padding: 8px; margin-bottom: 5px; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="tel" id="customer-phone" placeholder="Số điện thoại" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+      </div>
+      
+      <div class="order-methods">
+        <button onclick="copyOrder()">📋 Sao chép đơn</button>
+        <button onclick="sendToZalo()" style="background:#0088cc">📤 Gửi Zalo</button>
+        <button onclick="sendToServer()" style="background:#6c757d">📦 Gửi về máy chủ</button>
+      </div>
+      
+      <div id="server-response"></div>
     </div>
   </div>
 
@@ -1685,6 +486,64 @@
 
   <script>
     let cart = [];
+    
+    // Khởi tạo thanh điều hướng
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuGroups = [
+        { id: 'tra', name: 'Trà' },
+        { id: 'tra-sua', name: 'Trà sữa' },
+        { id: 'coffee', name: 'Coffee' },
+        { id: 'sinh-to', name: 'Sinh tố' }
+      ];
+      
+      const navBar = document.getElementById('navBar');
+      
+      menuGroups.forEach(group => {
+        const navItem = document.createElement('div');
+        navItem.className = 'nav-item';
+        navItem.textContent = group.name;
+        navItem.onclick = () => {
+          document.getElementById(group.id).scrollIntoView({
+            behavior: 'smooth'
+          });
+          
+          document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+          });
+          navItem.classList.add('active');
+        };
+        navBar.appendChild(navItem);
+      });
+      
+      // Highlight nút khi cuộn
+      const menuSections = document.querySelectorAll('.menu-section');
+      
+      window.addEventListener('scroll', function() {
+        let current = '';
+        
+        menuSections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          const sectionHeight = section.clientHeight;
+          
+          if (pageYOffset >= (sectionTop - 150)) {
+            current = section.getAttribute('id');
+          }
+        });
+        
+        document.querySelectorAll('.nav-item').forEach(item => {
+          item.classList.remove('active');
+          if (item.textContent.toLowerCase().replace(' ', '-') === current) {
+            item.classList.add('active');
+          }
+        });
+      });
+      
+      // Mở giỏ hàng nếu có sản phẩm
+      if (cart.length > 0) {
+        document.getElementById('cart').classList.remove('collapsed');
+        document.getElementById('cart-toggle').textContent = '▼';
+      }
+    });
     
     function toggleCart() {
       const cart = document.getElementById('cart');
@@ -1838,9 +697,17 @@
         return;
       }
       
+      const customerName = document.getElementById('customer-name').value.trim();
+      const customerPhone = document.getElementById('customer-phone').value.trim();
+      
+      if (!customerName || !customerPhone) {
+        alert("Vui lòng nhập đầy đủ tên và số điện thoại!");
+        return;
+      }
+      
       const textArea = document.getElementById("orderText");
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const orderMessage = `Xin chào, mình muốn đặt:\n${textArea.value}\nTổng tiền: ${total}k`;
+      const orderMessage = `Xin chào, mình muốn đặt:\n${textArea.value}\nTổng tiền: ${total}k\n\nThông tin khách hàng:\nTên: ${customerName}\nSĐT: ${customerPhone}`;
       
       const zaloPhone = "0964391834";
       const encodedMessage = encodeURIComponent(orderMessage);
@@ -1848,14 +715,72 @@
       
       window.open(zaloUrl, '_blank');
     }
-    
-    // Mở giỏ hàng nếu có sản phẩm khi tải trang
-    window.addEventListener('DOMContentLoaded', () => {
-      if (cart.length > 0) {
-        document.getElementById('cart').classList.remove('collapsed');
-        document.getElementById('cart-toggle').textContent = '▼';
+
+    async function sendToServer() {
+      if (cart.length === 0) {
+        alert("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
+        return;
       }
-    });
+      
+      const customerName = document.getElementById('customer-name').value.trim();
+      const customerPhone = document.getElementById('customer-phone').value.trim();
+      
+      if (!customerName || !customerPhone) {
+        alert("Vui lòng nhập đầy đủ tên và số điện thoại!");
+        return;
+      }
+      
+      const responseDiv = document.getElementById('server-response');
+      responseDiv.style.display = 'none';
+      
+      const orderData = {
+        customer: {
+          name: customerName,
+          phone: customerPhone
+        },
+        items: cart.map(item => ({
+          name: item.name,
+          description: item.text,
+          price: item.price,
+          quantity: item.quantity,
+          note: item.note || ''
+        })),
+        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+        timestamp: new Date().toISOString()
+      };
+      
+      try {
+        // Thay đổi URL này thành endpoint thực tế của bạn
+        const response = await fetch('https://your-server-endpoint.com/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(orderData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          responseDiv.textContent = 'Đã gửi đơn hàng thành công!';
+          responseDiv.className = 'success';
+          responseDiv.style.display = 'block';
+          
+          // Xóa giỏ hàng sau khi gửi thành công
+          cart = [];
+          updateCart();
+          document.getElementById('customer-name').value = '';
+          document.getElementById('customer-phone').value = '';
+        } else {
+          throw new Error(result.message || 'Lỗi khi gửi đơn hàng');
+        }
+      } catch (error) {
+        responseDiv.textContent = 'Lỗi: ' + error.message;
+        responseDiv.className = 'error';
+        responseDiv.style.display = 'block';
+        console.error('Lỗi khi gửi đơn:', error);
+      }
+    }
   </script>
 </body>
 </html>
