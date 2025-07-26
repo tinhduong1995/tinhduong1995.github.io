@@ -1443,6 +1443,13 @@
       toggleBtn.textContent = cart.classList.contains('collapsed') ? '▲' : '▼';
     }
     
+    function changeQuantity(btn, delta) {
+      const input = btn.parentElement.querySelector('.quantity-input');
+      let newValue = parseInt(input.value) + delta;
+      if (newValue < 1) newValue = 1;
+      input.value = newValue;
+    }
+    
     function showNotification(message) {
       const notification = document.getElementById('notification');
       notification.textContent = message;
@@ -1468,17 +1475,34 @@
       const priceMatch = value.match(/(\d+)k/);
       const price = priceMatch ? parseInt(priceMatch[1]) : 0;
       
-      cart.push({
-        name: name,
-        text: value,
-        price: price,
-        quantity: quantity,
-        note: note
-      });
+      // Kiểm tra xem món đã có trong giỏ chưa
+      const existingItemIndex = cart.findIndex(item => item.text === value);
+      
+      if (existingItemIndex >= 0) {
+        // Nếu đã có thì cộng dồn số lượng và thêm ghi chú nếu có
+        cart[existingItemIndex].quantity += quantity;
+        if (note) {
+          if (cart[existingItemIndex].note) {
+            cart[existingItemIndex].note += `, ${note}`;
+          } else {
+            cart[existingItemIndex].note = note;
+          }
+        }
+        showNotification(`Đã cập nhật số lượng ${name} trong giỏ hàng!`);
+      } else {
+        // Nếu chưa có thì thêm mới
+        cart.push({
+          name: name,
+          text: value,
+          price: price,
+          quantity: quantity,
+          note: note
+        });
+        showNotification(`Đã thêm ${name} vào giỏ hàng!`);
+      }
       
       updateCart();
       noteInput.value = '';
-      showNotification(`Đã thêm ${name} vào giỏ hàng!`);
       
       // Mở giỏ hàng khi thêm món
       document.getElementById('cart').classList.remove('collapsed');
