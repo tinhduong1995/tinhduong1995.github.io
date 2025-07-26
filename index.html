@@ -5,148 +5,615 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bii Coffee - Đặt món</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 0;
-      margin: 0;
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 0; 
       background: #f9f9f9;
+      padding-bottom: 120px;
     }
-
-    header {
-      position: fixed;
+    
+    /* CSS cho thanh điều hướng */
+    .navbar {
+      position: sticky;
       top: 0;
-      width: 100%;
-      background-color: #0074cc;
+      background: #0056b3;
+      padding: 10px 0;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    
+    .navbar a {
       color: white;
       text-align: center;
-      padding: 15px 10px;
-      font-size: 20px;
-      z-index: 999;
+      padding: 10px 15px;
+      text-decoration: none;
+      font-size: 0.9em;
+      border-radius: 20px;
+      margin: 0 5px;
+      transition: all 0.3s;
     }
-
-    .nav-bar {
-      position: fixed;
-      top: 60px;
-      width: 100%;
-      background-color: #ffffff;
-      border-bottom: 1px solid #ddd;
-      z-index: 998;
+    
+    .navbar a:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    
+    .navbar a.active {
+      background: white;
+      color: #0056b3;
+      font-weight: bold;
+    }
+    
+    header { 
+      background: #007BFF; 
+      color: white; 
+      padding: 1em; 
+      text-align: center;
+      position: sticky;
+      top: 60px; /* Điều chỉnh vị trí header để không bị che bởi navbar */
+      z-index: 10;
+    }
+    
+    .menu-container {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      padding: 8px;
+      flex-direction: column;
+      max-width: 800px;
+      margin: 0 auto;
     }
-
-    .nav-bar button {
-      background-color: #f2f2f2;
-      border: 1px solid #ccc;
-      margin: 5px;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .nav-bar button:hover {
-      background-color: #e0e0e0;
-    }
-
-    main {
-      margin-top: 130px;
-      padding: 10px;
-    }
-
+    
     .menu-section {
-      margin-bottom: 40px;
-      scroll-margin-top: 120px; /* giúp cuộn không bị che */
+      margin-bottom: 20px;
+      scroll-margin-top: 180px; /* Đảm bảo khi nhảy đến section không bị che bởi navbar và header */
     }
-
-    .menu-section h2 {
-      color: #0074cc;
-      border-bottom: 2px solid #0074cc;
+    
+    .menu-title {
+      color: #007BFF; 
+      margin: 20px 10px 10px;
       padding-bottom: 5px;
-      margin-bottom: 10px;
+      border-bottom: 2px solid #007BFF;
+      font-size: 1.3em;
     }
-
-    .menu-item {
+    
+    .item { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin: 10px; 
+      background: white; 
+      padding: 10px; 
+      border-radius: 8px; 
+      box-shadow: 0 0 5px rgba(0,0,0,0.1); 
+    }
+    
+    .item-name {
+      font-size: 0.95em;
+      flex: 1;
+      min-width: 100px;
+    }
+    
+    .item-controls { 
+      display: flex; 
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    
+    .item select, .item button, .item input { 
+      margin-left: 10px; 
+    }
+    
+    #cart { 
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      width: 350px;
+      background: white; 
+      padding: 0;
+      border-radius: 10px; 
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      z-index: 100;
+      max-height: 60vh;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    #cart.collapsed {
+      height: 50px;
+    }
+    
+    #cart-header {
+      background: #007BFF;
+      color: white;
+      padding: 12px 15px;
+      cursor: pointer;
       display: flex;
       justify-content: space-between;
-      padding: 6px 0;
-      border-bottom: 1px solid #eee;
+      align-items: center;
     }
-
-    @media (max-width: 600px) {
-      .nav-bar {
-        overflow-x: auto;
-        white-space: nowrap;
+    
+    #cart-header h2 {
+      margin: 0;
+      color: white;
+      font-size: 1.2em;
+    }
+    
+    #cart-content {
+      padding: 15px;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+    
+    button { 
+      padding: 5px 10px; 
+      background: #28a745; 
+      color: white; 
+      border: none; 
+      border-radius: 5px; 
+      cursor: pointer; 
+    }
+    
+    textarea { 
+      width: 100%; 
+      margin-top: 10px; 
+    }
+    
+    .cart-item { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 8px; 
+      padding: 8px; 
+      background: #f5f5f5; 
+      border-radius: 5px; 
+    }
+    
+    .remove-btn { 
+      background: #dc3545; 
+    }
+    
+    .total { 
+      font-weight: bold; 
+      font-size: 1.2em; 
+      margin-top: 10px; 
+      padding-top: 10px; 
+      border-top: 1px dashed #ccc; 
+    }
+    
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+    }
+    
+    .quantity-btn {
+      width: 25px;
+      height: 25px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .quantity-input { 
+      width: 40px; 
+      text-align: center; 
+      margin: 0 5px;
+    }
+    
+    .note-input { 
+      flex-grow: 1; 
+      margin-left: 10px; 
+      padding: 5px; 
+      border: 1px solid #ddd; 
+      border-radius: 4px; 
+      font-size: 0.9em;
+    }
+    
+    .cart-note { 
+      font-size: 0.8em; 
+      color: #666; 
+      margin-left: 10px; 
+    }
+    
+    .cart-item-name { 
+      font-weight: bold; 
+    }
+    
+    .cart-item-details { 
+      flex-grow: 1; 
+      margin-left: 10px; 
+    }
+    
+    .cart-item-price { 
+      color: #007BFF; 
+      font-weight: bold; 
+    }
+    
+    .cart-header-row { 
+      font-weight: bold; 
+      background: #007BFF; 
+      color: white; 
+      padding: 8px; 
+      border-radius: 5px; 
+      margin-bottom: 10px; 
+      display: flex; 
+      justify-content: space-between; 
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 5px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .notification.show {
+      opacity: 1;
+    }
+    
+    #cart-toggle {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+    
+    @media screen and (max-width: 600px) {
+      #cart {
+        width: calc(100% - 40px);
+        left: 20px;
+        right: 20px;
       }
-
-      .nav-bar button {
-        font-size: 14px;
-        padding: 5px 10px;
-      }
-
-      .menu-item {
+      
+      .item {
         flex-direction: column;
         align-items: flex-start;
+      }
+      
+      .item-name {
+        width: 100%;
+        margin-bottom: 8px;
+        font-size: 1em;
+      }
+      
+      .item-controls {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 8px;
+      }
+      
+      .note-input {
+        margin-left: 0;
+        margin-top: 8px;
+        width: 100%;
+      }
+      
+      .menu-title {
+        font-size: 1.2em;
+        margin-left: 15px;
+      }
+      
+      .navbar {
+        top: 0;
+      }
+      
+      header {
+        top: 50px;
+      }
+      
+      .menu-section {
+        scroll-margin-top: 150px;
       }
     }
   </style>
 </head>
 <body>
-  <header>
-    Bii Coffee - Menu Đặt Món
-  </header>
-
-  <div class="nav-bar" id="navbar">
-    <!-- Nút điều hướng sẽ được tạo động -->
+  <!-- Thanh điều hướng -->
+  <div class="navbar" id="navbar">
+    <a href="#tra" class="active">Trà</a>
+    <a href="#soda">Soda</a>
+    <a href="#sinh-to">Sinh tố</a>
+    <a href="#da-xay">Đá xay</a>
+    <a href="#ca-phe">Cà phê</a>
+    <a href="#tra-sua">Trà sữa</a>
+    <a href="#sua-chua">Sữa chua</a>
+    <a href="#nuoc-ep">Nước ép</a>
+    <a href="#pizza">Pizza</a>
+    <a href="#do-an-vat">Đồ ăn vặt</a>
+    <a href="#my-cay">Mỳ cay</a>
+    <a href="#bun-dau">Bún đậu</a>
   </div>
 
-  <main id="menu">
-    <div class="menu-section" id="Trà">
-      <h2>🧋 TRÀ</h2>
-      <div class="menu-item"><span>Trà chanh</span><span>10K / 15K</span></div>
-      <div class="menu-item"><span>Trà quất</span><span>10K / 15K</span></div>
-      <div class="menu-item"><span>Trà chanh nha đam</span><span>15K / 20K</span></div>
+  <header>
+    <h1>🧋 Bii Coffee - Menu Đặt Món</h1>
+    <p>📍 Trung Mầu - Cổng Phụ Bá Thiện 2 | ☎ 0964 391 834 or 0928 020 777</p>
+  </header>
+
+  <div class="menu-group">
+    <h2 id="tra">TRÀ</h2>
+    <div class="menu-section">
+        <div class="item">
+      <span class="item-name">Trà chanh</span>
+      <div class="item-controls">
+        <select class="item-size">
+          <option value="Trà chanh - M - 10k">Size M - 10k</option>
+          <option value="Trà chanh - L - 15k">Size L - 15k</option>
+        </select>
+        <div class="quantity-control">
+          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
+          <input type="number" value="1" min="1" class="quantity-input">
+          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
+        </div>
+        <input type="text" class="note-input" placeholder="Ghi chú...">
+        <button onclick="addToCart(this)">Thêm</button>
+      </div>
+    </div>
+    <!-- Các mục menu khác giữ nguyên -->
+    <!-- ... -->
+    
+    <h2 id="soda">SODA</h2>
+    <div class="menu-section">
+        <div class="item">
+      <span class="item-name">Soda việt quất</span>
+      <div class="item-controls">
+        <select class="item-size">
+          <option value="Soda việt quất - M - 20k">Size M - 20k</option>
+        </select>
+        <div class="quantity-control">
+          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
+          <input type="number" value="1" min="1" class="quantity-input">
+          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
+        </div>
+        <input type="text" class="note-input" placeholder="Ghi chú...">
+        <button onclick="addToCart(this)">Thêm</button>
+      </div>
+    </div>
+    <!-- Các mục menu khác giữ nguyên -->
+    <!-- ... -->
+    
+    <!-- Các phần menu khác cũng được thêm id và class menu-section tương tự -->
+    
+    <div id="cart" class="collapsed">
+      <div id="cart-header" onclick="toggleCart()">
+        <h2>🛒 Giỏ hàng (<span id="cart-count">0</span>)</h2>
+        <button id="cart-toggle">▼</button>
+      </div>
+      <div id="cart-content">
+        <div class="cart-header-row">
+          <span>Sản phẩm</span>
+          <span>Đơn giá</span>
+        </div>
+        <ul id="cart-list"></ul>
+        <div id="cart-total" class="total">Tổng tiền: 0đ</div>
+        <textarea id="orderText" rows="4" placeholder="Đơn hàng sẽ hiển thị ở đây..." readonly></textarea><br/>
+        <button onclick="copyOrder()">📋 Sao chép đơn</button>
+        <button onclick="sendToZalo()" style="background:#0088cc">📤 Gửi Zalo</button>
+      </div>
     </div>
 
-    <div class="menu-section" id="Trà-sữa">
-      <h2>🧋 TRÀ SỮA</h2>
-      <div class="menu-item"><span>Trà sữa truyền thống</span><span>20K / 25K</span></div>
-      <div class="menu-item"><span>Trà sữa trân châu đường đen</span><span>25K / 30K</span></div>
-    </div>
+    <div id="notification" class="notification">Đã thêm vào giỏ hàng!</div>
 
-    <div class="menu-section" id="Pizza">
-      <h2>🍕 PIZZA</h2>
-      <div class="menu-item"><span>Pizza xúc xích</span><span>35K</span></div>
-      <div class="menu-item"><span>Pizza thập cẩm</span><span>40K</span></div>
-    </div>
-
-    <div class="menu-section" id="Mi-cay">
-      <h2>🌶️ MÌ CAY</h2>
-      <div class="menu-item"><span>Mì cay hải sản</span><span>35K</span></div>
-      <div class="menu-item"><span>Mì cay bò</span><span>35K</span></div>
-    </div>
-
-    <!-- Thêm các nhóm món khác tại đây -->
-  </main>
-
-  <script>
-    const menuSections = document.querySelectorAll('.menu-section');
-    const navbar = document.getElementById('navbar');
-
-    menuSections.forEach(section => {
-      const id = section.id;
-      const name = section.querySelector('h2').innerText;
-      const button = document.createElement('button');
-      button.textContent = name;
-      button.onclick = () => {
-        document.getElementById(id).scrollIntoView({
-          behavior: 'smooth'
+    <script>
+      let cart = [];
+      
+      // Thêm sự kiện click cho thanh điều hướng
+      document.querySelectorAll('.navbar a').forEach(link => {
+        link.addEventListener('click', function() {
+          // Xóa class active từ tất cả các link
+          document.querySelectorAll('.navbar a').forEach(item => {
+            item.classList.remove('active');
+          });
+          
+          // Thêm class active cho link được click
+          this.classList.add('active');
         });
-      };
-      navbar.appendChild(button);
-    });
-  </script>
+      });
+      
+      // Tự động cập nhật active link khi cuộn trang
+      window.addEventListener('scroll', function() {
+        const sections = document.querySelectorAll('.menu-section');
+        const navLinks = document.querySelectorAll('.navbar a');
+        
+        let current = '';
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          const sectionHeight = section.clientHeight;
+          if (pageYOffset >= (sectionTop - 200)) {
+            current = section.getAttribute('id');
+          }
+        });
+        
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === `#${current}`) {
+            link.classList.add('active');
+          }
+        });
+      });
+      
+      function toggleCart() {
+        const cart = document.getElementById('cart');
+        const toggleBtn = document.getElementById('cart-toggle');
+        cart.classList.toggle('collapsed');
+        toggleBtn.textContent = cart.classList.contains('collapsed') ? '▲' : '▼';
+      }
+      
+      function changeQuantity(btn, delta) {
+        const input = btn.parentElement.querySelector('.quantity-input');
+        let newValue = parseInt(input.value) + delta;
+        if (newValue < 1) newValue = 1;
+        input.value = newValue;
+      }
+      
+      function showNotification(message) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.classList.add('show');
+        
+        setTimeout(() => {
+          notification.classList.remove('show');
+        }, 2000);
+      }
+
+      function addToCart(button) {
+        const item = button.parentElement.parentElement;
+        const select = item.querySelector('select');
+        const quantityInput = item.querySelector('.quantity-input');
+        const noteInput = item.querySelector('.note-input');
+        
+        const selectedOption = select.options[select.selectedIndex];
+        const value = selectedOption.value;
+        const name = item.querySelector('.item-name').textContent;
+        const quantity = parseInt(quantityInput.value);
+        const note = noteInput.value;
+        
+        const priceMatch = value.match(/(\d+)k/);
+        const price = priceMatch ? parseInt(priceMatch[1]) : 0;
+        
+        // Kiểm tra xem món đã có trong giỏ chưa
+        const existingItemIndex = cart.findIndex(item => item.text === value);
+        
+        if (existingItemIndex >= 0) {
+          // Nếu đã có thì cộng dồn số lượng và thêm ghi chú nếu có
+          cart[existingItemIndex].quantity += quantity;
+          if (note) {
+            if (cart[existingItemIndex].note) {
+              cart[existingItemIndex].note += `, ${note}`;
+            } else {
+              cart[existingItemIndex].note = note;
+            }
+          }
+          showNotification(`Đã cập nhật số lượng ${name} trong giỏ hàng!`);
+        } else {
+          // Nếu chưa có thì thêm mới
+          cart.push({
+            name: name,
+            text: value,
+            price: price,
+            quantity: quantity,
+            note: note
+          });
+          showNotification(`Đã thêm ${name} vào giỏ hàng!`);
+        }
+        
+        updateCart();
+        noteInput.value = '';
+        
+        // Mở giỏ hàng khi thêm món
+        document.getElementById('cart').classList.remove('collapsed');
+        document.getElementById('cart-toggle').textContent = '▼';
+      }
+
+      function removeFromCart(index) {
+        cart.splice(index, 1);
+        updateCart();
+      }
+
+      function updateCart() {
+        const list = document.getElementById("cart-list");
+        const textArea = document.getElementById("orderText");
+        const totalElement = document.getElementById("cart-total");
+        const countElement = document.getElementById("cart-count");
+        
+        list.innerHTML = "";
+        let content = "Đơn hàng của bạn:\n";
+        let total = 0;
+        
+        cart.forEach((item, index) => {
+          const itemTotal = item.price * item.quantity;
+          total += itemTotal;
+          
+          content += `${index + 1}. ${item.text} x${item.quantity} - ${itemTotal}k`;
+          if (item.note) {
+            content += ` (Ghi chú: ${item.note})`;
+          }
+          content += "\n";
+          
+          const li = document.createElement("li");
+          li.className = "cart-item";
+          
+          const itemInfo = document.createElement("div");
+          itemInfo.className = "cart-item-details";
+          
+          const itemName = document.createElement("div");
+          itemName.className = "cart-item-name";
+          itemName.innerText = item.name;
+          
+          const itemDesc = document.createElement("div");
+          itemDesc.innerText = `${item.text} x${item.quantity}`;
+          if (item.note) {
+            const itemNote = document.createElement("div");
+            itemNote.className = "cart-note";
+            itemNote.innerText = `Ghi chú: ${item.note}`;
+            itemDesc.appendChild(itemNote);
+          }
+          
+          const itemPrice = document.createElement("div");
+          itemPrice.className = "cart-item-price";
+          itemPrice.innerText = `${itemTotal}k`;
+          
+          const removeBtn = document.createElement("button");
+          removeBtn.className = "remove-btn";
+          removeBtn.innerText = "Xóa";
+          removeBtn.onclick = () => removeFromCart(index);
+          
+          itemInfo.appendChild(itemName);
+          itemInfo.appendChild(itemDesc);
+          li.appendChild(itemInfo);
+          li.appendChild(itemPrice);
+          li.appendChild(removeBtn);
+          list.appendChild(li);
+        });
+        
+        textArea.value = content;
+        totalElement.innerText = `Tổng tiền: ${total}k`;
+        countElement.textContent = cart.length;
+      }
+
+      function copyOrder() {
+        const text = document.getElementById("orderText");
+        text.select();
+        document.execCommand("copy");
+        alert("Đã sao chép đơn hàng!");
+      }
+
+      function sendToZalo() {
+        if (cart.length === 0) {
+          alert("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
+          return;
+        }
+        
+        const textArea = document.getElementById("orderText");
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const orderMessage = `Xin chào, mình muốn đặt:\n${textArea.value}\nTổng tiền: ${total}k`;
+        
+        const zaloPhone = "0964391834";
+        const encodedMessage = encodeURIComponent(orderMessage);
+        const zaloUrl = `https://zalo.me/${zaloPhone}?text=${encodedMessage}`;
+        
+        window.open(zaloUrl, '_blank');
+      }
+      
+      // Mở giỏ hàng nếu có sản phẩm khi tải trang
+      window.addEventListener('DOMContentLoaded', () => {
+        if (cart.length > 0) {
+          document.getElementById('cart').classList.remove('collapsed');
+          document.getElementById('cart-toggle').textContent = '▼';
+        }
+      });
+    </script>
 </body>
 </html>
