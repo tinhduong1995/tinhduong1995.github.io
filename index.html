@@ -206,21 +206,31 @@
       cursor: pointer;
     }
     
-    /* New styles for search and delivery */
+    /* Cập nhật CSS cho search container */
     #search-container {
       padding: 10px;
       background: #fff;
       position: sticky;
-      top: 100px;
+      top: 80px; /* Đặt dưới header */
       z-index: 5;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
+    
     #search-input {
       width: 100%;
-      padding: 8px;
+      padding: 8px 15px;
       border: 1px solid #ddd;
-      border-radius: 4px;
+      border-radius: 20px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s;
     }
+    
+    #search-input:focus {
+      border-color: #007BFF;
+      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+    }
+    
     .delivery-info {
       margin-top: 15px;
       padding: 15px;
@@ -231,7 +241,8 @@
       margin-top: 0;
       color: #007BFF;
     }
-    .delivery-info input, .delivery-info textarea {
+    .delivery-info input, 
+    .delivery-info textarea {
       width: 100%;
       padding: 8px;
       margin-bottom: 10px;
@@ -271,6 +282,16 @@
         font-size: 1.2em;
         margin-left: 15px;
       }
+      
+      /* Điều chỉnh cho mobile */
+      #search-container {
+        top: 70px; /* Giảm khoảng cách trên mobile */
+        padding: 8px 10px;
+      }
+      #search-input {
+        padding: 6px 12px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -280,12 +301,12 @@
     <p>📍 Trung Mầu - Cổng Phụ Bá Thiện 2 | ☎ 0964 391 834 or 0928 020 777</p>
   </header>
 
-  <!-- Search box -->
+  <!-- Search box - Cố định khi cuộn -->
   <div id="search-container">
     <input type="text" id="search-input" placeholder="🔍 Tìm kiếm món...">
   </div>
 
-  <!-- Delivery info (hidden by default) -->
+  <!-- Delivery info -->
   <div id="delivery-section" class="delivery-info hidden">
     <h3>Thông tin giao hàng</h3>
     <input type="text" id="customer-name" placeholder="Họ tên">
@@ -293,7 +314,6 @@
     <textarea id="delivery-address" placeholder="Địa chỉ giao hàng"></textarea>
     <button onclick="toggleDeliveryInfo()">Đóng</button>
   </div>
-
   <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
