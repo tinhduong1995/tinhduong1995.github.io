@@ -20,21 +20,27 @@
       top: 0;
       z-index: 10;
     }
-    .menu-group { 
-      padding: 1em; 
+    .menu-container {
+      display: flex;
+      flex-direction: column;
       max-width: 800px;
       margin: 0 auto;
     }
-    h2 { 
+    .menu-section {
+      margin-bottom: 20px;
+    }
+    .menu-title {
       color: #007BFF; 
-      margin-top: 30px; 
+      margin: 20px 10px 10px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #007BFF;
       font-size: 1.3em;
     }
     .item { 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
-      margin: 10px 0; 
+      margin: 10px; 
       background: white; 
       padding: 10px; 
       border-radius: 8px; 
@@ -42,8 +48,14 @@
     }
     .item-name {
       font-size: 0.95em;
-      flex-shrink: 0;
-      min-width: 80px;
+      flex: 1;
+      min-width: 100px;
+    }
+    .item-controls { 
+      display: flex; 
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
     .item select, .item button, .item input { 
       margin-left: 10px; 
@@ -144,13 +156,6 @@
       border-radius: 4px; 
       font-size: 0.9em;
     }
-    .item-controls { 
-      display: flex; 
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      flex-grow: 1;
-    }
     .cart-note { 
       font-size: 0.8em; 
       color: #666; 
@@ -212,10 +217,9 @@
         align-items: flex-start;
       }
       .item-name {
-        min-width: auto;
+        width: 100%;
         margin-bottom: 8px;
         font-size: 1em;
-        width: 100%;
       }
       .item-controls {
         width: 100%;
@@ -226,6 +230,10 @@
         margin-left: 0;
         margin-top: 8px;
         width: 100%;
+      }
+      .menu-title {
+        font-size: 1.2em;
+        margin-left: 15px;
       }
     }
   </style>
