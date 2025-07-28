@@ -1760,14 +1760,9 @@
         
         items.forEach(item => {
           const itemName = item.querySelector('.item-name').textContent.toLowerCase();
-          if (itemName.includes(searchTerm)) {
-            item.style.display = 'flex';
-          } else {
-            item.style.display = 'none';
-          }
+          item.style.display = itemName.includes(searchTerm) ? 'flex' : 'none';
         });
         
-        // Show/hide category titles
         document.querySelectorAll('.menu-title').forEach(title => {
           const hasVisibleItems = Array.from(title.nextElementSibling.querySelectorAll('.item'))
             .some(item => item.style.display !== 'none');
@@ -1897,22 +1892,61 @@
     }
 
     function copyOrder() {
-      document.getElementById("orderText").select();
+      const textArea = document.getElementById("orderText");
+      textArea.select();
       document.execCommand("copy");
       showNotification("Đã sao chép đơn hàng!");
     }
 
     function sendToZalo() {
-      if (!cart.length) {
-        showNotification("Vui lòng thêm món vào giỏ hàng!");
+      if (cart.length === 0) {
+        showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
         return;
       }
       
-      const text = document.getElementById("orderText").value;
+      // Lấy nội dung đơn hàng
+      const textArea = document.getElementById("orderText");
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      const message = encodeURIComponent(`${text}\nTổng tiền: ${total}k`);
+      const orderMessage = `${textArea.value}\nTổng tiền: ${total}k`;
       
-      window.open(`https://zalo.me/0964391834?text=${message}`, '_blank');
+      // Sao chép tự động vào clipboard
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(orderMessage).then(() => {
+          showNotification("Đã sao chép đơn hàng, đang mở Zalo...");
+          // Mở Zalo sau 1 giây để đảm bảo đã copy xong
+          setTimeout(() => {
+            window.open("https://zalo.me/0964391834", '_blank');
+          }, 1000);
+        }).catch(err => {
+          console.error('Lỗi khi sao chép: ', err);
+          fallbackCopyToZalo(orderMessage);
+        });
+      } else {
+        // Trình duyệt không hỗ trợ Clipboard API
+        fallbackCopyToZalo(orderMessage);
+      }
+    }
+
+    // Phương pháp sao chép dự phòng
+    function fallbackCopyToZalo(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          showNotification("Đã sao chép đơn hàng, đang mở Zalo...");
+          setTimeout(() => window.open("https://zalo.me/0964391834", '_blank'), 1000);
+        } else {
+          showNotification("Không thể sao chép tự động, vui lòng sao chép thủ công");
+        }
+      } catch (err) {
+        showNotification("Lỗi khi sao chép đơn hàng!");
+      }
+      
+      document.body.removeChild(textArea);
     }
     
     // Khởi tạo khi trang tải xong
