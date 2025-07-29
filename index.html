@@ -230,6 +230,10 @@
       flex-grow: 1; 
       margin-left: 10px; 
     }
+    .cart-item-price { 
+      color: #007BFF; 
+      font-weight: bold; 
+    }
     .cart-header-row { 
       font-weight: bold; 
       background: #007BFF; 
@@ -237,6 +241,8 @@
       padding: 8px; 
       border-radius: 5px; 
       margin-bottom: 10px; 
+      display: flex; 
+      justify-content: space-between; 
     }
     .notification {
       position: fixed;
@@ -348,7 +354,7 @@
     <textarea id="delivery-address" placeholder="Địa chỉ giao hàng"></textarea>
     <button onclick="toggleDeliveryInfo()">Đóng</button>
   </div>
-    <div class="menu-group">
+      <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -1775,6 +1781,7 @@
     <div id="cart-content">
       <div class="cart-header-row">
         <span>Sản phẩm</span>
+        <span>Đơn giá</span>
       </div>
       <ul id="cart-list"></ul>
       <div id="cart-total" class="total">Tổng tiền: 0đ</div>
@@ -1933,6 +1940,7 @@
               ${item.note ? `<div class="cart-note">Ghi chú: ${item.note}</div>` : ''}
             </div>
           </div>
+          <div class="cart-item-price">${itemTotal}k</div>
           <button class="remove-btn" onclick="removeFromCart(${index})">Xóa</button>
         `;
         list.appendChild(li);
