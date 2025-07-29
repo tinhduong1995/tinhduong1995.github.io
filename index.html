@@ -169,25 +169,65 @@
     textarea { 
       width: 100%; 
       margin-top: 10px; 
+      font-size: 0.9em;
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 5px;
     }
-    .cart-item { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 8px; 
-      padding: 8px; 
-      background: #f5f5f5; 
-      border-radius: 5px; 
+    .cart-header-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 8px;
+      padding: 8px;
+      text-align: center;
+      font-weight: bold;
+      background: #007BFF;
+      color: white;
+      border-radius: 5px;
+      margin-bottom: 10px;
     }
-    .remove-btn { 
-      background: #dc3545; 
+    
+    .cart-item {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      background: #f5f5f5;
+      border-radius: 5px;
+      margin-bottom: 8px;
+      text-align: center;
     }
+    
+    .cart-item-name {
+      font-weight: bold;
+      text-align: left;
+    }
+    
+    .cart-item-price, 
+    .cart-item-quantity,
+    .cart-item-total {
+      text-align: center;
+    }
+    
+    .remove-btn {
+      grid-column: span 5;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 5px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    
     .total { 
       font-weight: bold; 
       font-size: 1.2em; 
       margin-top: 10px; 
       padding-top: 10px; 
       border-top: 1px dashed #ccc; 
+      text-align: right;
     }
     .quantity-controls {
       display: flex;
@@ -221,28 +261,9 @@
     .cart-note { 
       font-size: 0.8em; 
       color: #666; 
-      margin-left: 10px; 
-    }
-    .cart-item-name { 
-      font-weight: bold; 
-    }
-    .cart-item-details { 
-      flex-grow: 1; 
-      margin-left: 10px; 
-    }
-    .cart-item-price { 
-      color: #007BFF; 
-      font-weight: bold; 
-    }
-    .cart-header-row { 
-      font-weight: bold; 
-      background: #007BFF; 
-      color: white; 
-      padding: 8px; 
-      border-radius: 5px; 
-      margin-bottom: 10px; 
-      display: flex; 
-      justify-content: space-between; 
+      grid-column: span 5;
+      text-align: left;
+      margin-top: 5px;
     }
     .notification {
       position: fixed;
@@ -305,6 +326,13 @@
         left: 20px;
         right: 20px;
       }
+      
+      .cart-header-row,
+      .cart-item {
+        grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
+        font-size: 0.8em;
+      }
+      
       .item {
         flex-direction: column;
         align-items: flex-start;
@@ -354,7 +382,7 @@
     <textarea id="delivery-address" placeholder="Địa chỉ giao hàng"></textarea>
     <button onclick="toggleDeliveryInfo()">Đóng</button>
   </div>
-      <div class="menu-group">
+    <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -1781,12 +1809,15 @@
     <div id="cart-content">
       <div class="cart-header-row">
         <span>Sản phẩm</span>
+        <span>Size</span>
         <span>Đơn giá</span>
+        <span>Số lượng</span>
+        <span>Thành tiền</span>
       </div>
       <ul id="cart-list"></ul>
       <div id="cart-total" class="total">Tổng tiền: 0đ</div>
       <button onclick="toggleDeliveryInfo()">🏠 Thêm địa chỉ giao hàng</button>
-      <textarea id="orderText" rows="4" placeholder="Đơn hàng sẽ hiển thị ở đây..." readonly></textarea><br/>
+      <textarea id="orderText" rows="4" placeholder="Thông tin đơn hàng sẽ hiển thị ở đây..." readonly></textarea><br/>
       <button onclick="copyOrder()">📋 Sao chép đơn</button>
       <button onclick="sendToZalo()" style="background:#0088cc">📤 Gửi Zalo</button>
     </div>
@@ -1906,7 +1937,7 @@
       ];
       
       list.innerHTML = "";
-      let content = "Đơn hàng của bạn:\n";
+      let orderContent = "Đơn hàng của bạn:\n";
       let total = 0;
       
       // Thêm thông tin giao hàng nếu có
@@ -1915,11 +1946,11 @@
       const deliveryAddress = document.getElementById('delivery-address').value;
       
       if (customerName || customerPhone || deliveryAddress) {
-        content += "\nThông tin giao hàng:\n";
-        if (customerName) content += `- Tên: ${customerName}\n`;
-        if (customerPhone) content += `- Điện thoại: ${customerPhone}\n`;
-        if (deliveryAddress) content += `- Địa chỉ: ${deliveryAddress}\n`;
-        content += "\n";
+        orderContent += "\nThông tin giao hàng:\n";
+        if (customerName) orderContent += `- Tên: ${customerName}\n`;
+        if (customerPhone) orderContent += `- Điện thoại: ${customerPhone}\n`;
+        if (deliveryAddress) orderContent += `- Địa chỉ: ${deliveryAddress}\n`;
+        orderContent += "\n";
       }
       
       // Thêm các món vào đơn hàng
@@ -1927,26 +1958,28 @@
         const itemTotal = item.price * item.quantity;
         total += itemTotal;
         
-        content += `${index + 1}. ${item.text} x${item.quantity} - ${itemTotal}k`;
-        if (item.note) content += ` (Ghi chú: ${item.note})`;
-        content += "\n";
+        // Nội dung cho phần thông tin đơn hàng (đơn giản)
+        const sizeInfo = item.text.split(' - ')[1] || '';
+        orderContent += `${index + 1}. ${item.name} - ${sizeInfo} x${item.quantity}\n`;
         
+        // Nội dung chi tiết cho giỏ hàng
         const li = document.createElement("li");
         li.className = "cart-item";
         li.innerHTML = `
-          <div class="cart-item-details">
-            <div class="cart-item-name">${item.name}</div>
-            <div>${item.text} x${item.quantity}
-              ${item.note ? `<div class="cart-note">Ghi chú: ${item.note}</div>` : ''}
-            </div>
-          </div>
-          <div class="cart-item-price">${itemTotal}k</div>
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-size">${item.text.split(' - ')[1] || ''}</div>
+          <div class="cart-item-price">${item.price}k</div>
+          <div class="cart-item-quantity">${item.quantity}</div>
+          <div class="cart-item-total">${itemTotal}k</div>
           <button class="remove-btn" onclick="removeFromCart(${index})">Xóa</button>
+          ${item.note ? `<div class="cart-note">Ghi chú: ${item.note}</div>` : ''}
         `;
         list.appendChild(li);
       });
       
-      textArea.value = content;
+      // Thêm tổng tiền vào cả 2 phần
+      orderContent += `\nTổng tiền: ${total}k`;
+      textArea.value = orderContent;
       totalElement.textContent = `Tổng tiền: ${total}k`;
       countElement.textContent = cart.length;
     }
