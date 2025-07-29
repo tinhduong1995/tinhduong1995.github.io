@@ -9,6 +9,7 @@
       font-family: Arial, sans-serif; 
       margin: 0; 
       background: #f9f9f9;
+      padding-top: 160px; /* Tăng padding-top để bù cho header và search box */
       padding-bottom: 120px;
     }
     header { 
@@ -16,10 +17,42 @@
       color: white; 
       padding: 1em; 
       text-align: center;
-      position: sticky;
+      position: fixed; /* Cố định header */
       top: 0;
+      width: 100%;
       z-index: 10;
     }
+    
+    /* Search box cố định */
+    #search-container {
+      padding: 10px;
+      background: #fff;
+      position: fixed;
+      top: 80px; /* Đặt bên dưới header */
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    #search-input {
+      width: calc(100% - 30px);
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    
+    #search-input:focus {
+      border-color: #007BFF;
+      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+    }
+
     .menu-container {
       display: flex;
       flex-direction: column;
@@ -206,21 +239,6 @@
       cursor: pointer;
     }
     
-    /* New styles for search and delivery */
-    #search-container {
-      padding: 10px;
-      background: #fff;
-      position: sticky;
-      top: 100px;
-      z-index: 5;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    #search-input {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
     .delivery-info {
       margin-top: 15px;
       padding: 15px;
@@ -231,7 +249,8 @@
       margin-top: 0;
       color: #007BFF;
     }
-    .delivery-info input, .delivery-info textarea {
+    .delivery-info input, 
+    .delivery-info textarea {
       width: 100%;
       padding: 8px;
       margin-bottom: 10px;
@@ -243,6 +262,15 @@
     }
     
     @media screen and (max-width: 600px) {
+      body {
+        padding-top: 140px; /* Điều chỉnh cho mobile */
+      }
+      
+      #search-container {
+        top: 70px;
+        padding: 8px 10px;
+      }
+      
       #cart {
         width: calc(100% - 40px);
         left: 20px;
@@ -271,6 +299,10 @@
         font-size: 1.2em;
         margin-left: 15px;
       }
+      #search-input {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -280,12 +312,12 @@
     <p>📍 Trung Mầu - Cổng Phụ Bá Thiện 2 | ☎ 0964 391 834 or 0928 020 777</p>
   </header>
 
-  <!-- Search box -->
+  <!-- Search box cố định -->
   <div id="search-container">
     <input type="text" id="search-input" placeholder="🔍 Tìm kiếm món...">
   </div>
 
-  <!-- Delivery info (hidden by default) -->
+  <!-- Delivery info -->
   <div id="delivery-section" class="delivery-info hidden">
     <h3>Thông tin giao hàng</h3>
     <input type="text" id="customer-name" placeholder="Họ tên">
@@ -293,7 +325,6 @@
     <textarea id="delivery-address" placeholder="Địa chỉ giao hàng"></textarea>
     <button onclick="toggleDeliveryInfo()">Đóng</button>
   </div>
-
   <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
