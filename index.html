@@ -69,31 +69,62 @@
       border-bottom: 2px solid #007BFF;
       font-size: 1.3em;
     }
-    .item { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin: 10px; 
-      background: white; 
-      padding: 10px; 
-      border-radius: 8px; 
-      box-shadow: 0 0 5px rgba(0,0,0,0.1); 
+.item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    gap: 8px; /* Thêm khoảng cách đều giữa các phần tử */
+  }
+  
+  .item-name {
+    font-size: 0.95em;
+    flex: 1;
+    min-width: 100px;
+    margin-right: 8px; /* Giảm khoảng cách bên phải */
+  }
+  
+  .item-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px; /* Thêm khoảng cách đều giữa các control */
+  }
+  
+  .item select {
+    margin-left: 0; /* Bỏ margin left của select */
+    min-width: 120px; /* Đảm bảo select đủ rộng */
+  }
+  
+  /* Điều chỉnh responsive cho mobile */
+  @media screen and (max-width: 600px) {
+    .item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
     }
+    
     .item-name {
-      font-size: 0.95em;
-      flex: 1;
-      min-width: 100px;
+      width: 100%;
+      margin-bottom: 4px; /* Giảm khoảng cách dưới */
+      margin-right: 0;
     }
-    .item-controls { 
-      display: flex; 
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: flex-end;
+    
+    .item-controls {
+      width: 100%;
+      justify-content: space-between;
+      gap: 6px;
     }
-    .item select, .item button, .item input { 
-      margin-left: 10px; 
+    
+    .item select {
+      width: 100%;
     }
-    #cart { 
+  }    #cart { 
       position: fixed;
       left: 20px;
       bottom: 20px;
@@ -282,7 +313,7 @@
       }
       .item-name {
         width: 100%;
-        margin-bottom: 4px;
+        margin-bottom: 8px;
         font-size: 1em;
       }
       .item-controls {
