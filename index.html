@@ -9,7 +9,7 @@
       font-family: Arial, sans-serif; 
       margin: 0; 
       background: #f9f9f9;
-      padding-top: 160px; /* Tăng padding-top để bù cho header và search box */
+      padding-top: 160px;
       padding-bottom: 120px;
     }
     header { 
@@ -17,18 +17,17 @@
       color: white; 
       padding: 1em; 
       text-align: center;
-      position: fixed; /* Cố định header */
+      position: fixed;
       top: 0;
       width: 100%;
       z-index: 10;
     }
     
-    /* Search box cố định */
     #search-container {
       padding: 10px;
       background: #fff;
       position: fixed;
-      top: 80px; /* Đặt bên dưới header */
+      top: 80px;
       width: 100%;
       max-width: 800px;
       margin: 0 auto;
@@ -78,14 +77,14 @@
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    gap: 8px; /* Thêm khoảng cách đều giữa các phần tử */
+    gap: 8px;
   }
   
   .item-name {
     font-size: 0.95em;
     flex: 1;
     min-width: 100px;
-    margin-right: 8px; /* Giảm khoảng cách bên phải */
+    margin-right: 8px;
   }
   
   .item-controls {
@@ -93,15 +92,14 @@
     align-items: center;
     flex-wrap: wrap;
     justify-content: flex-end;
-    gap: 8px; /* Thêm khoảng cách đều giữa các control */
+    gap: 8px;
   }
   
   .item select {
-    margin-left: 0; /* Bỏ margin left của select */
-    min-width: 120px; /* Đảm bảo select đủ rộng */
+    margin-left: 0;
+    min-width: 120px;
   }
   
-  /* Điều chỉnh responsive cho mobile */
   @media screen and (max-width: 600px) {
     .item {
       flex-direction: column;
@@ -111,8 +109,8 @@
     
     .item-name {
       width: 100%;
-      margin-bottom: 4px; /* Giảm khoảng cách dưới */
-      margin-right: 400px;
+      margin-bottom: 4px;
+      margin-right: 40px;
     }
     
     .item-controls {
@@ -232,10 +230,6 @@
       flex-grow: 1; 
       margin-left: 10px; 
     }
-    .cart-item-price { 
-      color: #007BFF; 
-      font-weight: bold; 
-    }
     .cart-header-row { 
       font-weight: bold; 
       background: #007BFF; 
@@ -243,8 +237,6 @@
       padding: 8px; 
       border-radius: 5px; 
       margin-bottom: 10px; 
-      display: flex; 
-      justify-content: space-between; 
     }
     .notification {
       position: fixed;
@@ -294,7 +286,7 @@
     
     @media screen and (max-width: 600px) {
       body {
-        padding-top: 140px; /* Điều chỉnh cho mobile */
+        padding-top: 140px;
       }
       
       #search-container {
@@ -356,7 +348,7 @@
     <textarea id="delivery-address" placeholder="Địa chỉ giao hàng"></textarea>
     <button onclick="toggleDeliveryInfo()">Đóng</button>
   </div>
-  <div class="menu-group">
+    <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -1783,7 +1775,6 @@
     <div id="cart-content">
       <div class="cart-header-row">
         <span>Sản phẩm</span>
-        <span>Đơn giá</span>
       </div>
       <ul id="cart-list"></ul>
       <div id="cart-total" class="total">Tổng tiền: 0đ</div>
@@ -1942,7 +1933,6 @@
               ${item.note ? `<div class="cart-note">Ghi chú: ${item.note}</div>` : ''}
             </div>
           </div>
-          <div class="cart-item-price">${itemTotal}k</div>
           <button class="remove-btn" onclick="removeFromCart(${index})">Xóa</button>
         `;
         list.appendChild(li);
