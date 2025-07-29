@@ -1924,33 +1924,33 @@
         content += "\n";
       }
       
-// Thêm các món vào đơn hàng
-cart.forEach((item, index) => {
-  const itemTotal = item.price * item.quantity;
-  total += itemTotal;
-
-  // Ghi thông tin vào textarea
-  content += `${index + 1}. ${item.text} x${item.quantity}`;
-  if (item.note) content += ` (Ghi chú: ${item.note})`;
-  content += `\n`;
-
-  // Tạo phần tử hiển thị trong danh sách
-  const li = document.createElement("li");
-  li.className = "cart-item";
-  li.innerHTML = `
-    <div class="cart-item-details">
-      <div class="cart-item-name">${item.name}</div>
-      <div>${item.text} x${item.quantity}</div>
-      ${item.note ? `<div class="cart-note">Ghi chú: ${item.note}</div>` : ''}
-    </div>
-  `;
-  list.appendChild(li);
-});
-
-// Gán thông tin đơn hàng
-textArea.value = content;
-totalElement.textContent = `Tổng tiền: ${total}k`;
-countElement.textContent = cart.length;
+      // Thêm các món vào đơn hàng
+      cart.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        
+        content += `${index + 1}. ${item.text} x${item.quantity} - ${itemTotal}k`;
+        if (item.note) content += ` (Ghi chú: ${item.note})`;
+        content += "\n";
+        
+        const li = document.createElement("li");
+        li.className = "cart-item";
+        li.innerHTML = `
+          <div class="cart-item-details">
+            <div class="cart-item-name">${item.name}</div>
+            <div>${item.text} x${item.quantity}
+              ${item.note ? `<div class="cart-note">Ghi chú: ${item.note}</div>` : ''}
+            </div>
+          </div>
+          <div class="cart-item-price">${itemTotal}k</div>
+          <button class="remove-btn" onclick="removeFromCart(${index})">Xóa</button>
+        `;
+        list.appendChild(li);
+      });
+      
+      textArea.value = content;
+      totalElement.textContent = `Tổng tiền: ${total}k`;
+      countElement.textContent = cart.length;
     }
 
     function copyOrder() {
