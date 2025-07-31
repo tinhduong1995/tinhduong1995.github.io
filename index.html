@@ -1960,12 +1960,40 @@
       showNotification("Đã sao chép đơn hàng!");
     }
 
-    function sendToZalo() {
-      if (cart.length === 0) {
-        showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
-        return;
-      }
+function sendToZalo() {
+  if (cart.length === 0) {
+    showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
+    return;
+  }
+
+  const textArea = document.getElementById("orderText");
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const orderMessage = `${textArea.value}\nTổng tiền: ${total}k`;
+  
+  // Tạo URL an toàn cho Zalo
+  const phoneNumber = "0964391834"; // Số điện thoại quán
+  const encodedMessage = encodeURIComponent(orderMessage);
+  
+  // Thử mở Zalo theo nhiều cách khác nhau
+  const zaloAppUrl = `https://zalo.me/${phoneNumber}?text=${encodedMessage}`;
+  const zaloPcUrl = `https://zalo.me/${phoneNumber}`;
+  
+  // Mở trong cửa sổ mới
+  const newWindow = window.open(zaloAppUrl, '_blank');
+  
+  // Fallback nếu bị chặn popup
+  setTimeout(() => {
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      // Nếu không mở được app, chuyển hướng trang hiện tại
+      window.location.href = zaloPcUrl;
       
+      // Hoặc hiển thị hướng dẫn copy thủ công
+      navigator.clipboard.writeText(orderMessage).then(() => {
+        showNotification("Đã sao chép đơn hàng. Vui lòng dán vào Zalo thủ công!");
+      });
+    }
+  }, 500);
+}      
       // Lấy nội dung đơn hàng
       const textArea = document.getElementById("orderText");
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
