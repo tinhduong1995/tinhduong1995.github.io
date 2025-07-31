@@ -9,7 +9,7 @@
       font-family: Arial, sans-serif; 
       margin: 0; 
       background: #f9f9f9;
-      padding-top: 160px; /* Tăng padding-top để bù cho header và search box */
+      padding-top: 160px;
       padding-bottom: 120px;
     }
     header { 
@@ -17,18 +17,17 @@
       color: white; 
       padding: 1em; 
       text-align: center;
-      position: fixed; /* Cố định header */
+      position: fixed;
       top: 0;
       width: 100%;
       z-index: 10;
     }
     
-    /* Search box cố định */
     #search-container {
       padding: 10px;
       background: #fff;
       position: fixed;
-      top: 80px; /* Đặt bên dưới header */
+      top: 80px;
       width: 100%;
       max-width: 800px;
       margin: 0 auto;
@@ -69,62 +68,62 @@
       border-bottom: 2px solid #007BFF;
       font-size: 1.3em;
     }
-.item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px;
-    background: white;
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    gap: 8px; /* Thêm khoảng cách đều giữa các phần tử */
-  }
-  
-  .item-name {
-    font-size: 0.95em;
-    flex: 1;
-    min-width: 100px;
-    margin-right: 8px; /* Giảm khoảng cách bên phải */
-  }
-  
-  .item-controls {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 8px; /* Thêm khoảng cách đều giữa các control */
-  }
-  
-  .item select {
-    margin-left: 0; /* Bỏ margin left của select */
-    min-width: 120px; /* Đảm bảo select đủ rộng */
-  }
-  
-  /* Điều chỉnh responsive cho mobile */
-  @media screen and (max-width: 600px) {
     .item {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 6px;
-    }
-    
-    .item-name {
-      width: 100%;
-      margin-bottom: 4px; /* Giảm khoảng cách dưới */
-      margin-right: 40px;
-    }
-    
-    .item-controls {
-      width: 100%;
+      display: flex;
       justify-content: space-between;
-      gap: 6px;
+      align-items: center;
+      margin: 10px;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      gap: 8px;
     }
-    
+  
+    .item-name {
+      font-size: 0.95em;
+      flex: 1;
+      min-width: 100px;
+      margin-right: 8px;
+    }
+  
+    .item-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+  
     .item select {
-      width: 100%;
+      margin-left: 0;
+      min-width: 120px;
     }
-  }    #cart { 
+  
+    @media screen and (max-width: 600px) {
+      .item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      
+      .item-name {
+        width: 100%;
+        margin-bottom: 4px;
+        margin-right: 40px;
+      }
+      
+      .item-controls {
+        width: 100%;
+        justify-content: space-between;
+        gap: 6px;
+      }
+      
+      .item select {
+        width: 100%;
+      }
+    }    
+    #cart { 
       position: fixed;
       left: 20px;
       bottom: 20px;
@@ -292,9 +291,30 @@
       display: none;
     }
     
+    /* Nút Zalo cố định */
+    .zalo-float-btn {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background: #0088cc;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .zalo-float-btn img {
+      width: 24px;
+      margin-right: 8px;
+    }
+    
     @media screen and (max-width: 600px) {
       body {
-        padding-top: 140px; /* Điều chỉnh cho mobile */
+        padding-top: 140px;
       }
       
       #search-container {
@@ -334,6 +354,13 @@
         padding: 8px 12px;
         font-size: 14px;
       }
+      
+      /* Điều chỉnh nút Zalo cho mobile */
+      .zalo-float-btn {
+        bottom: 100px;
+        padding: 8px 12px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -356,7 +383,13 @@
     <textarea id="delivery-address" placeholder="Địa chỉ giao hàng"></textarea>
     <button onclick="toggleDeliveryInfo()">Đóng</button>
   </div>
-  <div class="menu-group">
+
+  <!-- Nút Zalo cố định -->
+  <a href="https://zalo.me/0964391834" class="zalo-float-btn" target="_blank">
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA1MTJjLTE0MS4zOSAwLTI1Ni0xMTQuNjEtMjU2LTI1NlMxMTQuNjEgMCAyNTYgMHMyNTYgMTE0LjYxIDI1NiAyNTYtMTE0LjYxIDI1Ni0yNTYgMjU2em0xMjYuNzktMTU5LjY5Yy0xNi4xMy0xMS42MS0zOS43My0yMC43Mi-etc..." alt="Zalo">
+    Chat Zalo
+  </a>
+    <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -1966,49 +1999,49 @@
         return;
       }
       
-      // Lấy nội dung đơn hàng
       const textArea = document.getElementById("orderText");
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const orderMessage = `${textArea.value}\nTổng tiền: ${total}k`;
+      const phoneNumber = "0964391834";
+      const encodedMessage = encodeURIComponent(orderMessage);
       
-      // Sao chép tự động vào clipboard
-      if (navigator.clipboard) {
+      // Tạo nhiều cách mở Zalo khác nhau
+      const zaloUrls = [
+        `https://zalo.me/${phoneNumber}?text=${encodedMessage}`, // Web Zalo
+        `intent://send/${phoneNumber}?text=${encodedMessage}#Intent;scheme=zalo;package=com.zing.zalo;end`, // Android Intent
+        `zalo://send?phone=${phoneNumber}&text=${encodedMessage}` // Zalo deep link
+      ];
+      
+      // Thử từng cách cho đến khi thành công
+      let success = false;
+      for (let url of zaloUrls) {
+        const newWindow = window.open(url, '_blank');
+        if (newWindow && !newWindow.closed) {
+          success = true;
+          break;
+        }
+      }
+      
+      // Nếu không mở được Zalo, hướng dẫn copy thủ công
+      if (!success) {
         navigator.clipboard.writeText(orderMessage).then(() => {
-          showNotification("Đã sao chép đơn hàng, đang mở Zalo...");
-          // Mở Zalo sau 1 giây để đảm bảo đã copy xong
-          setTimeout(() => {
-            window.open("https://zalo.me/0964391834", '_blank');
-          }, 1000);
-        }).catch(err => {
-          console.error('Lỗi khi sao chép: ', err);
-          fallbackCopyToZalo(orderMessage);
+          showNotification("Đã sao chép đơn hàng. Vui lòng dán vào Zalo thủ công!");
+        }).catch(() => {
+          // Fallback cuối cùng
+          const textArea = document.createElement("textarea");
+          textArea.value = orderMessage;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          showNotification("Đã sao chép đơn hàng. Vui lòng mở Zalo và dán vào!");
         });
-      } else {
-        // Trình duyệt không hỗ trợ Clipboard API
-        fallbackCopyToZalo(orderMessage);
       }
     }
-
-    // Phương pháp sao chép dự phòng
-    function fallbackCopyToZalo(text) {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      document.body.appendChild(textArea);
-      textArea.select();
-      
-      try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          showNotification("Đã sao chép đơn hàng, đang mở Zalo...");
-          setTimeout(() => window.open("https://zalo.me/0964391834", '_blank'), 1000);
-        } else {
-          showNotification("Không thể sao chép tự động, vui lòng sao chép thủ công");
-        }
-      } catch (err) {
-        showNotification("Lỗi khi sao chép đơn hàng!");
-      }
-      
-      document.body.removeChild(textArea);
+    
+    // Kiểm tra thiết bị di động
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
     
     // Khởi tạo khi trang tải xong
@@ -2017,6 +2050,14 @@
       setupSearch();
       if (cart.length) {
         document.getElementById('cart').classList.remove('collapsed');
+      }
+      
+      // Điều chỉnh vị trí giỏ hàng trên mobile
+      if (isMobile()) {
+        const cart = document.getElementById('cart');
+        cart.style.left = '10px';
+        cart.style.right = '10px';
+        cart.style.width = 'calc(100% - 20px)';
       }
     });
   </script>
