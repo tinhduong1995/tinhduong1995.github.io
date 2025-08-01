@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bii Coffee - Đặt món</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
     body { 
       font-family: Arial, sans-serif; 
@@ -312,6 +313,26 @@
       margin-right: 8px;
     }
     
+    /* Nút Messenger */
+    .messenger-btn {
+      background: #0084FF !important;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .messenger-btn i {
+      font-size: 1.2em;
+    }
+    
     @media screen and (max-width: 600px) {
       body {
         padding-top: 140px;
@@ -389,7 +410,7 @@
     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA1MTJjLTE0MS4zOSAwLTI1Ni0xMTQuNjEtMjU2LTI1NlMxMTQuNjEgMCAyNTYgMHMyNTYgMTE0LjYxIDI1NiAyNTYtMTE0LjYxIDI1Ni0yNTYgMjU2em0xMjYuNzktMTU5LjY5Yy0xNi4xMy0xMS42MS0zOS43My0yMC43Mi-etc..." alt="Zalo">
     Chat Zalo
   </a>
-    <div class="menu-group">
+      <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -1824,6 +1845,7 @@
       <textarea id="orderText" rows="4" placeholder="Đơn hàng sẽ hiển thị ở đây..." readonly></textarea><br/>
       <button onclick="copyOrder()">📋 Sao chép đơn</button>
       <button onclick="sendToZalo()" style="background:#0088cc">📤 Gửi Zalo</button>
+      <button onclick="sendToMessenger()" class="messenger-btn"><i class="fab fa-facebook-messenger"></i> Gửi Messenger</button>
     </div>
   </div>
 
@@ -2037,6 +2059,57 @@
           showNotification("Đã sao chép đơn hàng. Vui lòng mở Zalo và dán vào!");
         });
       }
+    }
+    
+    // Hàm gửi qua Messenger
+    function sendToMessenger() {
+      if (cart.length === 0) {
+        showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
+        return;
+      }
+      
+      // Lấy nội dung đơn hàng
+      const textArea = document.getElementById("orderText");
+      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const orderMessage = `${textArea.value}\nTổng tiền: ${total}k`;
+      
+      // Copy nội dung đơn hàng vào clipboard
+      navigator.clipboard.writeText(orderMessage).then(() => {
+        showNotification("Đã sao chép đơn hàng. Đang mở Messenger...");
+        
+        // ID trang Facebook của bạn (thay bằng ID thực tế)
+        const pageId = "your_facebook_page_id"; 
+        // Số điện thoại liên kết với Facebook của bạn
+        const phoneNumber = "0964391834";
+        
+        // Tạo URL Messenger
+        let messengerUrl;
+        if (isMobile()) {
+          // Link cho mobile app
+          messengerUrl = `fb-messenger://user-thread/${phoneNumber}`;
+        } else {
+          // Link cho web
+          messengerUrl = `https://m.me/${pageId}`;
+        }
+        
+        // Mở Messenger
+        window.open(messengerUrl, '_blank');
+        
+      }).catch(() => {
+        // Fallback nếu clipboard không hoạt động
+        const textArea = document.createElement("textarea");
+        textArea.value = orderMessage;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        showNotification("Đã sao chép đơn hàng. Vui lòng mở Messenger và dán vào!");
+        
+        // Vẫn mở Messenger sau khi copy
+        const pageId = "your_facebook_page_id";
+        window.open(`https://m.me/${pageId}`, '_blank');
+      });
     }
     
     // Kiểm tra thiết bị di động
