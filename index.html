@@ -2021,32 +2021,37 @@ function sendToZalo() {
     return;
   }
 
-  // Lấy nội dung đơn hàng
   const textArea = document.getElementById("orderText");
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const orderMessage = `${textArea.value}\nTổng tiền: ${total}k`;
+  const phoneNumber = "0964391834"; // Số điện thoại quán
 
-  // Copy nội dung vào clipboard (giống Messenger)
+  // Copy vào clipboard (giống Messenger)
   navigator.clipboard.writeText(orderMessage).then(() => {
     showNotification("Đã sao chép đơn hàng. Đang mở Zalo...");
 
-    // Số điện thoại của quán (thay bằng số thực)
-    const phoneNumber = "0964391834"; 
+    // Thử mở Zalo app bằng deep link (zalo://)
+    const zaloAppUrl = `zalo://send?phone=${phoneNumber}&text=${encodeURIComponent(orderMessage)}`;
+    const zaloWebUrl = `https://zalo.me/${phoneNumber}?text=${encodeURIComponent(orderMessage)}`;
 
-    // Tạo URL Zalo (thử cả deep link và web)
-    const zaloUrls = [
-      `https://zalo.me/${phoneNumber}?text=${encodedMessage}`, // Web Zalo
-      `https://zalo.me/${phoneNumber}?text=${encodeURIComponent(orderMessage)}`,   // Web Zalo
-    ];
-    }
-    }
+    // Tạo một thẻ <a> ẩn để mở Zalo
+    const link = document.createElement('a');
+    link.href = zaloAppUrl;
+    link.target = '_blank';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
-    // Nếu không mở được Zalo, thông báo cho người dùng dán thủ công
-    if (!opened) {
-      showNotification("Không mở được Zalo. Vui lòng dán thủ công vào Zalo!");
-    }
+    // Fallback: Nếu sau 1 giây Zalo không mở, chuyển sang web
+    setTimeout(() => {
+      if (!document.hidden) { // Nếu Zalo không mở được
+        window.open(zaloWebUrl, '_blank');
+      }
+    }, 1000);
+
   }).catch(() => {
-    // Fallback nếu clipboard không hoạt động
+    // Fallback nếu không dùng được clipboard
     const textArea = document.createElement("textarea");
     textArea.value = orderMessage;
     document.body.appendChild(textArea);
@@ -2055,7 +2060,7 @@ function sendToZalo() {
     document.body.removeChild(textArea);
     showNotification("Đã sao chép đơn hàng. Vui lòng mở Zalo và dán vào!");
   });
-}    
+}
     // Hàm gửi qua Messenger
     function sendToMessenger() {
       if (cart.length === 0) {
