@@ -2038,15 +2038,7 @@ function sendToZalo() {
       `https://zalo.me/${phoneNumber}?text=${encodedMessage}`, // Web Zalo
       `https://zalo.me/${phoneNumber}?text=${encodeURIComponent(orderMessage)}`,   // Web Zalo
     ];
-
-    // Thử mở Zalo app trước, nếu không được thì mở web
-    let opened = false;
-    for (const url of zaloUrls) {
-      const newWindow = window.open(url, '_blank');
-      if (newWindow && !newWindow.closed) {
-        opened = true;
-        break;
-      }
+    }
     }
 
     // Nếu không mở được Zalo, thông báo cho người dùng dán thủ công
