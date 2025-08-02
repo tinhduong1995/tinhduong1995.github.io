@@ -2021,14 +2021,11 @@
         return;
       }
       
-      // Lấy nội dung đơn hàng
       const textArea = document.getElementById("orderText");
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const orderMessage = `${textArea.value}\nTổng tiền: ${total}k`;
-      
-      // Copy nội dung đơn hàng vào clipboard
-      navigator.clipboard.writeText(orderMessage).then(() => {
-        showNotification("Đã sao chép đơn hàng. Đang mở Zalo...");
+      const phoneNumber = "0964391834";
+      const encodedMessage = encodeURIComponent(orderMessage);
       
       // Tạo nhiều cách mở Zalo khác nhau
       const zaloUrls = [
