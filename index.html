@@ -2035,7 +2035,7 @@ function sendToZalo() {
 
     // Tạo URL Zalo (thử cả deep link và web)
     const zaloUrls = [
-      `zalo://send?phone=${phoneNumber}&text=${encodeURIComponent(orderMessage)}`, // Deep link Zalo app
+      `zalo://send?phone=${phoneNumber}&text=${encodedMessage}` // Zalo deep link
       `https://zalo.me/${phoneNumber}?text=${encodeURIComponent(orderMessage)}`,   // Web Zalo
     ];
 
