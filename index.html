@@ -2016,42 +2016,36 @@
     }
 function sendToZalo() {
   if (cart.length === 0) {
-    showNotification("Vui lòng thêm món vào giỏ hàng!");
+    alert("Vui lòng thêm món vào giỏ hàng!");
     return;
   }
 
   // Lấy nội dung đơn hàng
-  const orderMessage = document.getElementById("orderText").value;
+  const orderText = document.getElementById("orderText").value;
   const phoneNumber = "0964391834"; // Số Zalo quán
+  const encodedMessage = encodeURIComponent(orderText);
 
-  // Copy vào clipboard (để dán thủ công nếu Zalo không mở)
-  navigator.clipboard.writeText(orderMessage).then(() => {
-    showNotification("Đã sao chép đơn hàng. Đang mở Zalo...");
+  // Copy vào clipboard
+  navigator.clipboard.writeText(orderText).then(() => {
+    // Mở Zalo Web (https://zalo.me)
+    const zaloWebUrl = `https://zalo.me/${phoneNumber}?text=${encodedMessage}`;
+    window.open(zaloWebUrl, '_blank');
 
-    // Tạo iframe ẩn để kích hoạt Zalo app (tránh bị chặn popup)
-    const zaloWebUrl = `https://zalo.me/${phoneNumber}
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = zaloAppUrl;
-    document.body.appendChild(iframe);
-
-    // Fallback: Nếu sau 1 giây Zalo không mở, chuyển sang web
+    // Hiển thị hướng dẫn nếu Zalo không mở
     setTimeout(() => {
-      if (!document.hidden) { // Nếu Zalo không mở được
-        window.open(zaloWebUrl, '_blank');
+      if (!document.hidden) {
+        alert("Nhấn vào liên kết sau để mở Zalo: \n\n" + zaloWebUrl);
       }
-      document.body.removeChild(iframe);
     }, 1000);
-
   }).catch(() => {
-    // Fallback nếu clipboard không hoạt động
+    // Fallback nếu trình duyệt chặn clipboard
     const textarea = document.createElement('textarea');
-    textarea.value = orderMessage;
+    textarea.value = orderText;
     document.body.appendChild(textarea);
     textarea.select();
     document.execCommand('copy');
     document.body.removeChild(textarea);
-    showNotification("Đã sao chép đơn hàng. Vui lòng mở Zalo và dán vào!");
+    alert("Đã sao chép đơn hàng. Vui lòng mở Zalo và dán vào chat!");
   });
 }
     // Hàm gửi qua Messenger
