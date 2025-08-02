@@ -2020,31 +2020,46 @@ function sendToZalo() {
     return;
   }
 
-  // Lấy nội dung đơn hàng (giống Messenger)
-  const textArea = document.getElementById("orderText");
+  // 1. Lấy thông tin đơn hàng (giống Messenger)
+  let orderMessage = "Đơn hàng của bạn:\n";
+  
+  cart.forEach((item, index) => {
+    orderMessage += `${index + 1}. ${item.text} x${item.quantity} - ${item.price * item.quantity}k\n`;
+    if (item.note) orderMessage += `   (Ghi chú: ${item.note})\n`;
+  });
+
+  // 2. Thêm tổng tiền vào nội dung
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const orderMessage = textArea.value; // Sử dụng nội dung đã định dạng sẵn từ Messenger
+  orderMessage += `\nTổng tiền: ${total}k\n`;
 
-  // Số điện thoại Zalo của quán
-  const phoneNumber = "0964391834"; 
+  // 3. Thêm thông tin giao hàng (nếu có)
+  const customerName = document.getElementById('customer-name').value;
+  const customerPhone = document.getElementById('customer-phone').value;
+  const deliveryAddress = document.getElementById('delivery-address').value;
 
-  // Copy vào clipboard (giống Messenger)
+  if (customerName || customerPhone || deliveryAddress) {
+    orderMessage += "\nThông tin giao hàng:\n";
+    if (customerName) orderMessage += `- Tên: ${customerName}\n`;
+    if (customerPhone) orderMessage += `- Điện thoại: ${customerPhone}\n`;
+    if (deliveryAddress) orderMessage += `- Địa chỉ: ${deliveryAddress}\n`;
+  }
+
+  // 4. Copy vào clipboard
   navigator.clipboard.writeText(orderMessage).then(() => {
     showNotification("Đã sao chép đơn hàng. Đang mở Zalo...");
 
-    // URL Zalo app (deep link)
+    // 5. Mở Zalo app hoặc web
+    const phoneNumber = "0964391834"; // Số Zalo quán
     const zaloAppUrl = `zalo://send?phone=${phoneNumber}&text=${encodeURIComponent(orderMessage)}`;
-    
-    // URL Zalo web (fallback)
     const zaloWebUrl = `https://zalo.me/${phoneNumber}?text=${encodeURIComponent(orderMessage)}`;
 
-    // Thử mở Zalo app bằng iframe ẩn (tránh chặn popup)
+    // Thử mở Zalo app trước
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
     iframe.src = zaloAppUrl;
     document.body.appendChild(iframe);
 
-    // Fallback sau 1 giây: Nếu Zalo không mở được, chuyển sang web
+    // Fallback sau 1 giây: Nếu không mở được, chuyển sang web Zalo
     setTimeout(() => {
       if (!document.hidden) {
         window.open(zaloWebUrl, '_blank');
@@ -2054,12 +2069,12 @@ function sendToZalo() {
 
   }).catch(() => {
     // Fallback nếu trình duyệt chặn clipboard
-    const textArea = document.createElement("textarea");
-    textArea.value = orderMessage;
-    document.body.appendChild(textArea);
-    textArea.select();
+    const textarea = document.createElement('textarea');
+    textarea.value = orderMessage;
+    document.body.appendChild(textarea);
+    textarea.select();
     document.execCommand('copy');
-    document.body.removeChild(textArea);
+    document.body.removeChild(textarea);
     showNotification("Đã sao chép đơn hàng. Vui lòng mở Zalo và dán vào!");
   });
 }
