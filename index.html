@@ -2016,36 +2016,51 @@
     }
 function sendToZalo() {
   if (cart.length === 0) {
-    alert("Vui lòng thêm món vào giỏ hàng!");
+    showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
     return;
   }
 
-  // Lấy nội dung đơn hàng
-  const orderText = document.getElementById("orderText").value;
-  const phoneNumber = "0964391834"; // Số Zalo quán
-  const encodedMessage = encodeURIComponent(orderText);
+  // Lấy nội dung đơn hàng (giống Messenger)
+  const textArea = document.getElementById("orderText");
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const orderMessage = textArea.value; // Sử dụng nội dung đã định dạng sẵn từ Messenger
 
-  // Copy vào clipboard
-  navigator.clipboard.writeText(orderText).then(() => {
-    // Mở Zalo Web (https://zalo.me)
-    const zaloWebUrl = `https://zalo.me/${phoneNumber}?text=${encodedMessage}`;
-    window.open(zaloWebUrl, '_blank');
+  // Số điện thoại Zalo của quán
+  const phoneNumber = "0964391834"; 
 
-    // Hiển thị hướng dẫn nếu Zalo không mở
+  // Copy vào clipboard (giống Messenger)
+  navigator.clipboard.writeText(orderMessage).then(() => {
+    showNotification("Đã sao chép đơn hàng. Đang mở Zalo...");
+
+    // URL Zalo app (deep link)
+    const zaloAppUrl = `zalo://send?phone=${phoneNumber}&text=${encodeURIComponent(orderMessage)}`;
+    
+    // URL Zalo web (fallback)
+    const zaloWebUrl = `https://zalo.me/${phoneNumber}?text=${encodeURIComponent(orderMessage)}`;
+
+    // Thử mở Zalo app bằng iframe ẩn (tránh chặn popup)
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = zaloAppUrl;
+    document.body.appendChild(iframe);
+
+    // Fallback sau 1 giây: Nếu Zalo không mở được, chuyển sang web
     setTimeout(() => {
       if (!document.hidden) {
-        alert("Nhấn vào liên kết sau để mở Zalo: \n\n" + zaloWebUrl);
+        window.open(zaloWebUrl, '_blank');
       }
+      document.body.removeChild(iframe);
     }, 1000);
+
   }).catch(() => {
     // Fallback nếu trình duyệt chặn clipboard
-    const textarea = document.createElement('textarea');
-    textarea.value = orderText;
-    document.body.appendChild(textarea);
-    textarea.select();
+    const textArea = document.createElement("textarea");
+    textArea.value = orderMessage;
+    document.body.appendChild(textArea);
+    textArea.select();
     document.execCommand('copy');
-    document.body.removeChild(textarea);
-    alert("Đã sao chép đơn hàng. Vui lòng mở Zalo và dán vào chat!");
+    document.body.removeChild(textArea);
+    showNotification("Đã sao chép đơn hàng. Vui lòng mở Zalo và dán vào!");
   });
 }
     // Hàm gửi qua Messenger
