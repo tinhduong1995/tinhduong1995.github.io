@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Bii Coffee - Đặt món</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
@@ -88,9 +88,15 @@
       gap: var(--space-sm);
     }
     
-    #search-input {
+    .search-input-wrapper {
+      position: relative;
       flex-grow: 1;
+    }
+    
+    #search-input {
+      width: 100%;
       padding: var(--space-sm) var(--space-md);
+      padding-right: 30px;
       border: 1px solid #ddd;
       border-radius: 20px;
       font-size: var(--font-sm);
@@ -101,6 +107,28 @@
     #search-input:focus {
       border-color: var(--primary-color);
       box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+    }
+    
+    .clear-search-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: var(--font-lg);
+      color: #999;
+      cursor: pointer;
+      padding: 0 var(--space-xs);
+      z-index: 2;
+    }
+    
+    .clear-search-btn:hover {
+      color: var(--danger-color);
+    }
+    
+    .clear-search-btn.hidden {
+      display: none;
     }
     
     #quick-search-toggle {
@@ -439,6 +467,12 @@
       font-size: var(--font-sm);
     }
     
+    /* Ngăn zoom trên mobile */
+    input[type="text"], input[type="search"], select, textarea {
+      font-size: var(--font-sm);
+      touch-action: manipulation;
+    }
+    
     /* Responsive adjustments */
     @media screen and (max-width: 600px) {
       body {
@@ -509,7 +543,10 @@
   <!-- Thanh tìm kiếm cải tiến -->
   <div id="search-area">
     <div id="search-container">
-      <input type="text" id="search-input" placeholder="🔍 Tìm kiếm món...">
+      <div class="search-input-wrapper">
+        <input type="text" id="search-input" placeholder="🔍 Tìm kiếm món...">
+        <button id="clear-search" class="clear-search-btn hidden">×</button>
+      </div>
       <button id="quick-search-toggle" onclick="toggleQuickSearch()">
         <i class="fas fa-tags"></i>
         <span>Danh mục</span>
@@ -543,7 +580,7 @@
     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA1MTJjLTE0MS4zOSAwLTI1Ni0xMTQuNjEtMjU2LTI1NlMxMTQuNjEgMCAyNTYgMHMyNTYgMTE0LjYxIDI1NiAyNTYtMTE0LjYxIDI1Ni0yNTYgMjU2em0xMjYuNzktMTU5LjY5Yy0xNi4xMy0xMS42MS0zOS43My0yMC43Mi-etc..." alt="Zalo">
     Chat Zalo
   </a>
-            <div class="menu-group">
+              <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -2004,7 +2041,13 @@
     // Search functionality
     function setupSearch() {
       const searchInput = document.getElementById('search-input');
+      const clearBtn = document.getElementById('clear-search');
+      
       searchInput.addEventListener('input', function() {
+        // Hiển thị nút X khi có nội dung
+        clearBtn.classList.toggle('hidden', this.value === '');
+        
+        // Phần tìm kiếm hiện có
         const searchTerm = this.value.toLowerCase();
         const items = document.querySelectorAll('.item');
         
@@ -2018,6 +2061,28 @@
             .some(item => item.style.display !== 'none');
           title.style.display = hasVisibleItems ? 'block' : 'none';
         });
+      });
+      
+      // Xử lý nút X
+      clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        searchInput.focus();
+        this.classList.add('hidden');
+        
+        // Kích hoạt sự kiện input để cập nhật hiển thị
+        const event = new Event('input');
+        searchInput.dispatchEvent(event);
+      });
+      
+      // Ngăn zoom trên mobile khi nhấn vào tìm kiếm
+      searchInput.addEventListener('touchstart', function(e) {
+        this.style.fontSize = '16px'; // Đặt font-size cố định
+      });
+      
+      searchInput.addEventListener('touchend', function(e) {
+        setTimeout(() => {
+          this.style.fontSize = ''; // Khôi phục font-size sau 100ms
+        }, 100);
       });
     }
     
@@ -2037,8 +2102,11 @@
     // Search by keyword
     function searchByKeyword(keyword) {
       const searchInput = document.getElementById('search-input');
+      const clearBtn = document.getElementById('clear-search');
+      
       searchInput.value = keyword;
       searchInput.focus();
+      clearBtn.classList.remove('hidden');
       
       // Close quick search panel
       toggleQuickSearch();
@@ -2272,11 +2340,6 @@
         const pageId = "your_facebook_page_id";
         window.open(`https://m.me/${pageId}`, '_blank');
       });
-    }
-    
-    // Check if mobile device
-    function isMobile() {
-      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
     
     // Initialize when page loads
