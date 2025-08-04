@@ -10,7 +10,7 @@
       font-family: Arial, sans-serif; 
       margin: 0; 
       background: #f9f9f9;
-      padding-top: 160px;
+      padding-top: 200px;
       padding-bottom: 120px;
     }
     header { 
@@ -36,6 +36,37 @@
       right: 0;
       z-index: 20;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    #quick-search {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px;
+      background: white;
+      position: fixed;
+      top: 120px;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      left: 0;
+      right: 0;
+      z-index: 19;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .search-tag {
+      padding: 5px 10px;
+      background: #f0f0f0;
+      border-radius: 15px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .search-tag:hover {
+      background: #007BFF;
+      color: white;
     }
     
     #search-input {
@@ -101,117 +132,6 @@
       min-width: 120px;
     }
   
-    @media screen and (max-width: 600px) {
-      body {
-        padding-top: 140px;
-      }
-      
-      #search-container {
-        top: 70px;
-        padding: 8px 10px;
-      }
-      
-      .item {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      
-      .item-name {
-        width: 100%;
-        margin-bottom: 8px;
-        font-size: 1em;
-      }
-      
-      .item-controls {
-        width: 100%;
-        justify-content: space-between;
-        margin-top: 8px;
-      }
-      
-      .item select {
-        width: 100%;
-      }
-      
-      .note-input {
-        margin-left: 0;
-        margin-top: 8px;
-        width: 100%;
-      }
-      
-      .menu-title {
-        font-size: 1.2em;
-        margin-left: 15px;
-      }
-      
-      #search-input {
-        padding: 8px 12px;
-        font-size: 14px;
-      }
-      
-      /* Nút Zalo cho mobile */
-      .zalo-float-btn {
-        bottom: 100px;
-        padding: 8px 12px;
-        font-size: 14px;
-      }
-      
-      /* Tối ưu giỏ hàng cho mobile */
-      #cart {
-        width: calc(100% - 20px);
-        left: 10px;
-        right: 10px;
-        bottom: 10px;
-        max-height: 50vh;
-      }
-      
-      #cart-content {
-        max-height: calc(50vh - 50px);
-        overflow-y: auto;
-      }
-      
-      .cart-item {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 8px;
-      }
-      
-      .cart-item-details {
-        width: 100%;
-        margin-bottom: 5px;
-      }
-      
-      .cart-item-price {
-        margin: 5px 0;
-      }
-      
-      .remove-btn {
-        align-self: flex-end;
-      }
-      
-      #cart-list {
-        max-height: 200px;
-        overflow-y: auto;
-        padding-right: 5px;
-      }
-      
-      /* Thanh cuộn tùy chỉnh cho mobile */
-      #cart-list::-webkit-scrollbar {
-        width: 5px;
-      }
-      
-      #cart-list::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      
-      #cart-list::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 5px;
-      }
-      
-      #cart-list::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
-    }    
     #cart { 
       position: fixed;
       left: 20px;
@@ -380,7 +300,6 @@
       display: none;
     }
     
-    /* Nút Zalo cố định */
     .zalo-float-btn {
       position: fixed;
       bottom: 80px;
@@ -401,7 +320,6 @@
       margin-right: 8px;
     }
     
-    /* Nút Messenger */
     .messenger-btn {
       background: #0084FF !important;
       color: white;
@@ -420,6 +338,128 @@
     .messenger-btn i {
       font-size: 1.2em;
     }
+
+    @media screen and (max-width: 600px) {
+      body {
+        padding-top: 240px;
+      }
+      
+      #search-container {
+        top: 70px;
+        padding: 8px 10px;
+      }
+      
+      #quick-search {
+        top: 110px;
+        padding: 8px;
+        overflow-x: auto;
+        white-space: nowrap;
+        display: block;
+      }
+      
+      .search-tag {
+        display: inline-block;
+        margin-right: 5px;
+      }
+      
+      .item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .item-name {
+        width: 100%;
+        margin-bottom: 8px;
+        font-size: 1em;
+      }
+      
+      .item-controls {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 8px;
+      }
+      
+      .item select {
+        width: 100%;
+      }
+      
+      .note-input {
+        margin-left: 0;
+        margin-top: 8px;
+        width: 100%;
+      }
+      
+      .menu-title {
+        font-size: 1.2em;
+        margin-left: 15px;
+      }
+      
+      #search-input {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+      
+      .zalo-float-btn {
+        bottom: 100px;
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+      
+      #cart {
+        width: calc(100% - 20px);
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        max-height: 50vh;
+      }
+      
+      #cart-content {
+        max-height: calc(50vh - 50px);
+        overflow-y: auto;
+      }
+      
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px;
+      }
+      
+      .cart-item-details {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      
+      .cart-item-price {
+        margin: 5px 0;
+      }
+      
+      .remove-btn {
+        align-self: flex-end;
+      }
+      
+      #cart-list {
+        max-height: 200px;
+        overflow-y: auto;
+        padding-right: 5px;
+      }
+      
+      #cart-list::-webkit-scrollbar {
+        width: 5px;
+      }
+      
+      #cart-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      
+      #cart-list::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 5px;
+      }
+      
+      #cart-list::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+    }
   </style>
 </head>
 <body>
@@ -428,12 +468,25 @@
     <p>📍 Trung Mầu - Cổng Phụ Bá Thiện 2 | ☎ 0964 391 834 or 0928 020 777</p>
   </header>
 
-  <!-- Search box cố định -->
   <div id="search-container">
     <input type="text" id="search-input" placeholder="🔍 Tìm kiếm món...">
   </div>
 
-  <!-- Delivery info -->
+  <div id="quick-search">
+    <div class="search-tag" onclick="searchByKeyword('TRÀ')">TRÀ</div>
+    <div class="search-tag" onclick="searchByKeyword('SODA')">SODA</div>
+    <div class="search-tag" onclick="searchByKeyword('SINH TỐ')">SINH TỐ</div>
+    <div class="search-tag" onclick="searchByKeyword('ĐÁ XAY')">ĐÁ XAY</div>
+    <div class="search-tag" onclick="searchByKeyword('CÀ PHÊ')">CÀ PHÊ</div>
+    <div class="search-tag" onclick="searchByKeyword('TRÀ SỮA')">TRÀ SỮA</div>
+    <div class="search-tag" onclick="searchByKeyword('SỮA CHUA')">SỮA CHUA</div>
+    <div class="search-tag" onclick="searchByKeyword('NƯỚC ÉP')">NƯỚC ÉP</div>
+    <div class="search-tag" onclick="searchByKeyword('PIZZA')">PIZZA</div>
+    <div class="search-tag" onclick="searchByKeyword('ĐỒ ĂN VẶT')">ĐỒ ĂN VẶT</div>
+    <div class="search-tag" onclick="searchByKeyword('MỲ CAY')">MỲ CAY</div>
+    <div class="search-tag" onclick="searchByKeyword('BÚN ĐẬU')">BÚN ĐẬU</div>
+  </div>
+
   <div id="delivery-section" class="delivery-info hidden">
     <h3>Thông tin giao hàng</h3>
     <input type="text" id="customer-name" placeholder="Họ tên">
@@ -442,12 +495,11 @@
     <button onclick="toggleDeliveryInfo()">Đóng</button>
   </div>
 
-  <!-- Nút Zalo cố định -->
   <a href="https://zalo.me/0964391834" class="zalo-float-btn" target="_blank">
     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA1MTJjLTE0MS4zOSAwLTI1Ni0xMTQuNjEtMjU2LTI1NlMxMTQuNjEgMCAyNTYgMHMyNTYgMTE0LjYxIDI1NiAyNTYtMTE0LjYxIDI1Ni0yNTYgMjU2em0xMjYuNzktMTU5LjY5Yy0xNi4xMy0xMS42MS0zOS43My0yMC43Mi-etc..." alt="Zalo">
     Chat Zalo
   </a>
-        <div class="menu-group">
+          <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -1891,7 +1943,6 @@
   <script>
     let cart = [];
     
-    // Load cart from localStorage
     function loadCart() {
       const savedCart = localStorage.getItem('biiCoffeeCart');
       if (savedCart) {
@@ -1900,12 +1951,10 @@
       }
     }
     
-    // Save cart to localStorage
     function saveCart() {
       localStorage.setItem('biiCoffeeCart', JSON.stringify(cart));
     }
     
-    // Search functionality
     function setupSearch() {
       const searchInput = document.getElementById('search-input');
       searchInput.addEventListener('input', function() {
@@ -1925,7 +1974,18 @@
       });
     }
     
-    // Toggle delivery info
+    function searchByKeyword(keyword) {
+      const searchInput = document.getElementById('search-input');
+      searchInput.value = keyword;
+      searchInput.focus();
+      
+      const event = new Event('input', {
+        bubbles: true,
+        cancelable: true,
+      });
+      searchInput.dispatchEvent(event);
+    }
+    
     function toggleDeliveryInfo() {
       document.getElementById('delivery-section').classList.toggle('hidden');
       updateCart();
@@ -1982,7 +2042,6 @@
       noteInput.value = '';
       updateCart();
       saveCart();
-      // Đã bỏ dòng tự động mở giỏ hàng
     }
 
     function removeFromCart(index) {
@@ -2003,7 +2062,6 @@
       let content = "Đơn hàng của bạn:\n";
       let total = 0;
       
-      // Thêm thông tin giao hàng nếu có
       const customerName = document.getElementById('customer-name').value;
       const customerPhone = document.getElementById('customer-phone').value;
       const deliveryAddress = document.getElementById('delivery-address').value;
@@ -2016,7 +2074,6 @@
         content += "\n";
       }
       
-      // Thêm các món vào đơn hàng
       cart.forEach((item, index) => {
         const itemTotal = item.price * item.quantity;
         total += itemTotal;
@@ -2058,7 +2115,6 @@
         return;
       }
 
-      // 1. Lấy thông tin đơn hàng
       let orderMessage = "Đơn hàng của bạn:\n";
       
       cart.forEach((item, index) => {
@@ -2066,11 +2122,9 @@
         if (item.note) orderMessage += `   (Ghi chú: ${item.note})\n`;
       });
 
-      // 2. Thêm tổng tiền vào nội dung
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       orderMessage += `\nTổng tiền: ${total}k\n`;
 
-      // 3. Thêm thông tin giao hàng (nếu có)
       const customerName = document.getElementById('customer-name').value;
       const customerPhone = document.getElementById('customer-phone').value;
       const deliveryAddress = document.getElementById('delivery-address').value;
@@ -2082,22 +2136,18 @@
         if (deliveryAddress) orderMessage += `- Địa chỉ: ${deliveryAddress}\n`;
       }
 
-      // 4. Copy vào clipboard
       navigator.clipboard.writeText(orderMessage).then(() => {
         showNotification("Đã sao chép đơn hàng. Đang mở Zalo...");
 
-        // 5. Mở Zalo app hoặc web
-        const phoneNumber = "0964391834"; // Số Zalo quán
+        const phoneNumber = "0964391834";
         const zaloAppUrl = `zalo://send?phone=${phoneNumber}&text=${encodeURIComponent(orderMessage)}`;
         const zaloWebUrl = `https://zalo.me/${phoneNumber}?text=${encodeURIComponent(orderMessage)}`;
 
-        // Thử mở Zalo app trước
         const iframe = document.createElement('iframe');
         iframe.style.display = 'none';
         iframe.src = zaloAppUrl;
         document.body.appendChild(iframe);
 
-        // Fallback sau 1 giây: Nếu không mở được, chuyển sang web Zalo
         setTimeout(() => {
           if (!document.hidden) {
             window.open(zaloWebUrl, '_blank');
@@ -2106,7 +2156,6 @@
         }, 1000);
 
       }).catch(() => {
-        // Fallback nếu trình duyệt chặn clipboard
         const textarea = document.createElement('textarea');
         textarea.value = orderMessage;
         document.body.appendChild(textarea);
@@ -2117,63 +2166,43 @@
       });
     }
 
-    // Hàm gửi qua Messenger
     function sendToMessenger() {
       if (cart.length === 0) {
         showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
         return;
       }
       
-      // Lấy nội dung đơn hàng
       const textArea = document.getElementById("orderText");
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const orderMessage = `${textArea.value}\nTổng tiền: ${total}k`;
       
-      // Copy nội dung đơn hàng vào clipboard
       navigator.clipboard.writeText(orderMessage).then(() => {
         showNotification("Đã sao chép đơn hàng. Đang mở Messenger...");
         
-        // ID trang Facebook của bạn (thay bằng ID thực tế)
         const pageId = "hoa.ciu.s.2025"; 
-        // Số điện thoại liên kết với Facebook của bạn
-        const phoneNumber = "hoa.ciu.s.2025";
+        const messengerUrl = `https://m.me/${pageId}`;
         
-        // Tạo URL Messenger
-        let messengerUrl;
-        if (isMobile()) {
-          // Link cho mobile app
-          messengerUrl = `https://m.me/${pageId}`;
-        } else {
-          // Link cho web
-          messengerUrl = `https://m.me/${pageId}`;
-        }
-        
-        // Mở Messenger
         window.open(messengerUrl, '_blank');
         
       }).catch(() => {
-        // Fallback nếu clipboard không hoạt động
         const textArea = document.createElement("textarea");
         textArea.value = orderMessage;
         document.body.appendChild(textArea);
         textArea.select();
         document.execCommand('copy');
-        document.body.removeChild(textArea);
+        document.body.removeChild(textarea);
         
         showNotification("Đã sao chép đơn hàng. Vui lòng mở Messenger và dán vào!");
         
-        // Vẫn mở Messenger sau khi copy
         const pageId = "your_facebook_page_id";
         window.open(`https://m.me/${pageId}`, '_blank');
       });
     }
     
-    // Kiểm tra thiết bị di động
     function isMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
     
-    // Khởi tạo khi trang tải xong
     window.addEventListener('DOMContentLoaded', () => {
       loadCart();
       setupSearch();
