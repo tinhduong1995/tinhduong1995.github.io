@@ -60,67 +60,109 @@
     }
     
     /* Search area */
-    #search-container {
-      padding: var(--space-sm);
-      background: #fff;
+#search-area {
       position: fixed;
-      top: clamp(70px, 10vh, 80px);
+      top: 80px;
       width: 100%;
-      max-width: min(95%, 800px);
+      max-width: 800px;
       margin: 0 auto;
       left: 0;
       right: 0;
       z-index: 20;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    
-    #quick-search {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-sm);
-      padding: var(--space-sm);
       background: white;
-      position: fixed;
-      top: clamp(110px, 15vh, 120px);
-      width: 100%;
-      max-width: min(95%, 800px);
-      margin: 0 auto;
-      left: 0;
-      right: 0;
-      z-index: 19;
+      padding: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    
-    .search-tag {
-      padding: var(--space-xs) var(--space-sm);
-      background: #f0f0f0;
-      border-radius: 15px;
-      font-size: var(--font-size-small);
+
+    #search-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #search-input {
+      flex-grow: 1;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    #quick-search-toggle {
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 15px;
       cursor: pointer;
-      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
       white-space: nowrap;
     }
-    
+
+    #quick-search {
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+      margin-top: 10px;
+    }
+
+    #quick-search.show {
+      display: flex;
+    }
+
+    .search-tag {
+      padding: 5px 10px;
+      background: #f0f0f0;
+      border-radius: 15px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
     .search-tag:hover {
       background: #007BFF;
       color: white;
     }
-    
-    #search-input {
-      width: 100%;
-      padding: var(--space-sm) var(--space-md);
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      font-size: var(--font-size-normal);
-      outline: none;
-      transition: all 0.3s;
-    }
-    
-    #search-input:focus {
-      border-color: #007BFF;
-      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
-    }
 
+    @media screen and (max-width: 600px) {
+      #search-area {
+        top: 70px;
+        padding: 8px;
+      }
+
+      #search-container {
+        gap: 8px;
+      }
+
+      #quick-search-toggle {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+
+      #search-input {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+
+      #quick-search {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 5px;
+      }
+
+      #quick-search::-webkit-scrollbar {
+        height: 3px;
+      }
+
+      .search-tag {
+        flex-shrink: 0;
+      }
+    }
     /* Menu container */
     .menu-container {
       display: flex;
@@ -369,25 +411,29 @@
     <p>📍 Trung Mầu - Cổng Phụ Bá Thiện 2 | ☎ 0964 391 834 or 0928 020 777</p>
   </header>
 
-  <div id="search-container">
-    <input type="text" id="search-input" placeholder="🔍 Tìm kiếm món...">
+<div id="search-area">
+    <div id="search-container">
+      <input type="text" id="search-input" placeholder="🔍 Tìm kiếm món...">
+      <button id="quick-search-toggle" onclick="toggleQuickSearch()">
+        <i class="fas fa-tags"></i>
+        <span>Danh mục</span>
+      </button>
+    </div>
+    <div id="quick-search">
+      <div class="search-tag" onclick="searchByKeyword('TRÀ')">TRÀ</div>
+      <div class="search-tag" onclick="searchByKeyword('SODA')">SODA</div>
+      <div class="search-tag" onclick="searchByKeyword('SINH TỐ')">SINH TỐ</div>
+      <div class="search-tag" onclick="searchByKeyword('ĐÁ XAY')">ĐÁ XAY</div>
+      <div class="search-tag" onclick="searchByKeyword('CÀ PHÊ')">CÀ PHÊ</div>
+      <div class="search-tag" onclick="searchByKeyword('TRÀ SỮA')">TRÀ SỮA</div>
+      <div class="search-tag" onclick="searchByKeyword('SỮA CHUA')">SỮA CHUA</div>
+      <div class="search-tag" onclick="searchByKeyword('NƯỚC ÉP')">NƯỚC ÉP</div>
+      <div class="search-tag" onclick="searchByKeyword('PIZZA')">PIZZA</div>
+      <div class="search-tag" onclick="searchByKeyword('ĐỒ ĂN VẶT')">ĐỒ ĂN VẶT</div>
+      <div class="search-tag" onclick="searchByKeyword('MỲ CAY')">MỲ CAY</div>
+      <div class="search-tag" onclick="searchByKeyword('BÚN ĐẬU')">BÚN ĐẬU</div>
+    </div>
   </div>
-
-  <div id="quick-search">
-    <div class="search-tag" onclick="searchByKeyword('TRÀ')">TRÀ</div>
-    <div class="search-tag" onclick="searchByKeyword('SODA')">SODA</div>
-    <div class="search-tag" onclick="searchByKeyword('SINH TỐ')">SINH TỐ</div>
-    <div class="search-tag" onclick="searchByKeyword('ĐÁ XAY')">ĐÁ XAY</div>
-    <div class="search-tag" onclick="searchByKeyword('CÀ PHÊ')">CÀ PHÊ</div>
-    <div class="search-tag" onclick="searchByKeyword('TRÀ SỮA')">TRÀ SỮA</div>
-    <div class="search-tag" onclick="searchByKeyword('SỮA CHUA')">SỮA CHUA</div>
-    <div class="search-tag" onclick="searchByKeyword('NƯỚC ÉP')">NƯỚC ÉP</div>
-    <div class="search-tag" onclick="searchByKeyword('PIZZA')">PIZZA</div>
-    <div class="search-tag" onclick="searchByKeyword('ĐỒ ĂN VẶT')">ĐỒ ĂN VẶT</div>
-    <div class="search-tag" onclick="searchByKeyword('MỲ CAY')">MỲ CAY</div>
-    <div class="search-tag" onclick="searchByKeyword('BÚN ĐẬU')">BÚN ĐẬU</div>
-  </div>
-
   <div id="delivery-section" class="delivery-info hidden">
     <h3>Thông tin giao hàng</h3>
     <input type="text" id="customer-name" placeholder="Họ tên">
@@ -1841,9 +1887,10 @@
 
   <div id="notification" class="notification">Đã thêm vào giỏ hàng!</div>
 
-  <script>
+<script>
     let cart = [];
     
+    // Load cart from localStorage
     function loadCart() {
       const savedCart = localStorage.getItem('biiCoffeeCart');
       if (savedCart) {
@@ -1852,10 +1899,12 @@
       }
     }
     
+    // Save cart to localStorage
     function saveCart() {
       localStorage.setItem('biiCoffeeCart', JSON.stringify(cart));
     }
     
+    // Search functionality
     function setupSearch() {
       const searchInput = document.getElementById('search-input');
       searchInput.addEventListener('input', function() {
@@ -1875,11 +1924,29 @@
       });
     }
     
+    // Hàm mới: toggle quick search
+    function toggleQuickSearch() {
+      const quickSearch = document.getElementById('quick-search');
+      quickSearch.classList.toggle('show');
+      
+      const toggleBtn = document.getElementById('quick-search-toggle');
+      if (quickSearch.classList.contains('show')) {
+        toggleBtn.innerHTML = '<i class="fas fa-times"></i><span>Đóng</span>';
+      } else {
+        toggleBtn.innerHTML = '<i class="fas fa-tags"></i><span>Danh mục</span>';
+      }
+    }
+    
+    // Hàm xử lý click vào từ khóa tìm kiếm
     function searchByKeyword(keyword) {
       const searchInput = document.getElementById('search-input');
       searchInput.value = keyword;
       searchInput.focus();
       
+      // Đóng panel danh mục sau khi chọn
+      toggleQuickSearch();
+      
+      // Kích hoạt sự kiện input để lọc menu
       const event = new Event('input', {
         bubbles: true,
         cancelable: true,
@@ -2104,6 +2171,7 @@
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
     
+    // Khởi tạo khi trang tải xong
     window.addEventListener('DOMContentLoaded', () => {
       loadCart();
       setupSearch();
@@ -2112,5 +2180,5 @@
       }
     });
   </script>
-</body>
+  </body>
 </html>
