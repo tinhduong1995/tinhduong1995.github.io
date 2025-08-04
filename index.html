@@ -7,10 +7,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
     :root {
-      /* Biến màu sắc mới - chuyên nghiệp */
+      /* Biến màu sắc */
       --primary-color: #2C5E9E; /* Xanh dương đậm */
       --secondary-color: #4CAF50; /* Xanh lá */
       --accent-color: #FF6B6B;   /* Cam đỏ */
+      --quantity-btn-color: #FF6B6B; /* Màu nút số lượng */
+      --add-to-cart-color: #4CAF50; /* Màu nút thêm vào giỏ */
       --light-color: #f8faf8;
       --dark-color: #333333;
       --text-color: #333;
@@ -256,7 +258,7 @@
       background: white;
     }
     
-    /* Quantity controls */
+    /* Quantity controls - Nút + và - */
     .quantity-controls {
       display: flex;
       align-items: center;
@@ -265,7 +267,7 @@
     .quantity-btn {
       width: clamp(25px, 6vw, 30px);
       height: clamp(25px, 6vw, 30px);
-      background: var(--primary-color);
+      background: var(--quantity-btn-color);
       color: white;
       border: none;
       border-radius: 3px;
@@ -275,10 +277,12 @@
       align-items: center;
       font-size: var(--font-sm);
       transition: all 0.2s;
+      font-weight: bold;
     }
     
     .quantity-btn:hover {
-      background: #1E4B8B;
+      background: #E55B5B;
+      transform: scale(1.05);
     }
     
     .quantity-input { 
@@ -297,6 +301,35 @@
       padding: var(--space-xs);
       border: 1px solid var(--border-color); 
       border-radius: 4px; 
+    }
+    
+    /* Nút Thêm vào giỏ */
+    .add-to-cart-btn {
+      background: var(--add-to-cart-color);
+      color: white;
+      padding: var(--space-xs) var(--space-sm);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: var(--font-sm);
+      transition: all 0.3s;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      min-width: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    
+    .add-to-cart-btn:hover {
+      background: #3E9E42;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .add-to-cart-btn:active {
+      transform: translateY(0);
     }
     
     /* Button styles */
@@ -581,6 +614,18 @@
         padding: var(--space-xs) var(--space-sm);
         font-size: var(--font-xs);
       }
+      
+      /* Điều chỉnh nút trên mobile */
+      .add-to-cart-btn {
+        min-width: 70px;
+        font-size: var(--font-xs);
+        padding: var(--space-xs);
+      }
+      
+      .quantity-btn {
+        width: 25px;
+        height: 25px;
+      }
     }
     
     /* Đối với màn hình rất nhỏ */
@@ -607,7 +652,7 @@
       </div>
       <button id="quick-search-toggle" onclick="toggleQuickSearch()">
         <i class="fas fa-tags"></i>
-        <span>Danh mục</span>
+        <span>Lọc món theo nhóm</span>
       </button>
     </div>
     <div id="quick-search">
@@ -627,7 +672,7 @@
   </div>
 
   <div id="delivery-section" class="delivery-info hidden">
-    <h3>Thông tin giao hàng</h3>
+    <h3>Thông tin ship</h3>
     <input type="text" id="customer-name" placeholder="Họ tên">
     <input type="tel" id="customer-phone" placeholder="Số điện thoại">
     <textarea id="delivery-address" placeholder="Địa chỉ giao hàng"></textarea>
@@ -638,7 +683,7 @@
     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA1MTJjLTE0MS4zOSAwLTI1Ni0xMTQuNjEtMjU2LTI1NlMxMTQuNjEgMCAyNTYgMHMyNTYgMTE0LjYxIDI1NiAyNTYtMTE0LjYxIDI1Ni0yNTYgMjU2em0xMjYuNzktMTU5LjY5Yy0xNi4xMy0xMS42MS0zOS43My0yMC43Mi-etc..." alt="Zalo">
     Chat Zalo
   </a>
-                <div class="menu-group">
+                  <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -2395,7 +2440,7 @@
         
         showNotification("Đã sao chép đơn hàng. Vui lòng mở Messenger và dán vào!");
         
-        const pageId = "your_facebook_page_id";
+        const pageId = "hoa.ciu.s.2025";
         window.open(`https://m.me/${pageId}`, '_blank');
       });
     }
