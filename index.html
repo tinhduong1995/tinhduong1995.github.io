@@ -102,26 +102,114 @@
     }
   
     @media screen and (max-width: 600px) {
+      body {
+        padding-top: 140px;
+      }
+      
+      #search-container {
+        top: 70px;
+        padding: 8px 10px;
+      }
+      
       .item {
         flex-direction: column;
         align-items: flex-start;
-        gap: 6px;
       }
       
       .item-name {
         width: 100%;
-        margin-bottom: 4px;
-        margin-right: 40px;
+        margin-bottom: 8px;
+        font-size: 1em;
       }
       
       .item-controls {
         width: 100%;
         justify-content: space-between;
-        gap: 6px;
+        margin-top: 8px;
       }
       
       .item select {
         width: 100%;
+      }
+      
+      .note-input {
+        margin-left: 0;
+        margin-top: 8px;
+        width: 100%;
+      }
+      
+      .menu-title {
+        font-size: 1.2em;
+        margin-left: 15px;
+      }
+      
+      #search-input {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+      
+      /* Nút Zalo cho mobile */
+      .zalo-float-btn {
+        bottom: 100px;
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+      
+      /* Tối ưu giỏ hàng cho mobile */
+      #cart {
+        width: calc(100% - 20px);
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        max-height: 50vh;
+      }
+      
+      #cart-content {
+        max-height: calc(50vh - 50px);
+        overflow-y: auto;
+      }
+      
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px;
+      }
+      
+      .cart-item-details {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      
+      .cart-item-price {
+        margin: 5px 0;
+      }
+      
+      .remove-btn {
+        align-self: flex-end;
+      }
+      
+      #cart-list {
+        max-height: 200px;
+        overflow-y: auto;
+        padding-right: 5px;
+      }
+      
+      /* Thanh cuộn tùy chỉnh cho mobile */
+      #cart-list::-webkit-scrollbar {
+        width: 5px;
+      }
+      
+      #cart-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      
+      #cart-list::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 5px;
+      }
+      
+      #cart-list::-webkit-scrollbar-thumb:hover {
+        background: #555;
       }
     }    
     #cart { 
@@ -332,57 +420,6 @@
     .messenger-btn i {
       font-size: 1.2em;
     }
-    
-    @media screen and (max-width: 600px) {
-      body {
-        padding-top: 140px;
-      }
-      
-      #search-container {
-        top: 70px;
-        padding: 8px 10px;
-      }
-      
-      #cart {
-        width: calc(100% - 40px);
-        left: 20px;
-        right: 20px;
-      }
-      .item {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .item-name {
-        width: 100%;
-        margin-bottom: 8px;
-        font-size: 1em;
-      }
-      .item-controls {
-        width: 100%;
-        justify-content: space-between;
-        margin-top: 8px;
-      }
-      .note-input {
-        margin-left: 0;
-        margin-top: 8px;
-        width: 100%;
-      }
-      .menu-title {
-        font-size: 1.2em;
-        margin-left: 15px;
-      }
-      #search-input {
-        padding: 8px 12px;
-        font-size: 14px;
-      }
-      
-      /* Điều chỉnh nút Zalo cho mobile */
-      .zalo-float-btn {
-        bottom: 100px;
-        padding: 8px 12px;
-        font-size: 14px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -410,7 +447,7 @@
     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA1MTJjLTE0MS4zOSAwLTI1Ni0xMTQuNjEtMjU2LTI1NlMxMTQuNjEgMCAyNTYgMHMyNTYgMTE0LjYxIDI1NiAyNTYtMTE0LjYxIDI1Ni0yNTYgMjU2em0xMjYuNzktMTU5LjY5Yy0xNi4xMy0xMS42MS0zOS43My0yMC43Mi-etc..." alt="Zalo">
     Chat Zalo
   </a>
-      <div class="menu-group">
+        <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -1945,7 +1982,7 @@
       noteInput.value = '';
       updateCart();
       saveCart();
-      document.getElementById('cart').classList.remove('collapsed');
+      // Đã bỏ dòng tự động mở giỏ hàng
     }
 
     function removeFromCart(index) {
@@ -2014,70 +2051,72 @@
       document.execCommand("copy");
       showNotification("Đã sao chép đơn hàng!");
     }
-function sendToZalo() {
-  if (cart.length === 0) {
-    showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
-    return;
-  }
 
-  // 1. Lấy thông tin đơn hàng (giống Messenger)
-  let orderMessage = "Đơn hàng của bạn:\n";
-  
-  cart.forEach((item, index) => {
-    orderMessage += `${index + 1}. ${item.text} x${item.quantity} - ${item.price * item.quantity}k\n`;
-    if (item.note) orderMessage += `   (Ghi chú: ${item.note})\n`;
-  });
-
-  // 2. Thêm tổng tiền vào nội dung
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  orderMessage += `\nTổng tiền: ${total}k\n`;
-
-  // 3. Thêm thông tin giao hàng (nếu có)
-  const customerName = document.getElementById('customer-name').value;
-  const customerPhone = document.getElementById('customer-phone').value;
-  const deliveryAddress = document.getElementById('delivery-address').value;
-
-  if (customerName || customerPhone || deliveryAddress) {
-    orderMessage += "\nThông tin giao hàng:\n";
-    if (customerName) orderMessage += `- Tên: ${customerName}\n`;
-    if (customerPhone) orderMessage += `- Điện thoại: ${customerPhone}\n`;
-    if (deliveryAddress) orderMessage += `- Địa chỉ: ${deliveryAddress}\n`;
-  }
-
-  // 4. Copy vào clipboard
-  navigator.clipboard.writeText(orderMessage).then(() => {
-    showNotification("Đã sao chép đơn hàng. Đang mở Zalo...");
-
-    // 5. Mở Zalo app hoặc web
-    const phoneNumber = "0964391834"; // Số Zalo quán
-    const zaloAppUrl = `zalo://send?phone=${phoneNumber}&text=${encodeURIComponent(orderMessage)}`;
-    const zaloWebUrl = `https://zalo.me/${phoneNumber}?text=${encodeURIComponent(orderMessage)}`;
-
-    // Thử mở Zalo app trước
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = zaloAppUrl;
-    document.body.appendChild(iframe);
-
-    // Fallback sau 1 giây: Nếu không mở được, chuyển sang web Zalo
-    setTimeout(() => {
-      if (!document.hidden) {
-        window.open(zaloWebUrl, '_blank');
+    function sendToZalo() {
+      if (cart.length === 0) {
+        showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
+        return;
       }
-      document.body.removeChild(iframe);
-    }, 1000);
 
-  }).catch(() => {
-    // Fallback nếu trình duyệt chặn clipboard
-    const textarea = document.createElement('textarea');
-    textarea.value = orderMessage;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    showNotification("Đã sao chép đơn hàng. Vui lòng mở Zalo và dán vào!");
-  });
-}
+      // 1. Lấy thông tin đơn hàng
+      let orderMessage = "Đơn hàng của bạn:\n";
+      
+      cart.forEach((item, index) => {
+        orderMessage += `${index + 1}. ${item.text} x${item.quantity} - ${item.price * item.quantity}k\n`;
+        if (item.note) orderMessage += `   (Ghi chú: ${item.note})\n`;
+      });
+
+      // 2. Thêm tổng tiền vào nội dung
+      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      orderMessage += `\nTổng tiền: ${total}k\n`;
+
+      // 3. Thêm thông tin giao hàng (nếu có)
+      const customerName = document.getElementById('customer-name').value;
+      const customerPhone = document.getElementById('customer-phone').value;
+      const deliveryAddress = document.getElementById('delivery-address').value;
+
+      if (customerName || customerPhone || deliveryAddress) {
+        orderMessage += "\nThông tin giao hàng:\n";
+        if (customerName) orderMessage += `- Tên: ${customerName}\n`;
+        if (customerPhone) orderMessage += `- Điện thoại: ${customerPhone}\n`;
+        if (deliveryAddress) orderMessage += `- Địa chỉ: ${deliveryAddress}\n`;
+      }
+
+      // 4. Copy vào clipboard
+      navigator.clipboard.writeText(orderMessage).then(() => {
+        showNotification("Đã sao chép đơn hàng. Đang mở Zalo...");
+
+        // 5. Mở Zalo app hoặc web
+        const phoneNumber = "0964391834"; // Số Zalo quán
+        const zaloAppUrl = `zalo://send?phone=${phoneNumber}&text=${encodeURIComponent(orderMessage)}`;
+        const zaloWebUrl = `https://zalo.me/${phoneNumber}?text=${encodeURIComponent(orderMessage)}`;
+
+        // Thử mở Zalo app trước
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = zaloAppUrl;
+        document.body.appendChild(iframe);
+
+        // Fallback sau 1 giây: Nếu không mở được, chuyển sang web Zalo
+        setTimeout(() => {
+          if (!document.hidden) {
+            window.open(zaloWebUrl, '_blank');
+          }
+          document.body.removeChild(iframe);
+        }, 1000);
+
+      }).catch(() => {
+        // Fallback nếu trình duyệt chặn clipboard
+        const textarea = document.createElement('textarea');
+        textarea.value = orderMessage;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showNotification("Đã sao chép đơn hàng. Vui lòng mở Zalo và dán vào!");
+      });
+    }
+
     // Hàm gửi qua Messenger
     function sendToMessenger() {
       if (cart.length === 0) {
@@ -2140,14 +2179,6 @@ function sendToZalo() {
       setupSearch();
       if (cart.length) {
         document.getElementById('cart').classList.remove('collapsed');
-      }
-      
-      // Điều chỉnh vị trí giỏ hàng trên mobile
-      if (isMobile()) {
-        const cart = document.getElementById('cart');
-        cart.style.left = '10px';
-        cart.style.right = '10px';
-        cart.style.width = 'calc(100% - 20px)';
       }
     });
   </script>
