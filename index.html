@@ -335,7 +335,7 @@
     /* Button styles */
     button {
       padding: var(--space-sm) var(--space-md);
-      color: white;
+      color: rgb(255, 255, 255);
       border: none;
       border-radius: 6px;
       cursor: pointer;
@@ -347,12 +347,12 @@
     
     button:not(:disabled):hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
     
     button:active {
       transform: translateY(0);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
     
     .btn-primary {
@@ -652,7 +652,7 @@
       </div>
       <button id="quick-search-toggle" onclick="toggleQuickSearch()">
         <i class="fas fa-tags"></i>
-        <span>Lọc món theo nhóm</span>
+        <span>Lọc nhanh</span>
       </button>
     </div>
     <div id="quick-search">
@@ -672,7 +672,7 @@
   </div>
 
   <div id="delivery-section" class="delivery-info hidden">
-    <h3>Thông tin ship</h3>
+    <h3>Thông tin giao hàng</h3>
     <input type="text" id="customer-name" placeholder="Họ tên">
     <input type="tel" id="customer-phone" placeholder="Số điện thoại">
     <textarea id="delivery-address" placeholder="Địa chỉ giao hàng"></textarea>
