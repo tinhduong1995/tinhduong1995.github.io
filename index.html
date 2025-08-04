@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Bii Coffee - Đặt món</title>
+  <title>Bii Coffee - Đặt món Online</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
     :root {
-      /* Biến màu sắc */
-      --primary-color: #007BFF;
-      --secondary-color: #28a745;
-      --danger-color: #dc3545;
+      /* Biến màu sắc mới - chuyên nghiệp */
+      --primary-color: #2C5E9E; /* Xanh dương đậm */
+      --secondary-color: #4CAF50; /* Xanh lá */
+      --accent-color: #FF6B6B;   /* Cam đỏ */
       --light-color: #f8faf8;
-      --dark-color: #343a40;
+      --dark-color: #333333;
+      --text-color: #333;
+      --border-color: #e0e0e0;
       
       /* Biến cỡ chữ */
       --font-xs: clamp(12px, 2.5vw, 14px);
@@ -36,10 +38,11 @@
     }
     
     body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      color: var(--text-color);
       font-size: var(--font-sm);
-      line-height: 1.5;
+      line-height: 1.6;
       padding-top: clamp(150px, 22vh, 180px);
       padding-bottom: clamp(80px, 12vh, 100px);
     }
@@ -54,17 +57,19 @@
       top: 0;
       width: 100%;
       z-index: 100;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     
     header h1 {
       font-size: var(--font-lg);
       margin: var(--space-xs) 0;
+      font-weight: 600;
     }
     
     header p {
       font-size: var(--font-xs);
       margin: 0;
+      opacity: 0.9;
     }
     
     /* Search area */
@@ -79,7 +84,8 @@
       z-index: 90;
       background: white;
       padding: var(--space-sm);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 0 0 8px 8px;
     }
     
     #search-container {
@@ -97,7 +103,7 @@
       width: 100%;
       padding: var(--space-sm) var(--space-md);
       padding-right: 30px;
-      border: 1px solid #ddd;
+      border: 1px solid var(--border-color);
       border-radius: 20px;
       font-size: var(--font-sm);
       outline: none;
@@ -106,7 +112,7 @@
     
     #search-input:focus {
       border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+      box-shadow: 0 0 0 2px rgba(44,94,158,0.25);
     }
     
     .clear-search-btn {
@@ -124,7 +130,7 @@
     }
     
     .clear-search-btn:hover {
-      color: var(--danger-color);
+      color: var(--accent-color);
     }
     
     .clear-search-btn.hidden {
@@ -143,10 +149,12 @@
       gap: var(--space-xs);
       font-size: var(--font-xs);
       transition: all 0.3s;
+      font-weight: 500;
     }
     
     #quick-search-toggle:hover {
-      background: #0069d9;
+      background: #1E4B8B;
+      transform: translateY(-1px);
     }
     
     #quick-search {
@@ -154,7 +162,7 @@
       flex-wrap: wrap;
       gap: var(--space-xs);
       padding-top: var(--space-sm);
-      border-top: 1px solid #eee;
+      border-top: 1px solid var(--border-color);
       margin-top: var(--space-sm);
     }
     
@@ -202,7 +210,7 @@
       padding-bottom: var(--space-xs);
       border-bottom: 2px solid var(--primary-color);
       font-size: var(--font-md);
-      font-weight: bold;
+      font-weight: 600;
     }
     
     /* Menu items */
@@ -214,14 +222,21 @@
       background: white;
       padding: var(--space-md);
       border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
       gap: var(--space-sm);
+      transition: transform 0.2s;
+    }
+
+    .item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
   
     .item-name {
       font-size: var(--font-sm);
       flex: 1;
       min-width: 100px;
+      font-weight: 500;
     }
   
     .item-controls {
@@ -235,9 +250,10 @@
     .item select {
       font-size: var(--font-xs);
       padding: var(--space-xs);
-      border: 1px solid #dddddd;
+      border: 1px solid var(--border-color);
       border-radius: 4px;
       min-width: 120px;
+      background: white;
     }
     
     /* Quantity controls */
@@ -258,6 +274,11 @@
       justify-content: center;
       align-items: center;
       font-size: var(--font-sm);
+      transition: all 0.2s;
+    }
+    
+    .quantity-btn:hover {
+      background: #1E4B8B;
     }
     
     .quantity-input { 
@@ -266,7 +287,7 @@
       margin: 0 var(--space-xs);
       font-size: var(--font-sm);
       padding: var(--space-xs);
-      border: 1px solid #ddd;
+      border: 1px solid var(--border-color);
       border-radius: 4px;
     }
     
@@ -274,35 +295,55 @@
       flex-grow: 1; 
       font-size: var(--font-xs);
       padding: var(--space-xs);
-      border: 1px solid #ddd; 
+      border: 1px solid var(--border-color); 
       border-radius: 4px; 
     }
     
     /* Button styles */
     button {
-      padding: var(--space-xs) var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: var(--font-xs);
+      font-size: var(--font-sm);
       transition: all 0.3s;
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    button:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
     
     button:active {
-      transform: scale(0.98);
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
     
     .btn-primary {
       background: var(--primary-color);
     }
     
+    .btn-primary:hover {
+      background: #1E4B8B;
+    }
+    
     .btn-success {
       background: var(--secondary-color);
     }
     
+    .btn-success:hover {
+      background: #3E9E42;
+    }
+    
     .btn-danger {
-      background: var(--danger-color);
+      background: var(--accent-color);
+    }
+    
+    .btn-danger:hover {
+      background: #E55B5B;
     }
     
     /* Cart styles */
@@ -314,7 +355,7 @@
       background: white; 
       padding: 0;
       border-radius: 10px; 
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
       z-index: 80;
       max-height: 60vh;
       overflow: hidden;
@@ -340,6 +381,7 @@
       margin: 0;
       color: white;
       font-size: var(--font-md);
+      font-weight: 600;
     }
     
     #cart-content {
@@ -360,7 +402,7 @@
     }
     
     .cart-item-name { 
-      font-weight: bold; 
+      font-weight: 600; 
       font-size: var(--font-sm);
     }
     
@@ -368,10 +410,11 @@
       color: #666; 
       margin-left: var(--space-sm); 
       font-size: var(--font-xs);
+      font-style: italic;
     }
     
     .total { 
-      font-weight: bold; 
+      font-weight: 600; 
       font-size: var(--font-md); 
       margin-top: var(--space-md); 
       padding-top: var(--space-sm); 
@@ -392,6 +435,7 @@
       opacity: 0;
       transition: opacity 0.3s ease;
       font-size: var(--font-sm);
+      font-weight: 500;
     }
     
     .notification.show {
@@ -411,6 +455,7 @@
       margin-top: 0;
       color: var(--primary-color);
       font-size: var(--font-md);
+      font-weight: 600;
     }
     
     .delivery-info input, 
@@ -418,7 +463,7 @@
       width: 100%;
       padding: var(--space-sm);
       margin-bottom: var(--space-sm);
-      border: 1px solid #ddd;
+      border: 1px solid var(--border-color);
       border-radius: 4px;
       font-size: var(--font-sm);
     }
@@ -441,8 +486,14 @@
       z-index: 70;
       box-shadow: 0 3px 10px rgba(0,0,0,0.2);
       text-decoration: none;
-      font-weight: bold;
+      font-weight: 600;
       font-size: var(--font-sm);
+      transition: all 0.3s;
+    }
+    
+    .zalo-float-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.25);
     }
     
     .zalo-float-btn img {
@@ -456,7 +507,7 @@
       color: white;
       border: none;
       padding: var(--space-sm) var(--space-md);
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
       margin-top: var(--space-sm);
       display: flex;
@@ -465,6 +516,13 @@
       width: 100%;
       justify-content: center;
       font-size: var(--font-sm);
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .messenger-btn:hover {
+      background: #0073E6 !important;
+      transform: translateY(-1px);
     }
     
     /* Ngăn zoom trên mobile */
@@ -580,7 +638,7 @@
     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA1MTJjLTE0MS4zOSAwLTI1Ni0xMTQuNjEtMjU2LTI1NlMxMTQuNjEgMCAyNTYgMHMyNTYgMTE0LjYxIDI1NiAyNTYtMTE0LjYxIDI1Ni0yNTYgMjU2em0xMjYuNzktMTU5LjY5Yy0xNi4xMy0xMS42MS0zOS43My0yMC43Mi-etc..." alt="Zalo">
     Chat Zalo
   </a>
-              <div class="menu-group">
+                <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -2011,11 +2069,11 @@
       </div>
       <ul id="cart-list"></ul>
       <div id="cart-total" class="total">Tổng tiền: 0đ</div>
-      <button class="btn-primary" onclick="toggleDeliveryInfo()">🏠 Thêm địa chỉ giao hàng</button>
-      <textarea id="orderText" rows="4" placeholder="Đơn hàng sẽ hiển thị ở đây..." readonly></textarea><br/>
-      <button class="btn-success" onclick="copyOrder()">📋 Sao chép đơn</button>
-      <button class="btn-primary" onclick="sendToZalo()" style="background:#0088cc">📤 Gửi Zalo</button>
-      <button onclick="sendToMessenger()" class="messenger-btn"><i class="fab fa-facebook-messenger"></i> Gửi Messenger</button>
+      <button class="btn-primary" onclick="toggleDeliveryInfo()">✏️ Thông tin giao hàng</button>
+      <textarea id="orderText" rows="4" placeholder="Nội dung đơn hàng sẽ hiển thị tại đây..." readonly></textarea><br/>
+      <button class="btn-success" onclick="copyOrder()">📋 Sao chép đơn hàng</button>
+      <button class="btn-primary" onclick="sendToZalo()" style="background:#0088cc">💬 Gửi qua Zalo</button>
+      <button onclick="sendToMessenger()" class="messenger-btn"><i class="fab fa-facebook-messenger"></i> Gửi qua Messenger</button>
     </div>
   </div>
 
