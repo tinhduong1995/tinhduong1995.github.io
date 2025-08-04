@@ -7,13 +7,19 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
     :root {
+      /* Biến màu sắc */
+      --primary-color: #007BFF;
+      --secondary-color: #28a745;
+      --danger-color: #dc3545;
+      --light-color: #f8f9fa;
+      --dark-color: #343a40;
+      
       /* Biến cỡ chữ */
-      --font-size-small: clamp(12px, 3vw, 14px);
-      --font-size-normal: clamp(14px, 3.5vw, 16px);
-      --font-size-medium: clamp(16px, 4vw, 18px);
-      --font-size-large: clamp(18px, 4.5vw, 20px);
-      --font-size-xlarge: clamp(20px, 5vw, 24px);
-      --font-size-xxlarge: clamp(22px, 5.5vw, 28px);
+      --font-xs: clamp(12px, 2.5vw, 14px);
+      --font-sm: clamp(14px, 3vw, 16px);
+      --font-md: clamp(16px, 3.5vw, 18px);
+      --font-lg: clamp(18px, 4vw, 20px);
+      --font-xl: clamp(20px, 4.5vw, 24px);
       
       /* Biến khoảng cách */
       --space-xs: clamp(4px, 1vw, 8px);
@@ -25,144 +31,130 @@
     
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
     
-    body { 
-      font-family: Arial, sans-serif; 
-      margin: 0; 
+    body {
+      font-family: Arial, sans-serif;
       background: #f9f9f9;
-      font-size: var(--font-size-normal);
+      font-size: var(--font-sm);
       line-height: 1.5;
-      padding-top: clamp(180px, 25vh, 200px);
-      padding-bottom: clamp(100px, 15vh, 120px);
+      padding-top: clamp(150px, 22vh, 180px);
+      padding-bottom: clamp(80px, 12vh, 100px);
     }
     
     /* Header */
-    header { 
-      background: #007BFF; 
-      color: white; 
+    header {
+      background: var(--primary-color);
+      color: white;
       padding: var(--space-md);
       text-align: center;
       position: fixed;
       top: 0;
       width: 100%;
-      z-index: 10;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     
     header h1 {
-      font-size: var(--font-size-xlarge);
-      margin: var(--space-sm) 0;
+      font-size: var(--font-lg);
+      margin: var(--space-xs) 0;
     }
     
     header p {
-      font-size: var(--font-size-small);
+      font-size: var(--font-xs);
       margin: 0;
     }
     
     /* Search area */
-#search-area {
+    #search-area {
       position: fixed;
-      top: 80px;
+      top: clamp(70px, 12vh, 80px);
       width: 100%;
-      max-width: 800px;
+      max-width: min(95%, 800px);
       margin: 0 auto;
       left: 0;
       right: 0;
-      z-index: 20;
+      z-index: 90;
       background: white;
-      padding: 10px;
+      padding: var(--space-sm);
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-
+    
     #search-container {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: var(--space-sm);
     }
-
+    
     #search-input {
       flex-grow: 1;
-      padding: 10px 15px;
+      padding: var(--space-sm) var(--space-md);
       border: 1px solid #ddd;
       border-radius: 20px;
-      font-size: 16px;
+      font-size: var(--font-sm);
       outline: none;
+      transition: all 0.3s;
     }
-
+    
+    #search-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+    }
+    
     #quick-search-toggle {
-      background: #007BFF;
+      background: var(--primary-color);
       color: white;
       border: none;
       border-radius: 20px;
-      padding: 10px 15px;
+      padding: var(--space-sm) var(--space-md);
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 5px;
-      white-space: nowrap;
+      gap: var(--space-xs);
+      font-size: var(--font-xs);
+      transition: all 0.3s;
     }
-
+    
+    #quick-search-toggle:hover {
+      background: #0069d9;
+    }
+    
     #quick-search {
       display: none;
       flex-wrap: wrap;
-      gap: 8px;
-      padding-top: 10px;
+      gap: var(--space-xs);
+      padding-top: var(--space-sm);
       border-top: 1px solid #eee;
-      margin-top: 10px;
+      margin-top: var(--space-sm);
     }
-
+    
     #quick-search.show {
       display: flex;
+      animation: fadeIn 0.3s ease;
     }
-
+    
     .search-tag {
-      padding: 5px 10px;
+      padding: var(--space-xs) var(--space-sm);
       background: #f0f0f0;
       border-radius: 15px;
-      font-size: 12px;
+      font-size: var(--font-xs);
       cursor: pointer;
       transition: all 0.2s;
+      text-align: center;
     }
-
+    
     .search-tag:hover {
-      background: #007BFF;
+      background: var(--primary-color);
       color: white;
     }
-
-    @media screen and (max-width: 600px) {
-      #search-area {
-        top: 70px;
-        padding: 8px;
-      }
-
-      #search-container {
-        gap: 8px;
-      }
-
-      #quick-search-toggle {
-        padding: 8px 12px;
-        font-size: 14px;
-      }
-
-      #search-input {
-        padding: 8px 12px;
-        font-size: 14px;
-      }
-
-      #quick-search {
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        padding-bottom: 5px;
-      }
-
-      #quick-search::-webkit-scrollbar {
-        height: 3px;
-      }
-
-      .search-tag {
-        flex-shrink: 0;
-      }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; max-height: 0; }
+      to { opacity: 1; max-height: 200px; }
     }
+    
     /* Menu container */
     .menu-container {
       display: flex;
@@ -177,11 +169,11 @@
     }
     
     .menu-title {
-      color: #007BFF; 
+      color: var(--primary-color); 
       margin: var(--space-lg) var(--space-sm) var(--space-md);
       padding-bottom: var(--space-xs);
-      border-bottom: 2px solid #007BFF;
-      font-size: var(--font-size-large);
+      border-bottom: 2px solid var(--primary-color);
+      font-size: var(--font-md);
       font-weight: bold;
     }
     
@@ -199,7 +191,7 @@
     }
   
     .item-name {
-      font-size: var(--font-size-normal);
+      font-size: var(--font-sm);
       flex: 1;
       min-width: 100px;
     }
@@ -213,7 +205,7 @@
     }
   
     .item select {
-      font-size: var(--font-size-small);
+      font-size: var(--font-xs);
       padding: var(--space-xs);
       border: 1px solid #ddd;
       border-radius: 4px;
@@ -229,7 +221,7 @@
     .quantity-btn {
       width: clamp(25px, 6vw, 30px);
       height: clamp(25px, 6vw, 30px);
-      background: #007BFF;
+      background: var(--primary-color);
       color: white;
       border: none;
       border-radius: 3px;
@@ -237,14 +229,14 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: var(--font-size-normal);
+      font-size: var(--font-sm);
     }
     
     .quantity-input { 
       width: clamp(30px, 8vw, 40px); 
       text-align: center; 
       margin: 0 var(--space-xs);
-      font-size: var(--font-size-normal);
+      font-size: var(--font-sm);
       padding: var(--space-xs);
       border: 1px solid #ddd;
       border-radius: 4px;
@@ -252,10 +244,37 @@
     
     .note-input { 
       flex-grow: 1; 
-      font-size: var(--font-size-small);
+      font-size: var(--font-xs);
       padding: var(--space-xs);
       border: 1px solid #ddd; 
       border-radius: 4px; 
+    }
+    
+    /* Button styles */
+    button {
+      padding: var(--space-xs) var(--space-sm);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: var(--font-xs);
+      transition: all 0.3s;
+    }
+    
+    button:active {
+      transform: scale(0.98);
+    }
+    
+    .btn-primary {
+      background: var(--primary-color);
+    }
+    
+    .btn-success {
+      background: var(--secondary-color);
+    }
+    
+    .btn-danger {
+      background: var(--danger-color);
     }
     
     /* Cart styles */
@@ -268,7 +287,7 @@
       padding: 0;
       border-radius: 10px; 
       box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      z-index: 100;
+      z-index: 80;
       max-height: 60vh;
       overflow: hidden;
       transition: all 0.3s ease;
@@ -280,7 +299,7 @@
     }
     
     #cart-header {
-      background: #007BFF;
+      background: var(--primary-color);
       color: white;
       padding: var(--space-sm) var(--space-md);
       cursor: pointer;
@@ -292,23 +311,13 @@
     #cart-header h2 {
       margin: 0;
       color: white;
-      font-size: var(--font-size-medium);
+      font-size: var(--font-md);
     }
     
     #cart-content {
       padding: var(--space-md);
       max-height: calc(60vh - 60px);
       overflow-y: auto;
-    }
-    
-    button { 
-      padding: var(--space-xs) var(--space-sm); 
-      background: #28a745; 
-      color: white; 
-      border: none; 
-      border-radius: 5px; 
-      cursor: pointer; 
-      font-size: var(--font-size-small);
     }
     
     .cart-item { 
@@ -319,76 +328,152 @@
       padding: var(--space-sm); 
       background: #f5f5f5; 
       border-radius: 5px; 
-      font-size: var(--font-size-small);
-    }
-    
-    .remove-btn { 
-      background: #dc3545; 
-      padding: var(--space-xs) var(--space-sm);
-    }
-    
-    .total { 
-      font-weight: bold; 
-      font-size: var(--font-size-medium); 
-      margin-top: var(--space-md); 
-      padding-top: var(--space-sm); 
-      border-top: 1px dashed #ccc; 
+      font-size: var(--font-xs);
     }
     
     .cart-item-name { 
       font-weight: bold; 
-      font-size: var(--font-size-normal);
+      font-size: var(--font-sm);
     }
     
     .cart-note { 
       color: #666; 
       margin-left: var(--space-sm); 
-      font-size: var(--font-size-small);
+      font-size: var(--font-xs);
+    }
+    
+    .total { 
+      font-weight: bold; 
+      font-size: var(--font-md); 
+      margin-top: var(--space-md); 
+      padding-top: var(--space-sm); 
+      border-top: 1px dashed #ccc; 
+    }
+    
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--secondary-color);
+      color: white;
+      padding: var(--space-md) var(--space-lg);
+      border-radius: 5px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      font-size: var(--font-sm);
+    }
+    
+    .notification.show {
+      opacity: 1;
+    }
+    
+    /* Delivery info */
+    .delivery-info {
+      margin-top: var(--space-lg);
+      padding: var(--space-md);
+      background: #f5f5f5;
+      border-radius: 8px;
+      font-size: var(--font-sm);
+    }
+    
+    .delivery-info h3 {
+      margin-top: 0;
+      color: var(--primary-color);
+      font-size: var(--font-md);
+    }
+    
+    .delivery-info input, 
+    .delivery-info textarea {
+      width: 100%;
+      padding: var(--space-sm);
+      margin-bottom: var(--space-sm);
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: var(--font-sm);
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    /* Zalo button */
+    .zalo-float-btn {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background: #0088cc;
+      color: white;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      z-index: 70;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      text-decoration: none;
+      font-weight: bold;
+      font-size: var(--font-sm);
+    }
+    
+    .zalo-float-btn img {
+      width: 20px;
+      margin-right: var(--space-xs);
+    }
+    
+    /* Messenger button */
+    .messenger-btn {
+      background: #0084FF !important;
+      color: white;
+      border: none;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: var(--space-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      width: 100%;
+      justify-content: center;
+      font-size: var(--font-sm);
     }
     
     /* Responsive adjustments */
     @media screen and (max-width: 600px) {
       body {
-        padding-top: clamp(160px, 30vh, 180px);
+        padding-top: clamp(140px, 25vh, 160px);
       }
       
-      #search-container {
+      #search-area {
         top: clamp(60px, 12vh, 70px);
-      }
-      
-      #quick-search {
-        top: clamp(90px, 18vh, 100px);
-        overflow-x: auto;
-        white-space: nowrap;
-        display: block;
         padding: var(--space-xs) var(--space-sm);
       }
       
-      .search-tag {
-        display: inline-block;
-        margin-right: var(--space-xs);
-      }
-      
-      .item {
+      #search-container {
         flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-sm);
+        gap: var(--space-xs);
       }
       
-      .item-name {
+      #quick-search-toggle {
         width: 100%;
-        margin-bottom: var(--space-xs);
-        font-size: var(--font-size-medium);
+        justify-content: center;
+        padding: var(--space-xs) var(--space-sm);
       }
       
-      .item-controls {
-        width: 100%;
-        justify-content: space-between;
+      #quick-search {
+        flex-wrap: wrap;
+        gap: var(--space-xs);
+        padding: var(--space-xs) 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
       
-      .item select {
-        width: 100%;
-        font-size: var(--font-size-normal);
+      .search-tag {
+        flex: 1 0 calc(50% - var(--space-xs));
+        min-width: calc(50% - var(--space-xs));
+        font-size: var(--font-xs);
+        padding: var(--space-xs);
       }
       
       #cart {
@@ -399,11 +484,21 @@
         max-height: 50vh;
       }
       
-      #cart-content {
-        max-height: calc(50vh - 50px);
+      .zalo-float-btn {
+        bottom: 70px;
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--font-xs);
       }
     }
-      </style>
+    
+    /* Đối với màn hình rất nhỏ */
+    @media screen and (max-width: 400px) {
+      .search-tag {
+        flex: 1 0 100%;
+        min-width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -411,7 +506,8 @@
     <p>📍 Trung Mầu - Cổng Phụ Bá Thiện 2 | ☎ 0964 391 834 or 0928 020 777</p>
   </header>
 
-<div id="search-area">
+  <!-- Thanh tìm kiếm cải tiến -->
+  <div id="search-area">
     <div id="search-container">
       <input type="text" id="search-input" placeholder="🔍 Tìm kiếm món...">
       <button id="quick-search-toggle" onclick="toggleQuickSearch()">
@@ -434,19 +530,20 @@
       <div class="search-tag" onclick="searchByKeyword('BÚN ĐẬU')">BÚN ĐẬU</div>
     </div>
   </div>
+
   <div id="delivery-section" class="delivery-info hidden">
     <h3>Thông tin giao hàng</h3>
     <input type="text" id="customer-name" placeholder="Họ tên">
     <input type="tel" id="customer-phone" placeholder="Số điện thoại">
     <textarea id="delivery-address" placeholder="Địa chỉ giao hàng"></textarea>
-    <button onclick="toggleDeliveryInfo()">Đóng</button>
+    <button class="btn-primary" onclick="toggleDeliveryInfo()">Đóng</button>
   </div>
 
   <a href="https://zalo.me/0964391834" class="zalo-float-btn" target="_blank">
     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA1MTJjLTE0MS4zOSAwLTI1Ni0xMTQuNjEtMjU2LTI1NlMxMTQuNjEgMCAyNTYgMHMyNTYgMTE0LjYxIDI1NiAyNTYtMTE0LjYxIDI1Ni0yNTYgMjU2em0xMjYuNzktMTU5LjY5Yy0xNi4xMy0xMS42MS0zOS43My0yMC43Mi-etc..." alt="Zalo">
     Chat Zalo
   </a>
-          <div class="menu-group">
+            <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -1877,17 +1974,17 @@
       </div>
       <ul id="cart-list"></ul>
       <div id="cart-total" class="total">Tổng tiền: 0đ</div>
-      <button onclick="toggleDeliveryInfo()">🏠 Thêm địa chỉ giao hàng</button>
+      <button class="btn-primary" onclick="toggleDeliveryInfo()">🏠 Thêm địa chỉ giao hàng</button>
       <textarea id="orderText" rows="4" placeholder="Đơn hàng sẽ hiển thị ở đây..." readonly></textarea><br/>
-      <button onclick="copyOrder()">📋 Sao chép đơn</button>
-      <button onclick="sendToZalo()" style="background:#0088cc">📤 Gửi Zalo</button>
+      <button class="btn-success" onclick="copyOrder()">📋 Sao chép đơn</button>
+      <button class="btn-primary" onclick="sendToZalo()" style="background:#0088cc">📤 Gửi Zalo</button>
       <button onclick="sendToMessenger()" class="messenger-btn"><i class="fab fa-facebook-messenger"></i> Gửi Messenger</button>
     </div>
   </div>
 
   <div id="notification" class="notification">Đã thêm vào giỏ hàng!</div>
 
-<script>
+  <script>
     let cart = [];
     
     // Load cart from localStorage
@@ -1924,7 +2021,7 @@
       });
     }
     
-    // Hàm mới: toggle quick search
+    // Toggle quick search panel
     function toggleQuickSearch() {
       const quickSearch = document.getElementById('quick-search');
       quickSearch.classList.toggle('show');
@@ -1937,16 +2034,16 @@
       }
     }
     
-    // Hàm xử lý click vào từ khóa tìm kiếm
+    // Search by keyword
     function searchByKeyword(keyword) {
       const searchInput = document.getElementById('search-input');
       searchInput.value = keyword;
       searchInput.focus();
       
-      // Đóng panel danh mục sau khi chọn
+      // Close quick search panel
       toggleQuickSearch();
       
-      // Kích hoạt sự kiện input để lọc menu
+      // Trigger search
       const event = new Event('input', {
         bubbles: true,
         cancelable: true,
@@ -1954,24 +2051,28 @@
       searchInput.dispatchEvent(event);
     }
     
+    // Toggle delivery info
     function toggleDeliveryInfo() {
       document.getElementById('delivery-section').classList.toggle('hidden');
       updateCart();
     }
     
+    // Toggle cart visibility
     function toggleCart() {
       const cart = document.getElementById('cart');
       cart.classList.toggle('collapsed');
       document.getElementById('cart-toggle').textContent = 
-        cart.classList.contains('collapsed') ? '▲' : '▼';
+        cart.classList.contains('collapsed') ? '▼' : '▲';
     }
     
+    // Change item quantity
     function changeQuantity(btn, delta) {
       const input = btn.parentElement.querySelector('.quantity-input');
       let newValue = parseInt(input.value) + delta;
       input.value = newValue < 1 ? 1 : newValue;
     }
     
+    // Show notification
     function showNotification(message) {
       const notification = document.getElementById('notification');
       notification.textContent = message;
@@ -1979,6 +2080,7 @@
       setTimeout(() => notification.classList.remove('show'), 2000);
     }
 
+    // Add item to cart
     function addToCart(button) {
       const item = button.closest('.item');
       const [select, quantityInput, noteInput] = [
@@ -2012,12 +2114,14 @@
       saveCart();
     }
 
+    // Remove item from cart
     function removeFromCart(index) {
       cart.splice(index, 1);
       updateCart();
       saveCart();
     }
 
+    // Update cart display
     function updateCart() {
       const [list, textArea, totalElement, countElement] = [
         document.getElementById("cart-list"),
@@ -2060,7 +2164,7 @@
             </div>
           </div>
           <div class="cart-item-price">${itemTotal}k</div>
-          <button class="remove-btn" onclick="removeFromCart(${index})">Xóa</button>
+          <button class="btn-danger remove-btn" onclick="removeFromCart(${index})">Xóa</button>
         `;
         list.appendChild(li);
       });
@@ -2070,6 +2174,7 @@
       countElement.textContent = cart.length;
     }
 
+    // Copy order to clipboard
     function copyOrder() {
       const textArea = document.getElementById("orderText");
       textArea.select();
@@ -2077,6 +2182,7 @@
       showNotification("Đã sao chép đơn hàng!");
     }
 
+    // Send order via Zalo
     function sendToZalo() {
       if (cart.length === 0) {
         showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
@@ -2134,6 +2240,7 @@
       });
     }
 
+    // Send order via Messenger
     function sendToMessenger() {
       if (cart.length === 0) {
         showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
@@ -2158,7 +2265,7 @@
         document.body.appendChild(textArea);
         textArea.select();
         document.execCommand('copy');
-        document.body.removeChild(textarea);
+        document.body.removeChild(textArea);
         
         showNotification("Đã sao chép đơn hàng. Vui lòng mở Messenger và dán vào!");
         
@@ -2167,11 +2274,12 @@
       });
     }
     
+    // Check if mobile device
     function isMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
     
-    // Khởi tạo khi trang tải xong
+    // Initialize when page loads
     window.addEventListener('DOMContentLoaded', () => {
       loadCart();
       setupSearch();
@@ -2180,5 +2288,5 @@
       }
     });
   </script>
-  </body>
+</body>
 </html>
