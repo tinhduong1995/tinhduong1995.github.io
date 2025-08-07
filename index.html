@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Bii Coffee - Đặt món Online</title>
+  <title>Bii Coffee - Đặt món Online & Quản lý lợi nhuận</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       /* Biến màu sắc */
@@ -565,6 +566,126 @@
       touch-action: manipulation;
     }
     
+    /* Profit section styles */
+    #profit-section {
+      position: fixed;
+      right: 20px;
+      bottom: 80px;
+      width: clamp(300px, 90%, 500px);
+      max-height: 70vh;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      padding: 15px;
+      overflow-y: auto;
+      z-index: 90;
+    }
+
+    .profit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .profit-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .profit-summary {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    #profit-chart {
+      height: 200px;
+      margin-bottom: 15px;
+      border: 1px solid #eee;
+      padding: 10px;
+    }
+
+    #order-details table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #order-details th, #order-details td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    #order-details th {
+      background-color: #f2f2f2;
+    }
+
+    #show-profit-btn {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 20px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      z-index: 80;
+    }
+
+    /* Cost input section */
+    .cost-input-section {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .cost-input-group {
+      margin-bottom: 10px;
+    }
+
+    .cost-input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .cost-input-group input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .cost-details {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #fff;
+      border-radius: 5px;
+      border: 1px solid #eee;
+    }
+
+    .cost-details h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .cost-details ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .cost-details li {
+      margin-bottom: 5px;
+    }
+
     /* Responsive adjustments */
     @media screen and (max-width: 600px) {
       body {
@@ -627,6 +748,16 @@
         width: 25px;
         height: 25px;
       }
+
+      #profit-section {
+        width: calc(100% - var(--space-md) * 2);
+        right: var(--space-md);
+        bottom: 100px;
+      }
+
+      #show-profit-btn {
+        bottom: 60px;
+      }
     }
     
     /* Đối với màn hình rất nhỏ */
@@ -684,7 +815,7 @@
     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA1MTJjLTE0MS4zOSAwLTI1Ni0xMTQuNjEtMjU2LTI1NlMxMTQuNjEgMCAyNTYgMHMyNTYgMTE0LjYxIDI1NiAyNTYtMTE0LjYxIDI1Ni0yNTYgMjU2em0xMjYuNzktMTU5LjY5Yy0xNi4xMy0xMS42MS0zOS43My0yMC43Mi-etc..." alt="Zalo">
     Chat Zalo
   </a>
-                  <div class="menu-group">
+                    <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -2120,8 +2251,86 @@
       <button class="btn-success" onclick="copyOrder()">📋 Sao chép đơn hàng</button>
       <button class="btn-primary" onclick="sendToZalo()" style="background:#0088cc">💬 Gửi qua Zalo</button>
       <button onclick="sendToMessenger()" class="messenger-btn"><i class="fab fa-facebook-messenger"></i> Gửi qua Messenger</button>
+      <button class="btn-success" onclick="completeOrder()">✅ Hoàn thành đơn hàng</button>
     </div>
   </div>
+
+  <!-- Phần thống kê lợi nhuận -->
+  <div id="profit-section" class="hidden">
+    <div class="profit-header">
+      <h2>📊 Thống kê lợi nhuận</h2>
+      <button onclick="toggleProfitSection()">Đóng</button>
+    </div>
+    
+    <div class="profit-controls">
+      <select id="time-range">
+        <option value="day">Theo ngày</option>
+        <option value="month">Theo tháng</option>
+        <option value="year">Theo năm</option>
+        <option value="custom">Tùy chọn</option>
+      </select>
+      
+      <div id="date-pickers" class="hidden">
+        <input type="date" id="start-date">
+        <input type="date" id="end-date">
+      </div>
+      
+      <button onclick="calculateProfit()">Tính toán</button>
+    </div>
+    
+    <div id="profit-results">
+      <div class="profit-summary">
+        <h3>Tổng doanh thu: <span id="total-revenue">0</span>đ</h3>
+        <h3>Tổng chi phí: <span id="total-cost">0</span>đ</h3>
+        <h3>Lợi nhuận: <span id="total-profit">0</span>đ</h3>
+      </div>
+      
+      <div id="profit-chart">
+        <!-- Biểu đồ sẽ được hiển thị ở đây -->
+      </div>
+      
+      <div id="order-details">
+        <h3>Chi tiết đơn hàng</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Ngày</th>
+              <th>Số đơn</th>
+              <th>Doanh thu</th>
+              <th>Chi phí</th>
+              <th>Lợi nhuận</th>
+            </tr>
+          </thead>
+          <tbody id="profit-details">
+            <!-- Dữ liệu sẽ được thêm động -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="cost-input-section">
+      <h3>Nhập chi phí thực tế</h3>
+      <div class="cost-input-group">
+        <label for="material-cost">Chi phí nguyên liệu:</label>
+        <input type="number" id="material-cost" placeholder="VND">
+      </div>
+      <div class="cost-input-group">
+        <label for="labor-cost">Chi phí nhân công:</label>
+        <input type="number" id="labor-cost" placeholder="VND">
+      </div>
+      <div class="cost-input-group">
+        <label for="utility-cost">Chi phí điện nước:</label>
+        <input type="number" id="utility-cost" placeholder="VND">
+      </div>
+      <div class="cost-input-group">
+        <label for="other-cost">Chi phí khác:</label>
+        <input type="number" id="other-cost" placeholder="VND">
+      </div>
+      <button onclick="saveActualCosts()">Lưu chi phí</button>
+    </div>
+  </div>
+
+  <button id="show-profit-btn" onclick="toggleProfitSection()">📈 Xem thống kê</button>
 
   <div id="notification" class="notification">Đã thêm vào giỏ hàng!</div>
 
@@ -2148,10 +2357,8 @@
       const clearBtn = document.getElementById('clear-search');
       
       searchInput.addEventListener('input', function() {
-        // Hiển thị nút X khi có nội dung
         clearBtn.classList.toggle('hidden', this.value === '');
         
-        // Phần tìm kiếm hiện có
         const searchTerm = this.value.toLowerCase();
         const items = document.querySelectorAll('.item');
         
@@ -2167,25 +2374,21 @@
         });
       });
       
-      // Xử lý nút X
       clearBtn.addEventListener('click', function() {
         searchInput.value = '';
         searchInput.focus();
         this.classList.add('hidden');
-        
-        // Kích hoạt sự kiện input để cập nhật hiển thị
         const event = new Event('input');
         searchInput.dispatchEvent(event);
       });
       
-      // Ngăn zoom trên mobile khi nhấn vào tìm kiếm
       searchInput.addEventListener('touchstart', function(e) {
-        this.style.fontSize = '16px'; // Đặt font-size cố định
+        this.style.fontSize = '16px';
       });
       
       searchInput.addEventListener('touchend', function(e) {
         setTimeout(() => {
-          this.style.fontSize = ''; // Khôi phục font-size sau 100ms
+          this.style.fontSize = '';
         }, 100);
       });
     }
@@ -2211,11 +2414,8 @@
       searchInput.value = keyword;
       searchInput.focus();
       clearBtn.classList.remove('hidden');
-      
-      // Close quick search panel
       toggleQuickSearch();
       
-      // Trigger search
       const event = new Event('input', {
         bubbles: true,
         cancelable: true,
@@ -2235,6 +2435,14 @@
       cart.classList.toggle('collapsed');
       document.getElementById('cart-toggle').textContent = 
         cart.classList.contains('collapsed') ? '▼' : '▲';
+    }
+    
+    // Toggle profit section visibility
+    function toggleProfitSection() {
+      document.getElementById('profit-section').classList.toggle('hidden');
+      if (!document.getElementById('profit-section').classList.contains('hidden')) {
+        calculateProfit();
+      }
     }
     
     // Change item quantity
@@ -2354,6 +2562,36 @@
       showNotification("Đã sao chép đơn hàng!");
     }
 
+    // Complete order and save to completed orders
+    function completeOrder() {
+      if (cart.length === 0) {
+        showNotification("Giỏ hàng trống, không có gì để hoàn thành!");
+        return;
+      }
+
+      const orderData = {
+        id: Date.now(),
+        date: new Date(),
+        items: [...cart],
+        customerName: document.getElementById('customer-name').value,
+        customerPhone: document.getElementById('customer-phone').value,
+        deliveryAddress: document.getElementById('delivery-address').value,
+        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      };
+      
+      // Lưu đơn hàng đã hoàn thành
+      const orders = JSON.parse(localStorage.getItem('completedOrders')) || [];
+      orders.push(orderData);
+      localStorage.setItem('completedOrders', JSON.stringify(orders));
+      
+      // Xóa giỏ hàng
+      cart = [];
+      updateCart();
+      saveCart();
+      
+      showNotification("Đã lưu đơn hàng thành công!");
+    }
+
     // Send order via Zalo
     function sendToZalo() {
       if (cart.length === 0) {
@@ -2445,7 +2683,358 @@
         window.open(`https://m.me/${pageId}`, '_blank');
       });
     }
-    
+
+    // Hàm lưu chi phí thực tế
+    function saveActualCosts() {
+      const materialCost = parseInt(document.getElementById('material-cost').value) || 0;
+      const laborCost = parseInt(document.getElementById('labor-cost').value) || 0;
+      const utilityCost = parseInt(document.getElementById('utility-cost').value) || 0;
+      const otherCost = parseInt(document.getElementById('other-cost').value) || 0;
+      
+      const totalCost = materialCost + laborCost + utilityCost + otherCost;
+      
+      // Lấy thông tin khoảng thời gian
+      const timeRange = document.getElementById('time-range').value;
+      const startDate = document.getElementById('start-date').value;
+      const endDate = document.getElementById('end-date').value;
+      
+      // Tạo key để lưu chi phí
+      let costKey;
+      if (timeRange === 'day') {
+        costKey = `costs_${new Date().toISOString().split('T')[0]}`;
+      } else if (timeRange === 'month') {
+        const now = new Date();
+        costKey = `costs_${now.getFullYear()}-${now.getMonth()+1}`;
+      } else if (timeRange === 'year') {
+        costKey = `costs_${new Date().getFullYear()}`;
+      } else {
+        costKey = `costs_${startDate}_to_${endDate}`;
+      }
+      
+      // Lưu chi tiết chi phí
+      const costDetails = {
+        materialCost,
+        laborCost,
+        utilityCost,
+        otherCost,
+        totalCost,
+        timestamp: new Date().toISOString()
+      };
+      
+      localStorage.setItem(costKey, JSON.stringify(costDetails));
+      
+      // Tính toán lại lợi nhuận
+      calculateProfit();
+      
+      showNotification("Đã lưu chi phí thành công!");
+    }
+
+    // Hàm tính toán lợi nhuận với chi phí thực tế
+    function calculateProfit() {
+      const timeRange = document.getElementById('time-range').value;
+      const startDate = document.getElementById('start-date').value;
+      const endDate = document.getElementById('end-date').value;
+      
+      // Lấy key chi phí tương ứng
+      let costKey;
+      if (timeRange === 'day') {
+        costKey = `costs_${new Date().toISOString().split('T')[0]}`;
+      } else if (timeRange === 'month') {
+        const now = new Date();
+        costKey = `costs_${now.getFullYear()}-${now.getMonth()+1}`;
+      } else if (timeRange === 'year') {
+        costKey = `costs_${new Date().getFullYear()}`;
+      } else {
+        costKey = `costs_${startDate}_to_${endDate}`;
+      }
+      
+      // Lấy chi phí đã lưu
+      const savedCosts = JSON.parse(localStorage.getItem(costKey)) || {
+        materialCost: 0,
+        laborCost: 0,
+        utilityCost: 0,
+        otherCost: 0,
+        totalCost: 0
+      };
+      
+      // Lấy đơn hàng trong khoảng thời gian
+      const orders = JSON.parse(localStorage.getItem('completedOrders')) || [];
+      let filteredOrders = [...orders];
+      
+      if (timeRange === 'day') {
+        const today = new Date().toISOString().split('T')[0];
+        filteredOrders = orders.filter(order => {
+          const orderDate = new Date(order.date).toISOString().split('T')[0];
+          return orderDate === today;
+        });
+      } else if (timeRange === 'month') {
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        filteredOrders = orders.filter(order => {
+          const orderDate = new Date(order.date);
+          return orderDate.getMonth() === currentMonth && 
+                 orderDate.getFullYear() === currentYear;
+        });
+      } else if (timeRange === 'year') {
+        const currentYear = new Date().getFullYear();
+        filteredOrders = orders.filter(order => {
+          return new Date(order.date).getFullYear() === currentYear;
+        });
+      } else if (timeRange === 'custom' && startDate && endDate) {
+        filteredOrders = orders.filter(order => {
+          const orderDate = new Date(order.date).toISOString().split('T')[0];
+          return orderDate >= startDate && orderDate <= endDate;
+        });
+      }
+      
+      // Tính toán doanh thu
+      const totalRevenue = filteredOrders.reduce((sum, order) => sum + order.total, 0) * 1000;
+      
+      // Sử dụng chi phí thực tế
+      const totalCost = savedCosts.totalCost;
+      const totalProfit = totalRevenue - totalCost;
+      
+      // Hiển thị kết quả
+      document.getElementById('total-revenue').textContent = formatCurrency(totalRevenue);
+      document.getElementById('total-cost').textContent = formatCurrency(totalCost);
+      document.getElementById('total-profit').textContent = formatCurrency(totalProfit);
+      
+      // Hiển thị chi tiết chi phí
+      displayCostDetails(savedCosts);
+      
+      // Hiển thị chi tiết đơn hàng
+      displayOrderDetails(filteredOrders, savedCosts);
+      
+      // Vẽ biểu đồ
+      drawProfitChart(filteredOrders, savedCosts);
+    }
+
+    // Định dạng tiền tệ
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('vi-VN', { 
+        style: 'currency', 
+        currency: 'VND' 
+      }).format(amount);
+    }
+
+    // Hiển thị chi tiết chi phí
+    function displayCostDetails(costs) {
+      // Xóa chi tiết chi phí cũ nếu có
+      const oldCostDetails = document.querySelector('.cost-details');
+      if (oldCostDetails) {
+        oldCostDetails.remove();
+      }
+      
+      const costDetailsHtml = `
+        <div class="cost-details">
+          <h4>Chi tiết chi phí:</h4>
+          <ul>
+            <li>Nguyên liệu: ${formatCurrency(costs.materialCost)}</li>
+            <li>Nhân công: ${formatCurrency(costs.laborCost)}</li>
+            <li>Điện nước: ${formatCurrency(costs.utilityCost)}</li>
+            <li>Khác: ${formatCurrency(costs.otherCost)}</li>
+          </ul>
+        </div>
+      `;
+      
+      document.querySelector('.profit-summary').insertAdjacentHTML('beforeend', costDetailsHtml);
+    }
+
+    // Hiển thị chi tiết đơn hàng
+    function displayOrderDetails(orders, costs) {
+      const detailsBody = document.getElementById('profit-details');
+      detailsBody.innerHTML = '';
+      
+      // Nhóm đơn hàng theo ngày/tháng/năm tùy theo lựa chọn
+      const timeRange = document.getElementById('time-range').value;
+      const groupedOrders = {};
+      
+      orders.forEach(order => {
+        const orderDate = new Date(order.date);
+        let key;
+        
+        if (timeRange === 'day') {
+          key = orderDate.toLocaleDateString();
+        } else if (timeRange === 'month') {
+          key = `${orderDate.getMonth() + 1}/${orderDate.getFullYear()}`;
+        } else if (timeRange === 'year') {
+          key = orderDate.getFullYear().toString();
+        } else {
+          key = orderDate.toLocaleDateString();
+        }
+        
+        if (!groupedOrders[key]) {
+          groupedOrders[key] = {
+            count: 0,
+            revenue: 0,
+            cost: 0,
+            profit: 0
+          };
+        }
+        
+        groupedOrders[key].count++;
+        groupedOrders[key].revenue += order.total * 1000;
+      });
+      
+      // Phân bổ chi phí theo thời gian
+      const timeUnits = Object.keys(groupedOrders);
+      const costPerUnit = costs.totalCost / (timeUnits.length || 1);
+      
+      for (const [date, data] of Object.entries(groupedOrders)) {
+        data.cost = costPerUnit;
+        data.profit = data.revenue - costPerUnit;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${date}</td>
+          <td>${data.count}</td>
+          <td>${formatCurrency(data.revenue)}</td>
+          <td>${formatCurrency(data.cost)}</td>
+          <td>${formatCurrency(data.profit)}</td>
+        `;
+        detailsBody.appendChild(row);
+      }
+    }
+
+    // Vẽ biểu đồ lợi nhuận
+    function drawProfitChart(orders, costs) {
+      // Kiểm tra nếu Chart.js chưa được tải
+      if (typeof Chart === 'undefined') {
+        console.warn('Chart.js chưa được tải, không thể vẽ biểu đồ');
+        return;
+      }
+      
+      // Xóa biểu đồ cũ nếu có
+      const oldChart = Chart.getChart('profit-chart');
+      if (oldChart) {
+        oldChart.destroy();
+      }
+      
+      const ctx = document.getElementById('profit-chart').getContext('2d');
+      
+      // Nhóm dữ liệu
+      const timeRange = document.getElementById('time-range').value;
+      const labels = [];
+      const revenueData = [];
+      const costData = [];
+      const profitData = [];
+      
+      const groupedOrders = {};
+      
+      orders.forEach(order => {
+        const orderDate = new Date(order.date);
+        let key;
+        
+        if (timeRange === 'day') {
+          key = orderDate.toLocaleDateString();
+        } else if (timeRange === 'month') {
+          key = `${orderDate.getMonth() + 1}/${orderDate.getFullYear()}`;
+        } else if (timeRange === 'year') {
+          key = orderDate.getFullYear().toString();
+        } else {
+          key = orderDate.toLocaleDateString();
+        }
+        
+        if (!groupedOrders[key]) {
+          groupedOrders[key] = {
+            revenue: 0,
+            cost: 0,
+            profit: 0
+          };
+        }
+        
+        groupedOrders[key].revenue += order.total * 1000;
+      });
+      
+      // Phân bổ chi phí
+      const timeUnits = Object.keys(groupedOrders);
+      const costPerUnit = costs.totalCost / (timeUnits.length || 1);
+      
+      for (const [date, data] of Object.entries(groupedOrders)) {
+        labels.push(date);
+        revenueData.push(data.revenue);
+        costData.push(costPerUnit);
+        profitData.push(data.revenue - costPerUnit);
+      }
+      
+      // Vẽ biểu đồ mới
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Doanh thu',
+              data: revenueData,
+              backgroundColor: 'rgba(54, 162, 235, 0.5)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Chi phí',
+              data: costData,
+              backgroundColor: 'rgba(255, 99, 132, 0.5)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Lợi nhuận',
+              data: profitData,
+              backgroundColor: 'rgba(75, 192, 192, 0.5)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value.toLocaleString('vi-VN') + 'đ';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Load costs for selected period
+    function loadCostsForSelectedPeriod() {
+      const timeRange = document.getElementById('time-range').value;
+      const startDate = document.getElementById('start-date').value;
+      const endDate = document.getElementById('end-date').value;
+      
+      let costKey;
+      if (timeRange === 'day') {
+        costKey = `costs_${new Date().toISOString().split('T')[0]}`;
+      } else if (timeRange === 'month') {
+        const now = new Date();
+        costKey = `costs_${now.getFullYear()}-${now.getMonth()+1}`;
+      } else if (timeRange === 'year') {
+        costKey = `costs_${new Date().getFullYear()}`;
+      } else {
+        costKey = `costs_${startDate}_to_${endDate}`;
+      }
+      
+      const savedCosts = JSON.parse(localStorage.getItem(costKey));
+      
+      if (savedCosts) {
+        document.getElementById('material-cost').value = savedCosts.materialCost || '';
+        document.getElementById('labor-cost').value = savedCosts.laborCost || '';
+        document.getElementById('utility-cost').value = savedCosts.utilityCost || '';
+        document.getElementById('other-cost').value = savedCosts.otherCost || '';
+      } else {
+        document.getElementById('material-cost').value = '';
+        document.getElementById('labor-cost').value = '';
+        document.getElementById('utility-cost').value = '';
+        document.getElementById('other-cost').value = '';
+      }
+    }
+
     // Initialize when page loads
     window.addEventListener('DOMContentLoaded', () => {
       loadCart();
@@ -2453,6 +3042,25 @@
       if (cart.length) {
         document.getElementById('cart').classList.remove('collapsed');
       }
+      
+      // Set default dates
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('start-date').value = today;
+      document.getElementById('end-date').value = today;
+      
+      // Add event listeners for time range changes
+      document.getElementById('time-range').addEventListener('change', function() {
+        if (this.value === 'custom') {
+          document.getElementById('date-pickers').classList.remove('hidden');
+        } else {
+          document.getElementById('date-pickers').classList.add('hidden');
+        }
+        loadCostsForSelectedPeriod();
+      });
+      
+      // Add event listeners for date changes
+      document.getElementById('start-date').addEventListener('change', loadCostsForSelectedPeriod);
+      document.getElementById('end-date').addEventListener('change', loadCostsForSelectedPeriod);
     });
   </script>
 </body>
