@@ -560,12 +560,6 @@
       transform: translateY(-1px);
     }
     
-    /* Ngăn zoom trên mobile */
-    input[type="text"], input[type="search"], select, textarea {
-      font-size: var(--font-sm);
-      touch-action: manipulation;
-    }
-    
     /* Profit section styles */
     #profit-section {
       position: fixed;
@@ -686,6 +680,40 @@
       margin-bottom: 5px;
     }
 
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 500px;
+      border-radius: 8px;
+    }
+
+    .close-btn {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
     /* Responsive adjustments */
     @media screen and (max-width: 600px) {
       body {
@@ -758,6 +786,11 @@
       #show-profit-btn {
         bottom: 60px;
       }
+
+      .modal-content {
+        width: 90%;
+        margin: 20% auto;
+      }
     }
     
     /* Đối với màn hình rất nhỏ */
@@ -815,7 +848,7 @@
     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA1MTJjLTE0MS4zOSAwLTI1Ni0xMTQuNjEtMjU2LTI1NlMxMTQuNjEgMCAyNTYgMHMyNTYgMTE0LjYxIDI1NiAyNTYtMTE0LjYxIDI1Ni0yNTYgMjU2em0xMjYuNzktMTU5LjY5Yy0xNi4xMy0xMS42MS0zOS43My0yMC43Mi-etc..." alt="Zalo">
     Chat Zalo
   </a>
-                    <div class="menu-group">
+                      <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -2309,24 +2342,51 @@
     </div>
     
     <div class="cost-input-section">
-      <h3>Nhập chi phí thực tế</h3>
+      <h3>Nhập chi phí thực tế (đơn vị: 1.000đ)</h3>
       <div class="cost-input-group">
         <label for="material-cost">Chi phí nguyên liệu:</label>
-        <input type="number" id="material-cost" placeholder="VND">
+        <input type="number" id="material-cost" placeholder="nghìn đồng">
       </div>
       <div class="cost-input-group">
         <label for="labor-cost">Chi phí nhân công:</label>
-        <input type="number" id="labor-cost" placeholder="VND">
+        <input type="number" id="labor-cost" placeholder="nghìn đồng">
       </div>
       <div class="cost-input-group">
         <label for="utility-cost">Chi phí điện nước:</label>
-        <input type="number" id="utility-cost" placeholder="VND">
+        <input type="number" id="utility-cost" placeholder="nghìn đồng">
       </div>
       <div class="cost-input-group">
         <label for="other-cost">Chi phí khác:</label>
-        <input type="number" id="other-cost" placeholder="VND">
+        <input type="number" id="other-cost" placeholder="nghìn đồng">
       </div>
       <button onclick="saveActualCosts()">Lưu chi phí</button>
+    </div>
+  </div>
+
+  <!-- Modal chỉnh sửa chi phí -->
+  <div id="edit-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeEditModal()">&times;</span>
+      <h2>Chỉnh sửa chi phí</h2>
+      <div class="edit-form">
+        <div class="form-group">
+          <label>Nguyên liệu (nghìn đồng):</label>
+          <input type="number" id="edit-material">
+        </div>
+        <div class="form-group">
+          <label>Nhân công (nghìn đồng):</label>
+          <input type="number" id="edit-labor">
+        </div>
+        <div class="form-group">
+          <label>Điện nước (nghìn đồng):</label>
+          <input type="number" id="edit-utility">
+        </div>
+        <div class="form-group">
+          <label>Khác (nghìn đồng):</label>
+          <input type="number" id="edit-other">
+        </div>
+        <button class="btn-primary" onclick="saveEditedCosts()">Lưu thay đổi</button>
+      </div>
     </div>
   </div>
 
@@ -2336,6 +2396,7 @@
 
   <script>
     let cart = [];
+    let currentEditKey = null;
     
     // Load cart from localStorage
     function loadCart() {
@@ -2684,12 +2745,13 @@
       });
     }
 
-    // Hàm lưu chi phí thực tế
+    // Hàm lưu chi phí thực tế (đơn vị 1.000đ)
     function saveActualCosts() {
-      const materialCost = parseInt(document.getElementById('material-cost').value) || 0;
-      const laborCost = parseInt(document.getElementById('labor-cost').value) || 0;
-      const utilityCost = parseInt(document.getElementById('utility-cost').value) || 0;
-      const otherCost = parseInt(document.getElementById('other-cost').value) || 0;
+      // Nhân giá trị với 1000 để chuyển từ nghìn đồng sang đồng
+      const materialCost = (parseInt(document.getElementById('material-cost').value) || 0) * 1000;
+      const laborCost = (parseInt(document.getElementById('labor-cost').value) || 0) * 1000;
+      const utilityCost = (parseInt(document.getElementById('utility-cost').value) || 0) * 1000;
+      const otherCost = (parseInt(document.getElementById('other-cost').value) || 0) * 1000;
       
       const totalCost = materialCost + laborCost + utilityCost + otherCost;
       
@@ -2729,6 +2791,44 @@
       showNotification("Đã lưu chi phí thành công!");
     }
 
+    // Mở modal chỉnh sửa chi phí
+    function openEditModal(costKey) {
+      currentEditKey = costKey;
+      const costs = JSON.parse(localStorage.getItem(costKey)) || {};
+      
+      // Chia giá trị cho 1000 để hiển thị đơn vị nghìn đồng
+      document.getElementById('edit-material').value = costs.materialCost ? costs.materialCost / 1000 : '';
+      document.getElementById('edit-labor').value = costs.laborCost ? costs.laborCost / 1000 : '';
+      document.getElementById('edit-utility').value = costs.utilityCost ? costs.utilityCost / 1000 : '';
+      document.getElementById('edit-other').value = costs.otherCost ? costs.otherCost / 1000 : '';
+      
+      document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    // Đóng modal chỉnh sửa
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+    }
+
+    // Lưu chi phí đã chỉnh sửa
+    function saveEditedCosts() {
+      const editedCosts = {
+        materialCost: (parseInt(document.getElementById('edit-material').value) || 0) * 1000,
+        laborCost: (parseInt(document.getElementById('edit-labor').value) || 0) * 1000,
+        utilityCost: (parseInt(document.getElementById('edit-utility').value) || 0) * 1000,
+        otherCost: (parseInt(document.getElementById('edit-other').value) || 0) * 1000,
+        timestamp: new Date().toISOString()
+      };
+      
+      editedCosts.totalCost = editedCosts.materialCost + editedCosts.laborCost + 
+                            editedCosts.utilityCost + editedCosts.otherCost;
+      
+      localStorage.setItem(currentEditKey, JSON.stringify(editedCosts));
+      closeEditModal();
+      calculateProfit(); // Tính toán lại sau khi chỉnh sửa
+      showNotification("Đã cập nhật chi phí thành công!");
+    }
+
     // Hàm tính toán lợi nhuận với chi phí thực tế
     function calculateProfit() {
       const timeRange = document.getElementById('time-range').value;
@@ -2747,6 +2847,9 @@
       } else {
         costKey = `costs_${startDate}_to_${endDate}`;
       }
+      
+      // Lưu currentEditKey để sử dụng khi chỉnh sửa
+      currentEditKey = costKey;
       
       // Lấy chi phí đã lưu
       const savedCosts = JSON.parse(localStorage.getItem(costKey)) || {
@@ -2827,7 +2930,9 @@
       
       const costDetailsHtml = `
         <div class="cost-details">
-          <h4>Chi tiết chi phí:</h4>
+          <h4>Chi tiết chi phí: 
+            <button onclick="openEditModal('${currentEditKey}')" class="btn-primary">✏️ Chỉnh sửa</button>
+          </h4>
           <ul>
             <li>Nguyên liệu: ${formatCurrency(costs.materialCost)}</li>
             <li>Nhân công: ${formatCurrency(costs.laborCost)}</li>
@@ -3023,10 +3128,11 @@
       const savedCosts = JSON.parse(localStorage.getItem(costKey));
       
       if (savedCosts) {
-        document.getElementById('material-cost').value = savedCosts.materialCost || '';
-        document.getElementById('labor-cost').value = savedCosts.laborCost || '';
-        document.getElementById('utility-cost').value = savedCosts.utilityCost || '';
-        document.getElementById('other-cost').value = savedCosts.otherCost || '';
+        // Chia cho 1000 để hiển thị đơn vị nghìn đồng
+        document.getElementById('material-cost').value = savedCosts.materialCost ? savedCosts.materialCost / 1000 : '';
+        document.getElementById('labor-cost').value = savedCosts.laborCost ? savedCosts.laborCost / 1000 : '';
+        document.getElementById('utility-cost').value = savedCosts.utilityCost ? savedCosts.utilityCost / 1000 : '';
+        document.getElementById('other-cost').value = savedCosts.otherCost ? savedCosts.otherCost / 1000 : '';
       } else {
         document.getElementById('material-cost').value = '';
         document.getElementById('labor-cost').value = '';
