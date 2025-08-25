@@ -11,7 +11,7 @@
       font-family: Arial, sans-serif; 
       margin: 0; 
       background: #f9f9f9;
-      padding-top: 160px; /* Tăng padding-top để bù cho header và search box */
+      padding-top: 160px;
       padding-bottom: 120px;
     }
     header { 
@@ -19,18 +19,17 @@
       color: white; 
       padding: 1em; 
       text-align: center;
-      position: fixed; /* Cố định header */
+      position: fixed;
       top: 0;
       width: 100%;
       z-index: 10;
     }
     
-    /* Search box cố định */
     #search-container {
       padding: 10px;
       background: #fff;
       position: fixed;
-      top: 80px; /* Đặt bên dưới header */
+      top: 80px;
       width: 100%;
       max-width: 800px;
       margin: 0 auto;
@@ -71,62 +70,63 @@
       border-bottom: 2px solid #007BFF;
       font-size: 1.3em;
     }
-.item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px;
-    background: white;
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    gap: 8px; /* Thêm khoảng cách đều giữa các phần tử */
-  }
-  
-  .item-name {
-    font-size: 0.95em;
-    flex: 1;
-    min-width: 100px;
-    margin-right: 8px; /* Giảm khoảng cách bên phải */
-  }
-  
-  .item-controls {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 8px; /* Thêm khoảng cách đều giữa các control */
-  }
-  
-  .item select {
-    margin-left: 0; /* Bỏ margin left của select */
-    min-width: 120px; /* Đảm bảo select đủ rộng */
-  }
-  
-  /* Điều chỉnh responsive cho mobile */
-  @media screen and (max-width: 600px) {
     .item {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      gap: 8px;
     }
     
     .item-name {
-      width: 100%;
-      margin-bottom: 4px; /* Giảm khoảng cách dưới */
-      margin-right: 40px;
+      font-size: 0.95em;
+      flex: 1;
+      min-width: 100px;
+      margin-right: 8px;
     }
     
     .item-controls {
-      width: 100%;
-      justify-content: space-between;
-      gap: 6px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
     }
     
     .item select {
-      width: 100%;
+      margin-left: 0;
+      min-width: 120px;
     }
-  }    #cart { 
+    
+    @media screen and (max-width: 600px) {
+      .item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      
+      .item-name {
+        width: 100%;
+        margin-bottom: 4px;
+        margin-right: 40px;
+      }
+      
+      .item-controls {
+        width: 100%;
+        justify-content: space-between;
+        gap: 6px;
+      }
+      
+      .item select {
+        width: 100%;
+      }
+    }    
+    
+    #cart { 
       position: fixed;
       left: 20px;
       bottom: 20px;
@@ -335,9 +335,29 @@
       justify-content: center;
     }
     
+    #downloadQR {
+      margin-top: 15px;
+      padding: 10px 15px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    #bank-info {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f5f5f5;
+      border-radius: 5px;
+      font-size: 14px;
+      text-align: left;
+    }
+    
     @media screen and (max-width: 600px) {
       body {
-        padding-top: 140px; /* Điều chỉnh cho mobile */
+        padding-top: 140px;
       }
       
       #search-container {
@@ -409,36 +429,95 @@
   <div id="qrModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
-      <h2>Mã QR Đơn Hàng</h2>
+      <h2>Mã QR Thanh Toán</h2>
       <div id="qrcode"></div>
-      <p>Quét mã QR để xem chi tiết đơn hàng</p>
+      <div id="bank-info">
+        <p><strong>Ngân hàng: </strong>Vietcombank</p>
+        <p><strong>Số tài khoản: </strong>0123456789</p>
+        <p><strong>Chủ tài khoản: </strong>BUI VAN BII</p>
+        <p><strong>Số tiền: </strong><span id="qr-amount">0</span>k</p>
+        <p><strong>Nội dung: </strong><span id="qr-content">BiiCoffee</span></p>
+      </div>
+      <button id="downloadQR" onclick="downloadQRCode()">📥 Lưu mã QR</button>
       <button onclick="closeModal()">Đóng</button>
     </div>
   </div>
   
-  <div class="menu-group">
-    <!-- Nội dung menu giữ nguyên như trước -->
-    <h2>TRÀ</h2>
-    <div class="item">
-      <span class="item-name">Trà chanh</span>
-      <div class="item-controls">
-        <select class="item-size">
-          <option value="Trà chanh - M - 10k">Size M - 10k</option>
-          <option value="Trà chanh - L - 15k">Size L - 15k</option>
-        </select>
-        <div class="quantity-control">
-          <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
-          <input type="number" value="1" min="1" class="quantity-input">
-          <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
+  <div class="menu-container">
+    <!-- Menu items -->
+    <div class="menu-section">
+      <h2 class="menu-title">TRÀ</h2>
+      <div class="item">
+        <span class="item-name">Trà chanh</span>
+        <div class="item-controls">
+          <select class="item-size">
+            <option value="Trà chanh - M - 10k">Size M - 10k</option>
+            <option value="Trà chanh - L - 15k">Size L - 15k</option>
+          </select>
+          <div class="quantity-controls">
+            <button class="quantity-btn" onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="1" min="1" class="quantity-input">
+            <button class="quantity-btn" onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <input type="text" class="note-input" placeholder="Ghi chú...">
+          <button onclick="addToCart(this)">Thêm</button>
         </div>
-        <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+      </div>
+      
+      <div class="item">
+        <span class="item-name">Trà đào</span>
+        <div class="item-controls">
+          <select class="item-size">
+            <option value="Trà đào - M - 15k">Size M - 15k</option>
+            <option value="Trà đào - L - 20k">Size L - 20k</option>
+          </select>
+          <div class="quantity-controls">
+            <button class="quantity-btn" onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="1" min="1" class="quantity-input">
+            <button class="quantity-btn" onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <input type="text" class="note-input" placeholder="Ghi chú...">
+          <button onclick="addToCart(this)">Thêm</button>
+        </div>
       </div>
     </div>
     
-    <!-- Các mục menu khác giữ nguyên -->
-    <!-- ... -->
-    
+    <div class="menu-section">
+      <h2 class="menu-title">CÀ PHÊ</h2>
+      <div class="item">
+        <span class="item-name">Cà phê đen</span>
+        <div class="item-controls">
+          <select class="item-size">
+            <option value="Cà phê đen - M - 12k">Size M - 12k</option>
+            <option value="Cà phê đen - L - 17k">Size L - 17k</option>
+          </select>
+          <div class="quantity-controls">
+            <button class="quantity-btn" onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="1" min="1" class="quantity-input">
+            <button class="quantity-btn" onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <input type="text" class="note-input" placeholder="Ghi chú...">
+          <button onclick="addToCart(this)">Thêm</button>
+        </div>
+      </div>
+      
+      <div class="item">
+        <span class="item-name">Cà phê sữa</span>
+        <div class="item-controls">
+          <select class="item-size">
+            <option value="Cà phê sữa - M - 15k">Size M - 15k</option>
+            <option value="Cà phê sữa - L - 20k">Size L - 20k</option>
+          </select>
+          <div class="quantity-controls">
+            <button class="quantity-btn" onclick="changeQuantity(this, -1)">-</button>
+            <input type="number" value="1" min="1" class="quantity-input">
+            <button class="quantity-btn" onclick="changeQuantity(this, 1)">+</button>
+          </div>
+          <input type="text" class="note-input" placeholder="Ghi chú...">
+          <button onclick="addToCart(this)">Thêm</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="cart" class="collapsed">
@@ -686,16 +765,19 @@
         return;
       }
       
-      const textArea = document.getElementById("orderText");
-      const orderContent = textArea.value;
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       
-      // Tạo nội dung mã QR
-      const qrContent = `BIICOFFEE - ĐƠN HÀNG\n${orderContent}\nTổng tiền: ${total}k\nCảm ơn quý khách!`;
+      // Tạo nội dung mã QR theo định dạng chuyển khoản ngân hàng
+      // Định dạng: bank://transfer?account=0123456789&bank=Vietcombank&amount=100000&content=BiiCoffee123
+      const qrContent = `bank://transfer?account=0123456789&bank=Vietcombank&amount=${total}000&content=BiiCoffee${Date.now()}`;
       
       // Xóa mã QR cũ nếu có
       const qrElement = document.getElementById("qrcode");
       qrElement.innerHTML = "";
+      
+      // Cập nhật thông tin ngân hàng
+      document.getElementById("qr-amount").textContent = total;
+      document.getElementById("qr-content").textContent = `BiiCoffee${Date.now()}`;
       
       // Tạo mã QR mới
       QRCode.toCanvas(qrElement, qrContent, {
@@ -714,6 +796,20 @@
       
       // Hiển thị modal
       document.getElementById("qrModal").style.display = "block";
+    }
+    
+    // Tải mã QR về máy
+    function downloadQRCode() {
+      const canvas = document.querySelector("#qrcode canvas");
+      if (!canvas) return;
+      
+      const link = document.createElement('a');
+      link.download = `BiiCoffee_QR_${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showNotification("Đã tải mã QR về máy!");
     }
     
     // Đóng modal
