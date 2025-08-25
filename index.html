@@ -2,203 +2,273 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bii Coffee - Đặt món</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Bii Coffee - Đặt món Online & Quản lý lợi nhuận</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      margin: 0; 
-      background: #f9f9f9;
-      padding-top: 160px; /* Tăng padding-top để bù cho header và search box */
-      padding-bottom: 120px;
-    }
-    header { 
-      background: #007BFF; 
-      color: white; 
-      padding: 1em; 
-      text-align: center;
-      position: fixed; /* Cố định header */
-      top: 0;
-      width: 100%;
-      z-index: 10;
+    :root {
+      /* Biến màu sắc */
+      --primary-color: #2C5E9E; /* Xanh dương đậm */
+      --secondary-color: #4CAF50; /* Xanh lá */
+      --accent-color: #FF6B6B;   /* Cam đỏ */
+      --quantity-btn-color: #FF6B6B; /* Màu nút số lượng */
+      --add-to-cart-color: #4CAF50; /* Màu nút thêm vào giỏ */
+      --light-color: #f8faf8;
+      --dark-color: #333333;
+      --text-color: #333;
+      --border-color: #e0e0e0;
+      
+      /* Biến cỡ chữ */
+      --font-xs: clamp(12px, 2.5vw, 14px);
+      --font-sm: clamp(14px, 3vw, 16px);
+      --font-md: clamp(16px, 3.5vw, 18px);
+      --font-lg: clamp(18px, 4vw, 20px);
+      --font-xl: clamp(20px, 4.5vw, 24px);
+      
+      /* Biến khoảng cách */
+      --space-xs: clamp(4px, 1vw, 8px);
+      --space-sm: clamp(8px, 1.5vw, 12px);
+      --space-md: clamp(12px, 2vw, 16px);
+      --space-lg: clamp(16px, 2.5vw, 20px);
+      --space-xl: clamp(20px, 3vw, 24px);
     }
     
-    /* Search box cố định */
-    #search-container {
-      padding: 10px;
-      background: #fff;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f5f5;
+      color: var(--text-color);
+      font-size: var(--font-sm);
+      line-height: 1.6;
+      padding-top: clamp(150px, 22vh, 180px);
+      padding-bottom: clamp(80px, 12vh, 100px);
+    }
+    
+    /* Header */
+    header {
+      background: var(--primary-color);
+      color: white;
+      padding: var(--space-md);
+      text-align: center;
       position: fixed;
-      top: 80px; /* Đặt bên dưới header */
+      top: 0;
       width: 100%;
-      max-width: 800px;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    header h1 {
+      font-size: var(--font-lg);
+      margin: var(--space-xs) 0;
+      font-weight: 600;
+    }
+    
+    header p {
+      font-size: var(--font-xs);
+      margin: 0;
+      opacity: 0.9;
+    }
+    
+    /* Search area */
+    #search-area {
+      position: fixed;
+      top: clamp(70px, 15vh, 80px);
+      width: 100%;
+      max-width: min(95%, 800px);
       margin: 0 auto;
       left: 0;
       right: 0;
-      z-index: 20;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 90;
+      background: rgb(101, 120, 202);
+      padding: var(--space-sm);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 0 0 8px 8px;
+    }
+    
+    #search-container {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .search-input-wrapper {
+      position: relative;
+      flex-grow: 1;
     }
     
     #search-input {
-      width: calc(100% - 30px);
-      padding: 10px 15px;
-      border: 1px solid #ddd;
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      padding-right: 30px;
+      border: 1px solid var(--border-color);
       border-radius: 20px;
-      font-size: 16px;
+      font-size: var(--font-sm);
       outline: none;
       transition: all 0.3s;
     }
     
     #search-input:focus {
-      border-color: #007BFF;
-      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(44,94,158,0.25);
     }
-
+    
+    .clear-search-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: var(--font-lg);
+      color: #999;
+      cursor: pointer;
+      padding: 0 var(--space-xs);
+      z-index: 2;
+    }
+    
+    .clear-search-btn:hover {
+      color: var(--accent-color);
+    }
+    
+    .clear-search-btn.hidden {
+      display: none;
+    }
+    
+    #quick-search-toggle {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: var(--space-sm) var(--space-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: var(--font-xs);
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    
+    #quick-search-toggle:hover {
+      background: #1E4B8B;
+      transform: translateY(-1px);
+    }
+    
+    #quick-search {
+      display: none;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--border-color);
+      margin-top: var(--space-sm);
+    }
+    
+    #quick-search.show {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .search-tag {
+      padding: var(--space-xs) var(--space-sm);
+      background: #f0f0f0;
+      border-radius: 15px;
+      font-size: var(--font-xs);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    
+    .search-tag:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; max-height: 0; }
+      to { opacity: 1; max-height: 200px; }
+    }
+    
+    /* Menu container */
     .menu-container {
       display: flex;
       flex-direction: column;
-      max-width: 800px;
+      max-width: min(95%, 800px);
       margin: 0 auto;
+      padding: 0 var(--space-sm);
     }
+    
     .menu-section {
-      margin-bottom: 20px;
+      margin-bottom: var(--space-lg);
     }
+    
     .menu-title {
-      color: #007BFF; 
-      margin: 20px 10px 10px;
-      padding-bottom: 5px;
-      border-bottom: 2px solid #007BFF;
-      font-size: 1.3em;
+      color: var(--primary-color); 
+      margin: var(--space-lg) var(--space-sm) var(--space-md);
+      padding-bottom: var(--space-xs);
+      border-bottom: 2px solid var(--primary-color);
+      font-size: var(--font-md);
+      font-weight: 600;
     }
-.item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px;
-    background: white;
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    gap: 8px; /* Thêm khoảng cách đều giữa các phần tử */
-  }
-  
-  .item-name {
-    font-size: 0.95em;
-    flex: 1;
-    min-width: 100px;
-    margin-right: 8px; /* Giảm khoảng cách bên phải */
-  }
-  
-  .item-controls {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 8px; /* Thêm khoảng cách đều giữa các control */
-  }
-  
-  .item select {
-    margin-left: 0; /* Bỏ margin left của select */
-    min-width: 120px; /* Đảm bảo select đủ rộng */
-  }
-  
-  /* Điều chỉnh responsive cho mobile */
-  @media screen and (max-width: 600px) {
+    
+    /* Menu items */
     .item {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 6px;
-    }
-    
-    .item-name {
-      width: 100%;
-      margin-bottom: 4px; /* Giảm khoảng cách dưới */
-      margin-right: 40px;
-    }
-    
-    .item-controls {
-      width: 100%;
-      justify-content: space-between;
-      gap: 6px;
-    }
-    
-    .item select {
-      width: 100%;
-    }
-  }    #cart { 
-      position: fixed;
-      left: 20px;
-      bottom: 20px;
-      width: 350px;
-      background: white; 
-      padding: 0;
-      border-radius: 10px; 
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      z-index: 100;
-      max-height: 60vh;
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-    #cart.collapsed {
-      height: 50px;
-    }
-    #cart-header {
-      background: #007BFF;
-      color: white;
-      padding: 12px 15px;
-      cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin: var(--space-sm) 0;
+      background: white;
+      padding: var(--space-md);
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      gap: var(--space-sm);
+      transition: transform 0.2s;
     }
-    #cart-header h2 {
-      margin: 0;
-      color: white;
-      font-size: 1.2em;
+
+    .item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
-    #cart-content {
-      padding: 15px;
-      max-height: 50vh;
-      overflow-y: auto;
+  
+    .item-name {
+      font-size: var(--font-sm);
+      flex: 1;
+      min-width: 100px;
+      font-weight: 500;
     }
-    button { 
-      padding: 5px 10px; 
-      background: #28a745; 
-      color: white; 
-      border: none; 
-      border-radius: 5px; 
-      cursor: pointer; 
+  
+    .item-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: var(--space-sm);
     }
-    textarea { 
-      width: 100%; 
-      margin-top: 10px; 
+  
+    .item select {
+      font-size: var(--font-xs);
+      padding: var(--space-xs);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      min-width: 120px;
+      background: white;
     }
-    .cart-item { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 8px; 
-      padding: 8px; 
-      background: #f5f5f5; 
-      border-radius: 5px; 
-    }
-    .remove-btn { 
-      background: #dc3545; 
-    }
-    .total { 
-      font-weight: bold; 
-      font-size: 1.2em; 
-      margin-top: 10px; 
-      padding-top: 10px; 
-      border-top: 1px dashed #ccc; 
-    }
+    
+    /* Quantity controls - Nút + và - */
     .quantity-controls {
       display: flex;
       align-items: center;
     }
+    
     .quantity-btn {
-      width: 25px;
-      height: 25px;
-      background: #007BFF;
+      width: clamp(25px, 6vw, 30px);
+      height: clamp(25px, 6vw, 30px);
+      background: var(--quantity-btn-color);
       color: white;
       border: none;
       border-radius: 3px;
@@ -206,133 +276,528 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      font-size: var(--font-sm);
+      transition: all 0.2s;
+      font-weight: bold;
     }
+    
+    .quantity-btn:hover {
+      background: #E55B5B;
+      transform: scale(1.05);
+    }
+    
     .quantity-input { 
-      width: 40px; 
+      width: clamp(30px, 8vw, 40px); 
       text-align: center; 
-      margin: 0 5px;
+      margin: 0 var(--space-xs);
+      font-size: var(--font-sm);
+      padding: var(--space-xs);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
     }
+    
     .note-input { 
       flex-grow: 1; 
-      margin-left: 10px; 
-      padding: 5px; 
-      border: 1px solid #ddd; 
+      font-size: var(--font-xs);
+      padding: var(--space-xs);
+      border: 1px solid var(--border-color); 
       border-radius: 4px; 
-      font-size: 0.9em;
     }
-    .cart-note { 
-      font-size: 0.8em; 
-      color: #666; 
-      margin-left: 10px; 
+    
+    /* Nút Thêm vào giỏ */
+    .add-to-cart-btn {
+      background: var(--add-to-cart-color);
+      color: white;
+      padding: var(--space-xs) var(--space-sm);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: var(--font-sm);
+      transition: all 0.3s;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      min-width: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
     }
-    .cart-item-name { 
-      font-weight: bold; 
+    
+    .add-to-cart-btn:hover {
+      background: #3E9E42;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
-    .cart-item-details { 
-      flex-grow: 1; 
-      margin-left: 10px; 
+    
+    .add-to-cart-btn:active {
+      transform: translateY(0);
     }
-    .cart-item-price { 
-      color: #007BFF; 
-      font-weight: bold; 
+    
+    /* Button styles */
+    button {
+      padding: var(--space-sm) var(--space-md);
+      color: oklch(10.227% 0.02437 242.232);
+      background-color: #61a9da;
+      border:none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: var(--font-sm);
+      transition: all 0.3s;
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .cart-header-row { 
-      font-weight: bold; 
-      background: #007BFF; 
-      color: white; 
-      padding: 8px; 
-      border-radius: 5px; 
-      margin-bottom: 10px; 
+    
+    button:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(12, 231, 103, 0.15);
+    }
+    
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(184, 61, 92, 0.1);
+    }
+    
+    .btn-primary {
+      background: var(--primary-color);
+    }
+    
+    .btn-primary:hover {
+      background: #1E4B8B;
+    }
+    
+    .btn-success {
+      background: var(--secondary-color);
+    }
+    
+    .btn-success:hover {
+      background: #3E9E42;
+    }
+    
+    .btn-danger {
+      background: var(--accent-color);
+    }
+    
+    .btn-danger:hover {
+      background: #E55B5B;
+    }
+    
+    /* Cart styles */
+    #cart { 
+      position: fixed;
+      left: var(--space-md);
+      bottom: var(--space-md);
+      width: clamp(300px, 90%, 350px);
+      background: white; 
+      padding: 0;
+      border-radius: 10px; 
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      z-index: 80;
+      max-height: 60vh;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    #cart.collapsed {
+      height: auto;
+      max-height: 50px;
+    }
+    
+    #cart-header {
+      background: var(--primary-color);
+      color: white;
+      padding: var(--space-sm) var(--space-md);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    #cart-header h2 {
+      margin: 0;
+      color: white;
+      font-size: var(--font-md);
+      font-weight: 600;
+    }
+    
+    #cart-content {
+      padding: var(--space-md);
+      max-height: calc(60vh - 60px);
+      overflow-y: auto;
+    }
+    
+    .cart-item { 
       display: flex; 
       justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: var(--space-sm); 
+      padding: var(--space-sm); 
+      background: #f5f5f5; 
+      border-radius: 5px; 
+      font-size: var(--font-xs);
     }
+    
+    .cart-item-name { 
+      font-weight: 600; 
+      font-size: var(--font-sm);
+    }
+    
+    .cart-note { 
+      color: #666; 
+      margin-left: var(--space-sm); 
+      font-size: var(--font-xs);
+      font-style: italic;
+    }
+    
+    .total { 
+      font-weight: 600; 
+      font-size: var(--font-md); 
+      margin-top: var(--space-md); 
+      padding-top: var(--space-sm); 
+      border-top: 1px dashed #ccc; 
+    }
+    
+    /* Notification */
     .notification {
       position: fixed;
       top: 20px;
       right: 20px;
-      background: #28a745;
+      background: var(--secondary-color);
       color: white;
-      padding: 15px 20px;
+      padding: var(--space-md) var(--space-lg);
       border-radius: 5px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.2);
       z-index: 1000;
       opacity: 0;
       transition: opacity 0.3s ease;
+      font-size: var(--font-sm);
+      font-weight: 500;
     }
+    
     .notification.show {
       opacity: 1;
     }
-    #cart-toggle {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.2em;
-      cursor: pointer;
-    }
     
+    /* Delivery info */
     .delivery-info {
-      margin-top: 15px;
-      padding: 15px;
+      margin-top: var(--space-lg);
+      padding: var(--space-md);
       background: #f5f5f5;
       border-radius: 8px;
+      font-size: var(--font-sm);
     }
+    
     .delivery-info h3 {
       margin-top: 0;
-      color: #007BFF;
+      color: var(--primary-color);
+      font-size: var(--font-md);
+      font-weight: 600;
     }
+    
     .delivery-info input, 
     .delivery-info textarea {
       width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
+      padding: var(--space-sm);
+      margin-bottom: var(--space-sm);
+      border: 1px solid var(--border-color);
       border-radius: 4px;
+      font-size: var(--font-sm);
     }
+    
     .hidden {
       display: none;
     }
     
+    /* Zalo button */
+    .zalo-float-btn {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background: #0088cc;
+      color: white;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      z-index: 70;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: var(--font-sm);
+      transition: all 0.3s;
+    }
+    
+    .zalo-float-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+    }
+    
+    .zalo-float-btn img {
+      width: 20px;
+      margin-right: var(--space-xs);
+    }
+    
+    /* Messenger button */
+    .messenger-btn {
+      background: #0084FF !important;
+      color: white;
+      border: none;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: var(--space-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      width: 100%;
+      justify-content: center;
+      font-size: var(--font-sm);
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .messenger-btn:hover {
+      background: #0073E6 !important;
+      transform: translateY(-1px);
+    }
+    
+    /* Profit section styles */
+    #profit-section {
+      position: fixed;
+      right: 20px;
+      bottom: 80px;
+      width: clamp(300px, 90%, 500px);
+      max-height: 70vh;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      padding: 15px;
+      overflow-y: auto;
+      z-index: 90;
+    }
+
+    .profit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .profit-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .profit-summary {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    #profit-chart {
+      height: 200px;
+      margin-bottom: 15px;
+      border: 1px solid #eee;
+      padding: 10px;
+    }
+
+    #order-details table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #order-details th, #order-details td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    #order-details th {
+      background-color: #f2f2f2;
+    }
+
+    #show-profit-btn {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 20px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      z-index: 80;
+    }
+
+    /* Cost input section */
+    .cost-input-section {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .cost-input-group {
+      margin-bottom: 10px;
+    }
+
+    .cost-input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .cost-input-group input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .cost-details {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #fff;
+      border-radius: 5px;
+      border: 1px solid #eee;
+    }
+
+    .cost-details h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .cost-details ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .cost-details li {
+      margin-bottom: 5px;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 500px;
+      border-radius: 8px;
+    }
+
+    .close-btn {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    /* Responsive adjustments */
     @media screen and (max-width: 600px) {
       body {
-        padding-top: 140px; /* Điều chỉnh cho mobile */
+        padding-top: clamp(140px, 25vh, 160px);
+      }
+      
+      #search-area {
+        top: clamp(60px, 12vh, 70px);
+        padding: var(--space-xs) var(--space-sm);
       }
       
       #search-container {
-        top: 70px;
-        padding: 8px 10px;
+        flex-direction: column;
+        gap: var(--space-xs);
+      }
+      
+      #quick-search-toggle {
+        width: 100%;
+        justify-content: center;
+        padding: var(--space-xs) var(--space-sm);
+      }
+      
+      #quick-search {
+        flex-wrap: wrap;
+        gap: var(--space-xs);
+        padding: var(--space-xs) 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .search-tag {
+        flex: 1 0 calc(50% - var(--space-xs));
+        min-width: calc(50% - var(--space-xs));
+        font-size: var(--font-xs);
+        padding: var(--space-xs);
       }
       
       #cart {
-        width: calc(100% - 40px);
-        left: 20px;
-        right: 20px;
+        width: calc(100% - var(--space-md) * 2);
+        left: var(--space-md);
+        right: var(--space-md);
+        bottom: var(--space-sm);
+        max-height: 50vh;
       }
-      .item {
-        flex-direction: column;
-        align-items: flex-start;
+      
+      .zalo-float-btn {
+        bottom: 70px;
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--font-xs);
       }
-      .item-name {
-        width: 100%;
-        margin-bottom: 8px;
-        font-size: 1em;
+      
+      /* Điều chỉnh nút trên mobile */
+      .add-to-cart-btn {
+        min-width: 70px;
+        font-size: var(--font-xs);
+        padding: var(--space-xs);
       }
-      .item-controls {
-        width: 100%;
-        justify-content: space-between;
-        margin-top: 8px;
+      
+      .quantity-btn {
+        width: 25px;
+        height: 25px;
       }
-      .note-input {
-        margin-left: 0;
-        margin-top: 8px;
-        width: 100%;
+
+      #profit-section {
+        width: calc(100% - var(--space-md) * 2);
+        right: var(--space-md);
+        bottom: 100px;
       }
-      .menu-title {
-        font-size: 1.2em;
-        margin-left: 15px;
+
+      #show-profit-btn {
+        bottom: 60px;
       }
-      #search-input {
-        padding: 8px 12px;
-        font-size: 14px;
+
+      .modal-content {
+        width: 90%;
+        margin: 20% auto;
+      }
+    }
+    
+    /* Đối với màn hình rất nhỏ */
+    @media screen and (max-width: 400px) {
+      .search-tag {
+        flex: 1 0 100%;
+        min-width: 100%;
       }
     }
   </style>
@@ -343,20 +808,47 @@
     <p>📍 Trung Mầu - Cổng Phụ Bá Thiện 2 | ☎ 0964 391 834 or 0928 020 777</p>
   </header>
 
-  <!-- Search box cố định -->
-  <div id="search-container">
-    <input type="text" id="search-input" placeholder="🔍 Tìm kiếm món...">
+  <!-- Thanh tìm kiếm cải tiến -->
+  <div id="search-area">
+    <div id="search-container">
+      <div class="search-input-wrapper">
+        <input type="text" id="search-input" placeholder="🔍 Tìm kiếm món...">
+        <button id="clear-search" class="clear-search-btn hidden">×</button>
+      </div>
+      <button id="quick-search-toggle" onclick="toggleQuickSearch()">
+        <i class="fas fa-tags"></i>
+        <span>Lọc món theo nhóm</span>
+      </button>
+    </div>
+    <div id="quick-search">
+      <div class="search-tag" onclick="searchByKeyword('TRÀ')">TRÀ</div>
+      <div class="search-tag" onclick="searchByKeyword('SODA')">SODA</div>
+      <div class="search-tag" onclick="searchByKeyword('SINH TỐ')">SINH TỐ</div>
+      <div class="search-tag" onclick="searchByKeyword('ĐÁ XAY')">ĐÁ XAY</div>
+      <div class="search-tag" onclick="searchByKeyword('CÀ PHÊ')">CÀ PHÊ</div>
+      <div class="search-tag" onclick="searchByKeyword('TRÀ SỮA')">TRÀ SỮA</div>
+      <div class="search-tag" onclick="searchByKeyword('SỮA CHUA')">SỮA CHUA</div>
+      <div class="search-tag" onclick="searchByKeyword('NƯỚC ÉP')">NƯỚC ÉP</div>
+      <div class="search-tag" onclick="searchByKeyword('PIZZA')">PIZZA</div>
+      <div class="search-tag" onclick="searchByKeyword('ĐỒ ĂN VẶT')">ĐỒ ĂN VẶT</div>
+      <div class="search-tag" onclick="searchByKeyword('MỲ CAY')">MỲ CAY</div>
+      <div class="search-tag" onclick="searchByKeyword('BÚN ĐẬU')">BÚN ĐẬU</div>
+    </div>
   </div>
 
-  <!-- Delivery info -->
   <div id="delivery-section" class="delivery-info hidden">
     <h3>Thông tin giao hàng</h3>
     <input type="text" id="customer-name" placeholder="Họ tên">
     <input type="tel" id="customer-phone" placeholder="Số điện thoại">
     <textarea id="delivery-address" placeholder="Địa chỉ giao hàng"></textarea>
-    <button onclick="toggleDeliveryInfo()">Đóng</button>
+    <button class="btn-primary" onclick="toggleDeliveryInfo()">Đóng</button>
   </div>
-  <div class="menu-group">
+
+  <a href="https://zalo.me/0964391834" class="zalo-float-btn" target="_blank">
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA1MTJjLTE0MS4zOSAwLTI1Ni0xMTQuNjEtMjU2LTI1NlMxMTQuNjEgMCAyNTYgMHMyNTYgMTE0LjYxIDI1NiAyNTYtMTE0LjYxIDI1Ni0yNTYgMjU2em0xMjYuNzktMTU5LjY5Yy0xNi4xMy0xMS42MS0zOS43My0yMC43Mi-etc..." alt="Zalo">
+    Chat Zalo
+  </a>
+                      <div class="menu-group">
     <h2>TRÀ</h2>
         <div class="item">
       <span class="item-name">Trà chanh</span>
@@ -371,7 +863,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
     <div class="item">
@@ -387,7 +879,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
     <div class="item">
@@ -403,7 +895,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 <div class="item">
@@ -419,7 +911,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
     <div class="item">
@@ -435,7 +927,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
     <div class="item">
@@ -451,7 +943,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -467,7 +959,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -483,7 +975,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -499,7 +991,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -515,7 +1007,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -531,7 +1023,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -547,7 +1039,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -563,7 +1055,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -579,7 +1071,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -595,7 +1087,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -611,7 +1103,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -627,7 +1119,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -643,7 +1135,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 <h2>SODA</h2>
@@ -659,7 +1151,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -674,7 +1166,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -689,7 +1181,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -704,7 +1196,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 <h2>SINH TỐ</h2>
@@ -720,7 +1212,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -735,7 +1227,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -750,7 +1242,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 <h2>ĐÁ XAY</h2>
@@ -766,7 +1258,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -781,7 +1273,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -796,7 +1288,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -811,7 +1303,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 <h2>CÀ PHÊ</h2>
@@ -827,7 +1319,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -842,7 +1334,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -857,7 +1349,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 <h2>TRÀ SỮA</h2>
@@ -874,7 +1366,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -890,7 +1382,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -906,7 +1398,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -922,7 +1414,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -938,7 +1430,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -954,7 +1446,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -970,7 +1462,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -986,7 +1478,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1002,7 +1494,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1018,7 +1510,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1034,7 +1526,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1050,7 +1542,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1066,7 +1558,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1082,7 +1574,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1098,7 +1590,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1114,7 +1606,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1130,7 +1622,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1146,7 +1638,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1162,7 +1654,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1178,7 +1670,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1194,7 +1686,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1210,7 +1702,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1226,7 +1718,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1242,7 +1734,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1258,7 +1750,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 <h2>SỮA CHUA</h2>
@@ -1274,7 +1766,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1289,7 +1781,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1304,7 +1796,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1319,7 +1811,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 <h2>NƯỚC ÉP</h2>
@@ -1335,7 +1827,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1350,7 +1842,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1365,7 +1857,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 <h2>PIZZA</h2>
@@ -1382,7 +1874,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1398,7 +1890,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1414,7 +1906,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 <h2>ĐỒ ĂN VẶT</h2>
@@ -1430,7 +1922,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1445,7 +1937,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1460,7 +1952,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1476,7 +1968,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1491,7 +1983,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1506,7 +1998,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1521,7 +2013,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1536,7 +2028,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1551,7 +2043,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
     <div class="item">
@@ -1567,7 +2059,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1583,7 +2075,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1599,7 +2091,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
@@ -1615,27 +2107,27 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 <h2>MỲ CAY</h2>
         <div class="item">
-      <span class="item-name">Mỳ xúc xích</span>
+      <span class="item-name">Mỳ cay xúc xích</span>
       <div class="item-controls">
         <select class="item-size">
-          <option value="Mỳ xúc xích - Cấp 0 - 40k">Cấp 0 - 40k</option>
-          <option value="Mỳ xúc xích - Cấp 1 - 40k">Cấp 1 - 40k</option>
-          <option value="Mỳ xúc xích - Cấp 2 - 40k">Cấp 2 - 40k</option>
-          <option value="Mỳ xúc xích - Cấp 3 - 40k">Cấp 3 - 40k</option>
-          <option value="Mỳ xúc xích - Cấp 4 - 40k">Cấp 4 - 40k</option>
-          <option value="Mỳ xúc xích - Cấp 5 - 40k">Cấp 5 - 40k</option>
-          <option value="Mỳ xúc xích - Cấp 6 - 40k">Cấp 6 - 40k</option>
-          <option value="Mỳ xúc xích - Cấp 7 - 40k">Cấp 7 - 40k</option>
-          <option value="Mỳ xúc xích - Cấp 8 - 40k">Cấp 8 - 40k</option>
-          <option value="Mỳ xúc xích - Cấp 9 - 40k">Cấp 9 - 40k</option>
-          <option value="Mỳ xúc xích - Cấp 10 - 40k">Cấp 10 - 40k</option>
-          <option value="Mỳ xúc xích - Cấp 11 - 40k">Cấp 11 - 40k</option>
-          <option value="Mỳ xúc xích - Cấp 12 - 40k">Cấp 12 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 0 - 40k">Cấp 0 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 1 - 40k">Cấp 1 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 2 - 40k">Cấp 2 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 3 - 40k">Cấp 3 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 4 - 40k">Cấp 4 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 5 - 40k">Cấp 5 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 6 - 40k">Cấp 6 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 7 - 40k">Cấp 7 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 8 - 40k">Cấp 8 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 9 - 40k">Cấp 9 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 10 - 40k">Cấp 10 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 11 - 40k">Cấp 11 - 40k</option>
+          <option value="Mỳ cay xúc xích - Cấp 12 - 40k">Cấp 12 - 40k</option>
         </select>
         <div class="quantity-control">
           <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
@@ -1643,26 +2135,26 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
-      <span class="item-name">Mỳ bò</span>
+      <span class="item-name">Mỳ cay bò</span>
       <div class="item-controls">
         <select class="item-size">
-          <option value="Mỳ bò - Cấp 0 - 45k">Cấp 0 - 45k</option>
-          <option value="Mỳ bò - Cấp 1 - 45k">Cấp 1 - 45k</option>
-          <option value="Mỳ bò - Cấp 2 - 45k">Cấp 2 - 45k</option>
-          <option value="Mỳ bò - Cấp 3 - 45k">Cấp 3 - 45k</option>
-          <option value="Mỳ bò - Cấp 4 - 45k">Cấp 4 - 45k</option>
-          <option value="Mỳ bò - Cấp 5 - 45k">Cấp 5 - 45k</option>
-          <option value="Mỳ bò - Cấp 6 - 45k">Cấp 6 - 45k</option>
-          <option value="Mỳ bò - Cấp 7 - 45k">Cấp 7 - 45k</option>
-          <option value="Mỳ bò - Cấp 8 - 45k">Cấp 8 - 45k</option>
-          <option value="Mỳ bò - Cấp 9 - 45k">Cấp 9 - 45k</option>
-          <option value="Mỳ bò - Cấp 10 - 45k">Cấp 10 - 45k</option>
-          <option value="Mỳ bò - Cấp 11 - 45k">Cấp 11 - 45k</option>
-          <option value="Mỳ bò - Cấp 12 - 45k">Cấp 12 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 0 - 45k">Cấp 0 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 1 - 45k">Cấp 1 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 2 - 45k">Cấp 2 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 3 - 45k">Cấp 3 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 4 - 45k">Cấp 4 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 5 - 45k">Cấp 5 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 6 - 45k">Cấp 6 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 7 - 45k">Cấp 7 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 8 - 45k">Cấp 8 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 9 - 45k">Cấp 9 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 10 - 45k">Cấp 10 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 11 - 45k">Cấp 11 - 45k</option>
+          <option value="Mỳ cay bò - Cấp 12 - 45k">Cấp 12 - 45k</option>
         </select>
         <div class="quantity-control">
           <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
@@ -1670,26 +2162,26 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
       <span class="item-name">Mỳ sường sụn</span>
       <div class="item-controls">
         <select class="item-size">
-          <option value="Mỳ sườn sụn - Cấp 0 - 45k">Cấp 0 - 45k</option>
-          <option value="Mỳ sườn sụn - Cấp 1 - 45k">Cấp 1 - 45k</option>
-          <option value="Mỳ sườn sụn - Cấp 2 - 45k">Cấp 2 - 45k</option>
-          <option value="Mỳ sườn sụn - Cấp 3 - 45k">Cấp 3 - 45k</option>
-          <option value="Mỳ sườn sụn - Cấp 4 - 45k">Cấp 4 - 45k</option>
-          <option value="Mỳ sườn sụn - Cấp 5 - 45k">Cấp 5 - 45k</option>
-          <option value="Mỳ sườn sụn - Cấp 6 - 45k">Cấp 6 - 45k</option>
-          <option value="Mỳ sườn sụn - Cấp 7 - 45k">Cấp 7 - 45k</option>
-          <option value="Mỳ sườn sụn - Cấp 8 - 45k">Cấp 8 - 45k</option>
-          <option value="Mỳ sườn sụn - Cấp 9 - 45k">Cấp 9 - 45k</option>
-          <option value="Mỳ sườn sụn - Cấp 10 - 45k">Cấp 10 - 45k</option>
-          <option value="Mỳ sườn sụn - Cấp 11 - 45k">Cấp 11 - 45k</option>
-          <option value="Mỳ sườn sụn - Cấp 12 - 45k">Cấp 12 - 4k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 0 - 45k">Cấp 0 - 45k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 1 - 45k">Cấp 1 - 45k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 2 - 45k">Cấp 2 - 45k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 3 - 45k">Cấp 3 - 45k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 4 - 45k">Cấp 4 - 45k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 5 - 45k">Cấp 5 - 45k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 6 - 45k">Cấp 6 - 45k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 7 - 45k">Cấp 7 - 45k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 8 - 45k">Cấp 8 - 45k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 9 - 45k">Cấp 9 - 45k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 10 - 45k">Cấp 10 - 45k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 11 - 45k">Cấp 11 - 45k</option>
+          <option value="Mỳ cay sườn sụn - Cấp 12 - 45k">Cấp 12 - 4k</option>
         </select>
         <div class="quantity-control">
           <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
@@ -1697,26 +2189,26 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
-      <span class="item-name">Mỳ hải sản</span>
+      <span class="item-name">Mỳ cay hải sản</span>
       <div class="item-controls">
         <select class="item-size">
-          <option value="Mỳ hải sản - Cấp 0 - 50k">Cấp 0 - 50k</option>
-          <option value="Mỳ hải sản - Cấp 1 - 50k">Cấp 1 - 50k</option>
-          <option value="Mỳ hải sản - Cấp 2 - 50k">Cấp 2 - 50k</option>
-          <option value="Mỳ hải sản - Cấp 3 - 50k">Cấp 3 - 50k</option>
-          <option value="Mỳ hải sản - Cấp 4 - 50k">Cấp 4 - 50k</option>
-          <option value="Mỳ hải sản - Cấp 5 - 50k">Cấp 5 - 50k</option>
-          <option value="Mỳ hải sản - Cấp 6 - 50k">Cấp 6 - 50k</option>
-          <option value="Mỳ hải sản - Cấp 7 - 50k">Cấp 7 - 50k</option>
-          <option value="Mỳ hải sản - Cấp 8 - 50k">Cấp 8 - 50k</option>
-          <option value="Mỳ hải sản - Cấp 9 - 50k">Cấp 9 - 50k</option>
-          <option value="Mỳ hải sản - Cấp 10 - 50k">Cấp 10 - 50k</option>
-          <option value="Mỳ hải sản - Cấp 11 - 50k">Cấp 11 - 50k</option>
-          <option value="Mỳ hải sản - Cấp 12 - 50k">Cấp 12 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 0 - 50k">Cấp 0 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 1 - 50k">Cấp 1 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 2 - 50k">Cấp 2 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 3 - 50k">Cấp 3 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 4 - 50k">Cấp 4 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 5 - 50k">Cấp 5 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 6 - 50k">Cấp 6 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 7 - 50k">Cấp 7 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 8 - 50k">Cấp 8 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 9 - 50k">Cấp 9 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 10 - 50k">Cấp 10 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 11 - 50k">Cấp 11 - 50k</option>
+          <option value="Mỳ cay hải sản - Cấp 12 - 50k">Cấp 12 - 50k</option>
         </select>
         <div class="quantity-control">
           <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
@@ -1724,26 +2216,26 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
         <div class="item">
-      <span class="item-name">Mỳ thập cẩm</span>
+      <span class="item-name">Mỳ cay thập cẩm</span>
       <div class="item-controls">
         <select class="item-size">
-          <option value="Mỳ thập cẩm - Cấp 0 - 55k">Cấp 0 - 55k</option>
-          <option value="Mỳ thập cẩm - Cấp 1 - 55k">Cấp 1 - 55k</option>
-          <option value="Mỳ thập cẩm - Cấp 2 - 55k">Cấp 2 - 55k</option>
-          <option value="Mỳ thập cẩm - Cấp 3 - 55k">Cấp 3 - 55k</option>
-          <option value="Mỳ thập cẩm - Cấp 4 - 55k">Cấp 4 - 55k</option>
-          <option value="Mỳ thập cẩm - Cấp 5 - 55k">Cấp 5 - 55k</option>
-          <option value="Mỳ thập cẩm - Cấp 6 - 55k">Cấp 6 - 55k</option>
-          <option value="Mỳ thập cẩm - Cấp 7 - 55k">Cấp 7 - 55k</option>
-          <option value="Mỳ thập cẩm - Cấp 8 - 55k">Cấp 8 - 55k</option>
-          <option value="Mỳ thập cẩm - Cấp 9 - 55k">Cấp 9 - 55k</option>
-          <option value="Mỳ thập cẩm - Cấp 10 - 55k">Cấp 10 - 55k</option>
-          <option value="Mỳ thập cẩm - Cấp 11 - 55k">Cấp 11 - 55k</option>
-          <option value="Mỳ thập cẩm - Cấp 12 - 55k">Cấp 12 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 0 - 55k">Cấp 0 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 1 - 55k">Cấp 1 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 2 - 55k">Cấp 2 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 3 - 55k">Cấp 3 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 4 - 55k">Cấp 4 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 5 - 55k">Cấp 5 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 6 - 55k">Cấp 6 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 7 - 55k">Cấp 7 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 8 - 55k">Cấp 8 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 9 - 55k">Cấp 9 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 10 - 55k">Cấp 10 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 11 - 55k">Cấp 11 - 55k</option>
+          <option value="Mỳ cay thập cẩm - Cấp 12 - 55k">Cấp 12 - 55k</option>
         </select>
         <div class="quantity-control">
           <button class="quantity-minus" onclick="changeQuantity(this, -1)">-</button>
@@ -1751,7 +2243,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 <h2>BÚN ĐẬU</h2>
@@ -1771,7 +2263,7 @@
           <button class="quantity-plus" onclick="changeQuantity(this, 1)">+</button>
         </div>
         <input type="text" class="note-input" placeholder="Ghi chú...">
-        <button onclick="addToCart(this)">Thêm</button>
+        <button onclick="addToCart(this)">Thêm vào đơn</button>
       </div>
     </div>
 
@@ -1787,17 +2279,124 @@
       </div>
       <ul id="cart-list"></ul>
       <div id="cart-total" class="total">Tổng tiền: 0đ</div>
-      <button onclick="toggleDeliveryInfo()">🏠 Thêm địa chỉ giao hàng</button>
-      <textarea id="orderText" rows="4" placeholder="Đơn hàng sẽ hiển thị ở đây..." readonly></textarea><br/>
-      <button onclick="copyOrder()">📋 Sao chép đơn</button>
-      <button onclick="sendToZalo()" style="background:#0088cc">📤 Gửi Zalo</button>
+      <button class="btn-primary" onclick="toggleDeliveryInfo()">✏️ Thông tin giao hàng</button>
+      <textarea id="orderText" rows="4" placeholder="Nội dung đơn hàng sẽ hiển thị tại đây..." readonly></textarea><br/>
+      <button class="btn-success" onclick="copyOrder()">📋 Sao chép đơn hàng</button>
+      <button class="btn-primary" onclick="sendToZalo()" style="background:#0088cc">💬 Gửi qua Zalo</button>
+      <button onclick="sendToMessenger()" class="messenger-btn"><i class="fab fa-facebook-messenger"></i> Gửi qua Messenger</button>
+      <button class="btn-success" onclick="completeOrder()">✅ Hoàn thành đơn hàng</button>
     </div>
   </div>
+
+  <!-- Phần thống kê lợi nhuận -->
+  <div id="profit-section" class="hidden">
+    <div class="profit-header">
+      <h2>📊 Thống kê lợi nhuận</h2>
+      <button onclick="toggleProfitSection()">Đóng</button>
+    </div>
+    
+    <div class="profit-controls">
+      <select id="time-range">
+        <option value="day">Theo ngày</option>
+        <option value="month">Theo tháng</option>
+        <option value="year">Theo năm</option>
+        <option value="custom">Tùy chọn</option>
+      </select>
+      
+      <div id="date-pickers" class="hidden">
+        <input type="date" id="start-date">
+        <input type="date" id="end-date">
+      </div>
+      
+      <button onclick="calculateProfit()">Tính toán</button>
+    </div>
+    
+    <div id="profit-results">
+      <div class="profit-summary">
+        <h3>Tổng doanh thu: <span id="total-revenue">0</span></h3>
+        <h3>Tổng chi phí: <span id="total-cost">0</span></h3>
+        <h3>Lợi nhuận: <span id="total-profit">0</span></h3>
+      </div>
+      
+      <div id="profit-chart">
+        <!-- Biểu đồ sẽ được hiển thị ở đây -->
+      </div>
+      
+      <div id="order-details">
+        <h3>Chi tiết đơn hàng</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Ngày</th>
+              <th>Số đơn</th>
+              <th>Doanh thu</th>
+              <th>Chi phí</th>
+              <th>Lợi nhuận</th>
+            </tr>
+          </thead>
+          <tbody id="profit-details">
+            <!-- Dữ liệu sẽ được thêm động -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="cost-input-section">
+      <h3>Nhập chi phí thực tế (đơn vị: 1.000đ)</h3>
+      <div class="cost-input-group">
+        <label for="material-cost">Chi phí nguyên liệu:</label>
+        <input type="number" id="material-cost" placeholder="nghìn đồng">
+      </div>
+      <div class="cost-input-group">
+        <label for="labor-cost">Chi phí nhân viên:</label>
+        <input type="number" id="labor-cost" placeholder="nghìn đồng">
+      </div>
+      <div class="cost-input-group">
+        <label for="utility-cost">Chi phí điện nước:</label>
+        <input type="number" id="utility-cost" placeholder="nghìn đồng">
+      </div>
+      <div class="cost-input-group">
+        <label for="other-cost">Chi phí khác:</label>
+        <input type="number" id="other-cost" placeholder="nghìn đồng">
+      </div>
+      <button onclick="saveActualCosts()">Lưu chi phí</button>
+    </div>
+  </div>
+
+  <!-- Modal chỉnh sửa chi phí -->
+  <div id="edit-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeEditModal()">&times;</span>
+      <h2>Chỉnh sửa chi phí</h2>
+      <div class="edit-form">
+        <div class="form-group">
+          <label>Nguyên liệu (nghìn đồng):</label>
+          <input type="number" id="edit-material">
+        </div>
+        <div class="form-group">
+          <label>Nhân viên (nghìn đồng):</label>
+          <input type="number" id="edit-labor">
+        </div>
+        <div class="form-group">
+          <label>Điện nước (nghìn đồng):</label>
+          <input type="number" id="edit-utility">
+        </div>
+        <div class="form-group">
+          <label>Khác (nghìn đồng):</label>
+          <input type="number" id="edit-other">
+        </div>
+        <button class="btn-primary" onclick="saveEditedCosts()">Lưu thay đổi</button>
+      </div>
+    </div>
+  </div>
+
+  <button id="show-profit-btn" onclick="toggleProfitSection()">📈 Xem thống kê</button>
 
   <div id="notification" class="notification">Đã thêm vào giỏ hàng!</div>
 
   <script>
     let cart = [];
+    let currentEditKey = null;
     
     // Load cart from localStorage
     function loadCart() {
@@ -1816,7 +2415,11 @@
     // Search functionality
     function setupSearch() {
       const searchInput = document.getElementById('search-input');
+      const clearBtn = document.getElementById('clear-search');
+      
       searchInput.addEventListener('input', function() {
+        clearBtn.classList.toggle('hidden', this.value === '');
+        
         const searchTerm = this.value.toLowerCase();
         const items = document.querySelectorAll('.item');
         
@@ -1831,6 +2434,54 @@
           title.style.display = hasVisibleItems ? 'block' : 'none';
         });
       });
+      
+      clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        searchInput.focus();
+        this.classList.add('hidden');
+        const event = new Event('input');
+        searchInput.dispatchEvent(event);
+      });
+      
+      searchInput.addEventListener('touchstart', function(e) {
+        this.style.fontSize = '16px';
+      });
+      
+      searchInput.addEventListener('touchend', function(e) {
+        setTimeout(() => {
+          this.style.fontSize = '';
+        }, 100);
+      });
+    }
+    
+    // Toggle quick search panel
+    function toggleQuickSearch() {
+      const quickSearch = document.getElementById('quick-search');
+      quickSearch.classList.toggle('show');
+      
+      const toggleBtn = document.getElementById('quick-search-toggle');
+      if (quickSearch.classList.contains('show')) {
+        toggleBtn.innerHTML = '<i class="fas fa-times"></i><span>Đóng</span>';
+      } else {
+        toggleBtn.innerHTML = '<i class="fas fa-tags"></i><span>Lọc món theo nhóm</span>';
+      }
+    }
+    
+    // Search by keyword
+    function searchByKeyword(keyword) {
+      const searchInput = document.getElementById('search-input');
+      const clearBtn = document.getElementById('clear-search');
+      
+      searchInput.value = keyword;
+      searchInput.focus();
+      clearBtn.classList.remove('hidden');
+      toggleQuickSearch();
+      
+      const event = new Event('input', {
+        bubbles: true,
+        cancelable: true,
+      });
+      searchInput.dispatchEvent(event);
     }
     
     // Toggle delivery info
@@ -1839,19 +2490,30 @@
       updateCart();
     }
     
+    // Toggle cart visibility
     function toggleCart() {
       const cart = document.getElementById('cart');
       cart.classList.toggle('collapsed');
       document.getElementById('cart-toggle').textContent = 
-        cart.classList.contains('collapsed') ? '▲' : '▼';
+        cart.classList.contains('collapsed') ? '▼' : '▲';
     }
     
+    // Toggle profit section visibility
+    function toggleProfitSection() {
+      document.getElementById('profit-section').classList.toggle('hidden');
+      if (!document.getElementById('profit-section').classList.contains('hidden')) {
+        calculateProfit();
+      }
+    }
+    
+    // Change item quantity
     function changeQuantity(btn, delta) {
       const input = btn.parentElement.querySelector('.quantity-input');
       let newValue = parseInt(input.value) + delta;
       input.value = newValue < 1 ? 1 : newValue;
     }
     
+    // Show notification
     function showNotification(message) {
       const notification = document.getElementById('notification');
       notification.textContent = message;
@@ -1859,6 +2521,7 @@
       setTimeout(() => notification.classList.remove('show'), 2000);
     }
 
+    // Add item to cart
     function addToCart(button) {
       const item = button.closest('.item');
       const [select, quantityInput, noteInput] = [
@@ -1890,15 +2553,16 @@
       noteInput.value = '';
       updateCart();
       saveCart();
-      document.getElementById('cart').classList.remove('collapsed');
     }
 
+    // Remove item from cart
     function removeFromCart(index) {
       cart.splice(index, 1);
       updateCart();
       saveCart();
     }
 
+    // Update cart display
     function updateCart() {
       const [list, textArea, totalElement, countElement] = [
         document.getElementById("cart-list"),
@@ -1911,7 +2575,6 @@
       let content = "Đơn hàng của bạn:\n";
       let total = 0;
       
-      // Thêm thông tin giao hàng nếu có
       const customerName = document.getElementById('customer-name').value;
       const customerPhone = document.getElementById('customer-phone').value;
       const deliveryAddress = document.getElementById('delivery-address').value;
@@ -1924,7 +2587,6 @@
         content += "\n";
       }
       
-      // Thêm các món vào đơn hàng
       cart.forEach((item, index) => {
         const itemTotal = item.price * item.quantity;
         total += itemTotal;
@@ -1943,7 +2605,7 @@
             </div>
           </div>
           <div class="cart-item-price">${itemTotal}k</div>
-          <button class="remove-btn" onclick="removeFromCart(${index})">Xóa</button>
+          <button class="btn-danger remove-btn" onclick="removeFromCart(${index})">Xóa</button>
         `;
         list.appendChild(li);
       });
@@ -1953,6 +2615,7 @@
       countElement.textContent = cart.length;
     }
 
+    // Copy order to clipboard
     function copyOrder() {
       const textArea = document.getElementById("orderText");
       textArea.select();
@@ -1960,64 +2623,550 @@
       showNotification("Đã sao chép đơn hàng!");
     }
 
+    // Complete order and save to completed orders
+    function completeOrder() {
+      if (cart.length === 0) {
+        showNotification("Giỏ hàng trống, không có gì để hoàn thành!");
+        return;
+      }
+
+      const orderData = {
+        id: Date.now(),
+        date: new Date(),
+        items: [...cart],
+        customerName: document.getElementById('customer-name').value,
+        customerPhone: document.getElementById('customer-phone').value,
+        deliveryAddress: document.getElementById('delivery-address').value,
+        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      };
+      
+      // Lưu đơn hàng đã hoàn thành
+      const orders = JSON.parse(localStorage.getItem('completedOrders')) || [];
+      orders.push(orderData);
+      localStorage.setItem('completedOrders', JSON.stringify(orders));
+      
+      // Xóa giỏ hàng
+      cart = [];
+      updateCart();
+      saveCart();
+      
+      showNotification("Đã lưu đơn hàng thành công!");
+    }
+
+    // Send order via Zalo
     function sendToZalo() {
       if (cart.length === 0) {
         showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
         return;
       }
+
+      let orderMessage = "Đơn hàng của bạn:\n";
       
-      // Lấy nội dung đơn hàng
+      cart.forEach((item, index) => {
+        orderMessage += `${index + 1}. ${item.text} x${item.quantity} - ${item.price * item.quantity}k\n`;
+        if (item.note) orderMessage += `   (Ghi chú: ${item.note})\n`;
+      });
+
+      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      orderMessage += `\nTổng tiền: ${total}k\n`;
+
+      const customerName = document.getElementById('customer-name').value;
+      const customerPhone = document.getElementById('customer-phone').value;
+      const deliveryAddress = document.getElementById('delivery-address').value;
+
+      if (customerName || customerPhone || deliveryAddress) {
+        orderMessage += "\nThông tin giao hàng:\n";
+        if (customerName) orderMessage += `- Tên: ${customerName}\n`;
+        if (customerPhone) orderMessage += `- Điện thoại: ${customerPhone}\n`;
+        if (deliveryAddress) orderMessage += `- Địa chỉ: ${deliveryAddress}\n`;
+      }
+
+      navigator.clipboard.writeText(orderMessage).then(() => {
+        showNotification("Đã sao chép đơn hàng. Đang mở Zalo...");
+
+        const phoneNumber = "0964391834";
+        const zaloAppUrl = `zalo://send?phone=${phoneNumber}&text=${encodeURIComponent(orderMessage)}`;
+        const zaloWebUrl = `https://zalo.me/${phoneNumber}?text=${encodeURIComponent(orderMessage)}`;
+
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = zaloAppUrl;
+        document.body.appendChild(iframe);
+
+        setTimeout(() => {
+          if (!document.hidden) {
+            window.open(zaloWebUrl, '_blank');
+          }
+          document.body.removeChild(iframe);
+        }, 1000);
+
+      }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = orderMessage;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showNotification("Đã sao chép đơn hàng. Vui lòng mở Zalo và dán vào!");
+      });
+    }
+
+    // Send order via Messenger
+    function sendToMessenger() {
+      if (cart.length === 0) {
+        showNotification("Vui lòng thêm món vào giỏ hàng trước khi gửi đơn!");
+        return;
+      }
+      
       const textArea = document.getElementById("orderText");
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       const orderMessage = `${textArea.value}\nTổng tiền: ${total}k`;
       
-      // Sao chép tự động vào clipboard
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(orderMessage).then(() => {
-          showNotification("Đã sao chép đơn hàng, đang mở Zalo...");
-          // Mở Zalo sau 1 giây để đảm bảo đã copy xong
-          setTimeout(() => {
-            window.open("https://zalo.me/0964391834", '_blank');
-          }, 1000);
-        }).catch(err => {
-          console.error('Lỗi khi sao chép: ', err);
-          fallbackCopyToZalo(orderMessage);
-        });
+      navigator.clipboard.writeText(orderMessage).then(() => {
+        showNotification("Đã sao chép đơn hàng. Đang mở Messenger...");
+        
+        const pageId = "hoa.ciu.s.2025"; 
+        const messengerUrl = `https://m.me/${pageId}`;
+        
+        window.open(messengerUrl, '_blank');
+        
+      }).catch(() => {
+        const textArea = document.createElement("textarea");
+        textArea.value = orderMessage;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        showNotification("Đã sao chép đơn hàng. Vui lòng mở Messenger và dán vào!");
+        
+        const pageId = "hoa.ciu.s.2025";
+        window.open(`https://m.me/${pageId}`, '_blank');
+      });
+    }
+
+    // Hàm lưu chi phí thực tế (đơn vị 1.000đ)
+    function saveActualCosts() {
+      // Nhân giá trị với 1000 để chuyển từ nghìn đồng sang đồng
+      const materialCost = (parseInt(document.getElementById('material-cost').value) || 0) * 1000;
+      const laborCost = (parseInt(document.getElementById('labor-cost').value) || 0) * 1000;
+      const utilityCost = (parseInt(document.getElementById('utility-cost').value) || 0) * 1000;
+      const otherCost = (parseInt(document.getElementById('other-cost').value) || 0) * 1000;
+      
+      const totalCost = materialCost + laborCost + utilityCost + otherCost;
+      
+      // Lấy thông tin khoảng thời gian
+      const timeRange = document.getElementById('time-range').value;
+      const startDate = document.getElementById('start-date').value;
+      const endDate = document.getElementById('end-date').value;
+      
+      // Tạo key để lưu chi phí
+      let costKey;
+      if (timeRange === 'day') {
+        costKey = `costs_${new Date().toISOString().split('T')[0]}`;
+      } else if (timeRange === 'month') {
+        const now = new Date();
+        costKey = `costs_${now.getFullYear()}-${now.getMonth()+1}`;
+      } else if (timeRange === 'year') {
+        costKey = `costs_${new Date().getFullYear()}`;
       } else {
-        // Trình duyệt không hỗ trợ Clipboard API
-        fallbackCopyToZalo(orderMessage);
+        costKey = `costs_${startDate}_to_${endDate}`;
+      }
+      
+      // Lưu chi tiết chi phí
+      const costDetails = {
+        materialCost,
+        laborCost,
+        utilityCost,
+        otherCost,
+        totalCost,
+        timestamp: new Date().toISOString()
+      };
+      
+      localStorage.setItem(costKey, JSON.stringify(costDetails));
+      
+      // Tính toán lại lợi nhuận
+      calculateProfit();
+      
+      showNotification("Đã lưu chi phí thành công!");
+    }
+
+    // Mở modal chỉnh sửa chi phí
+    function openEditModal(costKey) {
+      currentEditKey = costKey;
+      const costs = JSON.parse(localStorage.getItem(costKey)) || {};
+      
+      // Chia giá trị cho 1000 để hiển thị đơn vị nghìn đồng
+      document.getElementById('edit-material').value = costs.materialCost ? costs.materialCost / 1000 : '';
+      document.getElementById('edit-labor').value = costs.laborCost ? costs.laborCost / 1000 : '';
+      document.getElementById('edit-utility').value = costs.utilityCost ? costs.utilityCost / 1000 : '';
+      document.getElementById('edit-other').value = costs.otherCost ? costs.otherCost / 1000 : '';
+      
+      document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    // Đóng modal chỉnh sửa
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+    }
+
+    // Lưu chi phí đã chỉnh sửa
+    function saveEditedCosts() {
+      const editedCosts = {
+        materialCost: (parseInt(document.getElementById('edit-material').value) || 0) * 1000,
+        laborCost: (parseInt(document.getElementById('edit-labor').value) || 0) * 1000,
+        utilityCost: (parseInt(document.getElementById('edit-utility').value) || 0) * 1000,
+        otherCost: (parseInt(document.getElementById('edit-other').value) || 0) * 1000,
+        timestamp: new Date().toISOString()
+      };
+      
+      editedCosts.totalCost = editedCosts.materialCost + editedCosts.laborCost + 
+                            editedCosts.utilityCost + editedCosts.otherCost;
+      
+      localStorage.setItem(currentEditKey, JSON.stringify(editedCosts));
+      closeEditModal();
+      calculateProfit(); // Tính toán lại sau khi chỉnh sửa
+      showNotification("Đã cập nhật chi phí thành công!");
+    }
+
+    // Hàm tính toán lợi nhuận với chi phí thực tế
+    function calculateProfit() {
+      const timeRange = document.getElementById('time-range').value;
+      const startDate = document.getElementById('start-date').value;
+      const endDate = document.getElementById('end-date').value;
+      
+      // Lấy key chi phí tương ứng
+      let costKey;
+      if (timeRange === 'day') {
+        costKey = `costs_${new Date().toISOString().split('T')[0]}`;
+      } else if (timeRange === 'month') {
+        const now = new Date();
+        costKey = `costs_${now.getFullYear()}-${now.getMonth()+1}`;
+      } else if (timeRange === 'year') {
+        costKey = `costs_${new Date().getFullYear()}`;
+      } else {
+        costKey = `costs_${startDate}_to_${endDate}`;
+      }
+      
+      // Lưu currentEditKey để sử dụng khi chỉnh sửa
+      currentEditKey = costKey;
+      
+      // Lấy chi phí đã lưu
+      const savedCosts = JSON.parse(localStorage.getItem(costKey)) || {
+        materialCost: 0,
+        laborCost: 0,
+        utilityCost: 0,
+        otherCost: 0,
+        totalCost: 0
+      };
+      
+      // Lấy đơn hàng trong khoảng thời gian
+      const orders = JSON.parse(localStorage.getItem('completedOrders')) || [];
+      let filteredOrders = [...orders];
+      
+      if (timeRange === 'day') {
+        const today = new Date().toISOString().split('T')[0];
+        filteredOrders = orders.filter(order => {
+          const orderDate = new Date(order.date).toISOString().split('T')[0];
+          return orderDate === today;
+        });
+      } else if (timeRange === 'month') {
+        const currentMonth = new Date().getMonth();
+        const currentYear = new Date().getFullYear();
+        filteredOrders = orders.filter(order => {
+          const orderDate = new Date(order.date);
+          return orderDate.getMonth() === currentMonth && 
+                 orderDate.getFullYear() === currentYear;
+        });
+      } else if (timeRange === 'year') {
+        const currentYear = new Date().getFullYear();
+        filteredOrders = orders.filter(order => {
+          return new Date(order.date).getFullYear() === currentYear;
+        });
+      } else if (timeRange === 'custom' && startDate && endDate) {
+        filteredOrders = orders.filter(order => {
+          const orderDate = new Date(order.date).toISOString().split('T')[0];
+          return orderDate >= startDate && orderDate <= endDate;
+        });
+      }
+      
+      // Tính toán doanh thu
+      const totalRevenue = filteredOrders.reduce((sum, order) => sum + order.total, 0) * 1000;
+      
+      // Sử dụng chi phí thực tế
+      const totalCost = savedCosts.totalCost;
+      const totalProfit = totalRevenue - totalCost;
+      
+      // Hiển thị kết quả
+      document.getElementById('total-revenue').textContent = formatCurrency(totalRevenue);
+      document.getElementById('total-cost').textContent = formatCurrency(totalCost);
+      document.getElementById('total-profit').textContent = formatCurrency(totalProfit);
+      
+      // Hiển thị chi tiết chi phí
+      displayCostDetails(savedCosts);
+      
+      // Hiển thị chi tiết đơn hàng
+      displayOrderDetails(filteredOrders, savedCosts);
+      
+      // Vẽ biểu đồ
+      drawProfitChart(filteredOrders, savedCosts);
+    }
+
+    // Định dạng tiền tệ
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('vi-VN', { 
+        style: 'currency', 
+        currency: 'VND' 
+      }).format(amount);
+    }
+
+    // Hiển thị chi tiết chi phí
+    function displayCostDetails(costs) {
+      // Xóa chi tiết chi phí cũ nếu có
+      const oldCostDetails = document.querySelector('.cost-details');
+      if (oldCostDetails) {
+        oldCostDetails.remove();
+      }
+      
+      const costDetailsHtml = `
+        <div class="cost-details">
+          <h4>Chi tiết chi phí: 
+            <button onclick="openEditModal('${currentEditKey}')" class="btn-primary">✏️ Chỉnh sửa</button>
+          </h4>
+          <ul>
+            <li>Nguyên liệu: ${formatCurrency(costs.materialCost)}</li>
+            <li>Nhân viên: ${formatCurrency(costs.laborCost)}</li>
+            <li>Điện nước: ${formatCurrency(costs.utilityCost)}</li>
+            <li>Khác: ${formatCurrency(costs.otherCost)}</li>
+          </ul>
+        </div>
+      `;
+      
+      document.querySelector('.profit-summary').insertAdjacentHTML('beforeend', costDetailsHtml);
+    }
+
+    // Hiển thị chi tiết đơn hàng
+    function displayOrderDetails(orders, costs) {
+      const detailsBody = document.getElementById('profit-details');
+      detailsBody.innerHTML = '';
+      
+      // Nhóm đơn hàng theo ngày/tháng/năm tùy theo lựa chọn
+      const timeRange = document.getElementById('time-range').value;
+      const groupedOrders = {};
+      
+      orders.forEach(order => {
+        const orderDate = new Date(order.date);
+        let key;
+        
+        if (timeRange === 'day') {
+          key = orderDate.toLocaleDateString();
+        } else if (timeRange === 'month') {
+          key = `${orderDate.getMonth() + 1}/${orderDate.getFullYear()}`;
+        } else if (timeRange === 'year') {
+          key = orderDate.getFullYear().toString();
+        } else {
+          key = orderDate.toLocaleDateString();
+        }
+        
+        if (!groupedOrders[key]) {
+          groupedOrders[key] = {
+            count: 0,
+            revenue: 0,
+            cost: 0,
+            profit: 0
+          };
+        }
+        
+        groupedOrders[key].count++;
+        groupedOrders[key].revenue += order.total * 1000;
+      });
+      
+      // Phân bổ chi phí theo thời gian
+      const timeUnits = Object.keys(groupedOrders);
+      const costPerUnit = costs.totalCost / (timeUnits.length || 1);
+      
+      for (const [date, data] of Object.entries(groupedOrders)) {
+        data.cost = costPerUnit;
+        data.profit = data.revenue - costPerUnit;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${date}</td>
+          <td>${data.count}</td>
+          <td>${formatCurrency(data.revenue)}</td>
+          <td>${formatCurrency(data.cost)}</td>
+          <td>${formatCurrency(data.profit)}</td>
+        `;
+        detailsBody.appendChild(row);
       }
     }
 
-    // Phương pháp sao chép dự phòng
-    function fallbackCopyToZalo(text) {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      document.body.appendChild(textArea);
-      textArea.select();
-      
-      try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          showNotification("Đã sao chép đơn hàng, đang mở Zalo...");
-          setTimeout(() => window.open("https://zalo.me/0964391834", '_blank'), 1000);
-        } else {
-          showNotification("Không thể sao chép tự động, vui lòng sao chép thủ công");
-        }
-      } catch (err) {
-        showNotification("Lỗi khi sao chép đơn hàng!");
+    // Vẽ biểu đồ lợi nhuận
+    function drawProfitChart(orders, costs) {
+      // Kiểm tra nếu Chart.js chưa được tải
+      if (typeof Chart === 'undefined') {
+        console.warn('Chart.js chưa được tải, không thể vẽ biểu đồ');
+        return;
       }
       
-      document.body.removeChild(textArea);
+      // Xóa biểu đồ cũ nếu có
+      const oldChart = Chart.getChart('profit-chart');
+      if (oldChart) {
+        oldChart.destroy();
+      }
+      
+      const ctx = document.getElementById('profit-chart').getContext('2d');
+      
+      // Nhóm dữ liệu
+      const timeRange = document.getElementById('time-range').value;
+      const labels = [];
+      const revenueData = [];
+      const costData = [];
+      const profitData = [];
+      
+      const groupedOrders = {};
+      
+      orders.forEach(order => {
+        const orderDate = new Date(order.date);
+        let key;
+        
+        if (timeRange === 'day') {
+          key = orderDate.toLocaleDateString();
+        } else if (timeRange === 'month') {
+          key = `${orderDate.getMonth() + 1}/${orderDate.getFullYear()}`;
+        } else if (timeRange === 'year') {
+          key = orderDate.getFullYear().toString();
+        } else {
+          key = orderDate.toLocaleDateString();
+        }
+        
+        if (!groupedOrders[key]) {
+          groupedOrders[key] = {
+            revenue: 0,
+            cost: 0,
+            profit: 0
+          };
+        }
+        
+        groupedOrders[key].revenue += order.total * 1000;
+      });
+      
+      // Phân bổ chi phí
+      const timeUnits = Object.keys(groupedOrders);
+      const costPerUnit = costs.totalCost / (timeUnits.length || 1);
+      
+      for (const [date, data] of Object.entries(groupedOrders)) {
+        labels.push(date);
+        revenueData.push(data.revenue);
+        costData.push(costPerUnit);
+        profitData.push(data.revenue - costPerUnit);
+      }
+      
+      // Vẽ biểu đồ mới
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Doanh thu',
+              data: revenueData,
+              backgroundColor: 'rgba(54, 162, 235, 0.5)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Chi phí',
+              data: costData,
+              backgroundColor: 'rgba(255, 99, 132, 0.5)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Lợi nhuận',
+              data: profitData,
+              backgroundColor: 'rgba(75, 192, 192, 0.5)',
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value.toLocaleString('vi-VN') + 'đ';
+                }
+              }
+            }
+          }
+        }
+      });
     }
-    
-    // Khởi tạo khi trang tải xong
+
+    // Load costs for selected period
+    function loadCostsForSelectedPeriod() {
+      const timeRange = document.getElementById('time-range').value;
+      const startDate = document.getElementById('start-date').value;
+      const endDate = document.getElementById('end-date').value;
+      
+      let costKey;
+      if (timeRange === 'day') {
+        costKey = `costs_${new Date().toISOString().split('T')[0]}`;
+      } else if (timeRange === 'month') {
+        const now = new Date();
+        costKey = `costs_${now.getFullYear()}-${now.getMonth()+1}`;
+      } else if (timeRange === 'year') {
+        costKey = `costs_${new Date().getFullYear()}`;
+      } else {
+        costKey = `costs_${startDate}_to_${endDate}`;
+      }
+      
+      const savedCosts = JSON.parse(localStorage.getItem(costKey));
+      
+      if (savedCosts) {
+        // Chia cho 1000 để hiển thị đơn vị nghìn đồng
+        document.getElementById('material-cost').value = savedCosts.materialCost ? savedCosts.materialCost / 1000 : '';
+        document.getElementById('labor-cost').value = savedCosts.laborCost ? savedCosts.laborCost / 1000 : '';
+        document.getElementById('utility-cost').value = savedCosts.utilityCost ? savedCosts.utilityCost / 1000 : '';
+        document.getElementById('other-cost').value = savedCosts.otherCost ? savedCosts.otherCost / 1000 : '';
+      } else {
+        document.getElementById('material-cost').value = '';
+        document.getElementById('labor-cost').value = '';
+        document.getElementById('utility-cost').value = '';
+        document.getElementById('other-cost').value = '';
+      }
+    }
+
+    // Initialize when page loads
     window.addEventListener('DOMContentLoaded', () => {
       loadCart();
       setupSearch();
       if (cart.length) {
         document.getElementById('cart').classList.remove('collapsed');
       }
+      
+      // Set default dates
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('start-date').value = today;
+      document.getElementById('end-date').value = today;
+      
+      // Add event listeners for time range changes
+      document.getElementById('time-range').addEventListener('change', function() {
+        if (this.value === 'custom') {
+          document.getElementById('date-pickers').classList.remove('hidden');
+        } else {
+          document.getElementById('date-pickers').classList.add('hidden');
+        }
+        loadCostsForSelectedPeriod();
+      });
+      
+      // Add event listeners for date changes
+      document.getElementById('start-date').addEventListener('change', loadCostsForSelectedPeriod);
+      document.getElementById('end-date').addEventListener('change', loadCostsForSelectedPeriod);
     });
   </script>
 </body>
