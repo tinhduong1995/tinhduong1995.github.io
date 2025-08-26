@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Bii Coffee - Đặt món Online & Xuất Hóa Đơn</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <!-- Thư viện để tạo mã QR -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <style>
     :root {
@@ -510,7 +511,7 @@
     /* Zalo button */
     .zalo-float-btn {
       position: fixed;
-      bottom: 80px;
+      bottom: 20px;
       right: 20px;
       background: #0088cc;
       color: white;
@@ -753,7 +754,8 @@
     <p>📍 Trung Mầu - Cổng Phụ Bá Thiện 2 | ☎ 0964 391 834 or 0928 020 777</p>
   </header>
 
-    <div id="search-area">
+  <!-- Thanh tìm kiếm cải tiến -->
+  <div id="search-area">
     <div id="search-container">
       <div class="search-input-wrapper">
         <input type="text" id="search-input" placeholder="🔍 Tìm kiếm món...">
@@ -2232,7 +2234,8 @@
     </div>
   </div>
 
-    <div id="invoice-modal" class="modal hidden">
+  <!-- Modal Hóa Đơn -->
+  <div id="invoice-modal" class="modal hidden">
     <div class="modal-content">
       <span class="close-btn" onclick="closeInvoiceModal()">&times;</span>
       <div id="invoice-content">
@@ -2591,7 +2594,7 @@
       });
     }
 
-    // Open invoice modal
+    // Open invoice modal and generate QR code
     function generateInvoice() {
       if (cart.length === 0) {
         showNotification("Giỏ hàng trống!");
@@ -2603,7 +2606,7 @@
       const deliveryAddress = document.getElementById('delivery-address').value || 'Tại quán';
       const orderTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
       
-      // Update invoice details
+      // Cập nhật nội dung hóa đơn
       document.getElementById('invoice-date').textContent = new Date().toLocaleString('vi-VN');
       document.getElementById('invoice-customer-name').textContent = customerName;
       document.getElementById('invoice-customer-phone').textContent = customerPhone;
@@ -2623,21 +2626,22 @@
       document.getElementById('invoice-total-amount').textContent = `${orderTotal}k`;
       document.getElementById('transfer-note').textContent = `BII COFFEE ${customerName}`;
       
-      // Generate VietQR code
+      // Tạo mã QR VietQR
       const bankId = '970422'; // MB Bank
       const accountNumber = '888899990000';
       const amount = orderTotal * 1000;
       const description = `BII COFFEE ${customerName}`.toUpperCase();
       
+      // Cấu trúc mã VietQR
       const qrData = `00020101021238590010A0000007270129002200097042201140008888999900000109NGUYEN THI ANH THU5303704540${amount.toString().length < 2 ? '0' + amount.toString().length : amount.toString().length}${amount}5802VN62110807${description.length < 2 ? '0' + description.length : description.length}${description}6304`;
       
-      const qr = new QRious({
+      new QRious({
         element: document.getElementById('invoice-qr'),
         value: qrData,
         size: 150
       });
       
-      // Show modal
+      // Hiển thị modal
       document.getElementById('invoice-modal').style.display = 'block';
     }
     
