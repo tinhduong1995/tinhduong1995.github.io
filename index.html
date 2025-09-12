@@ -1,784 +1,230 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý Doanh Thu - Trà Sữa & Đồ Ăn</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #4e73df;
-            --secondary: #858796;
-            --success: #1cc88a;
-            --info: #36b9cc;
-            --warning: #f6c23e;
-            --danger: #e74a3b;
-            --light: #f8f9fc;
-            --dark: #5a5c69;
-        }
-        
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(180deg, var(--primary) 10%, #224abe 100%);
-            color: white;
-        }
-        
-        .sidebar .nav-item {
-            margin-bottom: 5px;
-        }
-        
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 1rem;
-        }
-        
-        .sidebar .nav-link:hover {
-            color: white;
-        }
-        
-        .sidebar .nav-link.active {
-            font-weight: bold;
-            color: white;
-        }
-        
-        .topbar {
-            height: 4.375rem;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        }
-        
-        .card {
-            border: none;
-            border-radius: 0.35rem;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
-        }
-        
-        .card .card-header {
-            background-color: #f8f9fc;
-            border-bottom: 1px solid #e3e6f0;
-        }
-        
-        .revenue-card {
-            border-left: 4px solid var(--primary);
-        }
-        
-        .orders-card {
-            border-left: 4px solid var(--success);
-        }
-        
-        .menu-item-card {
-            transition: transform 0.2s;
-            cursor: pointer;
-            height: 100%;
-        }
-        
-        .menu-item-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .order-item {
-            border-left: 3px solid var(--primary);
-        }
-        
-        .date-selector {
-            max-width: 200px;
-        }
-        
-        #orderItems {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .order-history-item {
-            border-left: 3px solid var(--info);
-            margin-bottom: 10px;
-        }
-        
-        .category-header {
-            background-color: #f8f9fc;
-            padding: 10px;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        
-        .item-row {
-            margin-bottom: 10px;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .item-controls {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        
-        .quantity-control {
-            display: flex;
-            align-items: center;
-        }
-        
-        .quantity-input {
-            width: 50px;
-            text-align: center;
-            margin: 0 5px;
-        }
-        
-        .note-input {
-            flex: 1;
-            min-width: 150px;
-        }
-        
-        #cartItems {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .cart-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .menu-container {
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ Thống Quản Lý Doanh Thu</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #4e73df;
+      --success: #1cc88a;
+      --info: #36b9cc;
+      --warning: #f6c23e;
+      --danger: #e74a3b;
+      --light: #f8f9fc;
+      --dark: #5a5c69;
+    }
+    .sidebar {min-height: 100vh;background: linear-gradient(180deg, var(--primary) 10%, #224abe 100%);color: white;}
+    .sidebar .nav-link{color:rgba(255,255,255,0.8);padding:1rem;}
+    .sidebar .nav-link.active,.sidebar .nav-link:hover{color:white;font-weight:bold;}
+    .topbar{height:4.375rem;box-shadow:0 0.15rem 1.75rem 0 rgba(58,59,69,0.15);}
+    .card{border:none;box-shadow:0 0.15rem 1.75rem 0 rgba(58,59,69,0.1);}
+    .revenue-card{border-left:4px solid var(--primary);}
+    .orders-card{border-left:4px solid var(--success);}
+    .menu-item-card{transition:transform 0.2s;cursor:pointer;}
+    .menu-item-card:hover{transform:translateY(-5px);}
+  </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 sidebar px-0">
-                <div class="text-center p-4">
-                    <h4>Quản Lý Doanh Thu</h4>
-                </div>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#dashboard" data-bs-toggle="tab">
-                            <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>Tổng quan</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#orders" data-bs-toggle="tab">
-                            <i class="fas fa-fw fa-shopping-cart"></i>
-                            <span>Đơn hàng</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#menu" data-bs-toggle="tab">
-                            <i class="fas fa-fw fa-utensils"></i>
-                            <span>Menu</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#revenue" data-bs-toggle="tab">
-                            <i class="fas fa-fw fa-chart-line"></i>
-                            <span>Doanh thu</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#history" data-bs-toggle="tab">
-                            <i class="fas fa-fw fa-history"></i>
-                            <span>Lịch sử</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 ml-sm-auto px-4 py-4">
-                <!-- Topbar -->
-                <div class="topbar mb-4 d-flex justify-content-between align-items-center">
-                    <h1 class="h3 mb-0 text-gray-800">Hệ Thống Quản Lý Doanh Thu</h1>
-                    <div class="d-flex align-items-center">
-                        <span class="me-3" id="currentDate"></span>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newOrderModal">
-                            <i class="fas fa-plus me-1"></i> Tạo đơn mới
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Tab Content -->
-                <div class="tab-content">
-                    <!-- Dashboard Tab -->
-                    <div class="tab-pane fade show active" id="dashboard">
-                        <div class="row">
-                            <div class="col-xl-3 col-md-6 mb-4">
-                                <div class="card h-100 py-2 revenue-card">
-                                    <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                    Doanh thu hôm nay</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="todayRevenue">0 đ</div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-xl-3 col-md-6 mb-4">
-                                <div class="card h-100 py-2 orders-card">
-                                    <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                    Số đơn hôm nay</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="todayOrders">0</div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-xl-3 col-md-6 mb-4">
-                                <div class="card h-100 py-2">
-                                    <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                                    Món bán chạy nhất</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="bestSeller">-</div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i class="fas fa-utensils fa-2x text-gray-300"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-xl-3 col-md-6 mb-4">
-                                <div class="card h-100 py-2">
-                                    <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                    Giá trị đơn trung bình</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800" id="avgOrderValue">0 đ</div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i class="fas fa-chart-pie fa-2x text-gray-300"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <h6 class="m-0 font-weight-bold text-primary">Doanh thu 7 ngày gần đây</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <canvas id="revenueChart" height="100"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card mb-4">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h6 class="m-0 font-weight-bold text-primary">Đơn hàng gần đây</h6>
-                                        <a href="#orders" class="btn btn-sm btn-primary" data-bs-toggle="tab">Xem tất cả</a>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered" id="recentOrdersTable" width="100%" cellspacing="0">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Mã đơn</th>
-                                                        <th>Thời gian</th>
-                                                        <th>Số món</th>
-                                                        <th>Tổng tiền</th>
-                                                        <th>Trạng thái</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <!-- Recent orders will be populated here -->
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Orders Tab -->
-                    <div class="tab-pane fade" id="orders">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h6 class="m-0 font-weight-bold text-primary">Quản lý đơn hàng</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered" id="ordersTable" width="100%" cellspacing="0">
-                                        <thead>
-                                            <tr>
-                                                <th>Mã đơn</th>
-                                                <th>Thời gian</th>
-                                                <th>Số món</th>
-                                                <th>Tổng tiền</th>
-                                                <th>Trạng thái</th>
-                                                <th>Thao tác</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- Orders will be populated here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Menu Tab -->
-                    <div class="tab-pane fade" id="menu">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h6 class="m-0 font-weight-bold text-primary">Menu đồ uống và đồ ăn</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="menu-container">
-                                    <!-- Menu items will be populated here from your provided menu -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Revenue Tab -->
-                    <div class="tab-pane fade" id="revenue">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h6 class="m-0 font-weight-bold text-primary">Báo cáo doanh thu</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row mb-4">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="reportRange">Chọn khoảng thời gian:</label>
-                                            <select class="form-control" id="reportRange">
-                                                <option value="today">Hôm nay</option>
-                                                <option value="week">Tuần này</option>
-                                                <option value="month">Tháng này</option>
-                                                <option value="custom">Tùy chọn</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 custom-date-range" style="display: none;">
-                                        <div class="form-group">
-                                            <label for="startDate">Từ ngày:</label>
-                                            <input type="date" class="form-control" id="startDate">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 custom-date-range" style="display: none;">
-                                        <div class="form-group">
-                                            <label for="endDate">Đến ngày:</label>
-                                            <input type="date" class="form-control" id="endDate">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="card mb-4">
-                                            <div class="card-body">
-                                                <canvas id="detailedRevenueChart" height="100"></canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="card mb-4">
-                                            <div class="card-header">
-                                                <h6 class="m-0 font-weight-bold text-primary">Thống kê theo danh mục</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <canvas id="categoryChart" height="250"></canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="card mb-4">
-                                            <div class="card-header">
-                                                <h6 class="m-0 font-weight-bold text-primary">Top món bán chạy</h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <table class="table table-bordered" id="topItemsTable" width="100%" cellspacing="0">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Tên món</th>
-                                                            <th>Số lượng</th>
-                                                            <th>Doanh thu</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <!-- Top items will be populated here -->
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- History Tab -->
-                    <div class="tab-pane fade" id="history">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h6 class="m-0 font-weight-bold text-primary">Lịch sử đơn hàng</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row mb-4">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="historyDate">Chọn ngày:</label>
-                                            <input type="date" class="form-control" id="historyDate">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label for="searchOrder">Tìm kiếm đơn hàng:</label>
-                                            <input type="text" class="form-control" id="searchOrder" placeholder="Nhập mã đơn...">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="table-responsive">
-                                    <table class="table table-bordered" id="historyTable" width="100%" cellspacing="0">
-                                        <thead>
-                                            <tr>
-                                                <th>Mã đơn</th>
-                                                <th>Thời gian</th>
-                                                <th>Chi tiết đơn hàng</th>
-                                                <th>Tổng tiền</th>
-                                                <th>Thao tác</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- History will be populated here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 sidebar px-0">
+      <div class="text-center p-4"><h4>Quản Lý Doanh Thu</h4></div>
+      <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link active" href="#dashboard" data-bs-toggle="tab"><i class="fas fa-fw fa-tachometer-alt"></i> Tổng quan</a></li>
+        <li class="nav-item"><a class="nav-link" href="#orders" data-bs-toggle="tab"><i class="fas fa-fw fa-shopping-cart"></i> Đơn hàng</a></li>
+        <li class="nav-item"><a class="nav-link" href="#menu" data-bs-toggle="tab"><i class="fas fa-fw fa-utensils"></i> Menu</a></li>
+        <li class="nav-item"><a class="nav-link" href="#revenue" data-bs-toggle="tab"><i class="fas fa-fw fa-chart-line"></i> Doanh thu</a></li>
+        <li class="nav-item"><a class="nav-link" href="#history" data-bs-toggle="tab"><i class="fas fa-fw fa-history"></i> Lịch sử</a></li>
+      </ul>
     </div>
 
-    <!-- New Order Modal -->
-    <div class="modal fade" id="newOrderModal" tabindex="-1" aria-labelledby="newOrderModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="newOrderModalLabel">Tạo đơn hàng mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6 class="m-0 font-weight-bold text-primary">Menu</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="menu-container">
-                                        <!-- Menu items will be populated here -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6 class="m-0 font-weight-bold text-primary">Đơn hàng hiện tại</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div id="cartItems">
-                                        <!-- Cart items will be populated here -->
-                                    </div>
-                                    <div class="d-flex justify-content-between mt-3">
-                                        <strong>Tổng cộng:</strong>
-                                        <strong id="cartTotal">0 đ</strong>
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                    <button class="btn btn-success w-100" id="completeOrder">Hoàn thành đơn hàng</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10 px-4 py-4">
+      <!-- Topbar -->
+      <div class="topbar mb-4 d-flex justify-content-between align-items-center">
+        <h1 class="h3 mb-0">Hệ Thống Quản Lý Doanh Thu</h1>
+        <div class="d-flex align-items-center">
+          <span class="me-3" id="currentDate"></span>
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newOrderModal">
+            <i class="fas fa-plus me-1"></i> Tạo đơn mới
+          </button>
         </div>
-    </div>
+      </div>
 
-    <!-- View Order Details Modal -->
-    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="orderDetailsModalLabel">Chi tiết đơn hàng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="orderDetailsContent">
-                        <!-- Order details will be populated here -->
-                    </div>
-                </div>
-            </div>
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Dashboard -->
+        <div class="tab-pane fade show active" id="dashboard">
+          <div class="row">
+            <div class="col-xl-3 col-md-6 mb-4"><div class="card h-100 py-2 revenue-card"><div class="card-body"><div class="d-flex justify-content-between align-items-center"><div><div class="text-xs text-primary text-uppercase mb-1">Doanh thu hôm nay</div><div class="h5" id="todayRevenue">0 đ</div></div><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div></div></div></div>
+            <div class="col-xl-3 col-md-6 mb-4"><div class="card h-100 py-2 orders-card"><div class="card-body"><div class="d-flex justify-content-between align-items-center"><div><div class="text-xs text-success text-uppercase mb-1">Số đơn hôm nay</div><div class="h5" id="todayOrders">0</div></div><i class="fas fa-shopping-cart fa-2x text-gray-300"></i></div></div></div></div>
+            <div class="col-xl-3 col-md-6 mb-4"><div class="card h-100 py-2"><div class="card-body"><div class="d-flex justify-content-between align-items-center"><div><div class="text-xs text-info text-uppercase mb-1">Món bán chạy</div><div class="h5" id="bestSeller">-</div></div><i class="fas fa-utensils fa-2x text-gray-300"></i></div></div></div></div>
+            <div class="col-xl-3 col-md-6 mb-4"><div class="card h-100 py-2"><div class="card-body"><div class="d-flex justify-content-between align-items-center"><div><div class="text-xs text-warning text-uppercase mb-1">Giá trị đơn TB</div><div class="h5" id="avgOrderValue">0 đ</div></div><i class="fas fa-chart-pie fa-2x text-gray-300"></i></div></div></div></div>
+          </div>
+          <div class="card mb-4"><div class="card-header">Doanh thu 7 ngày gần đây</div><div class="card-body"><canvas id="revenueChart" height="100"></canvas></div></div>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Initialize data
-        let orders = JSON.parse(localStorage.getItem('orders')) || [];
-        let menuItems = [];
-        
-        // Parse menu from the provided HTML
-        function parseMenuItems() {
-            const menuContainer = document.querySelector('.menu-container');
-            const menuHtml = `YOUR_MENU_HTML_HERE`; // Your menu HTML goes here
-            
-            menuContainer.innerHTML = menuHtml;
-            
-            // Extract menu items
-            const items = document.querySelectorAll('.item');
-            items.forEach(item => {
-                const name = item.querySelector('.item-name').textContent;
-                const options = item.querySelectorAll('.item-size option');
-                
-                options.forEach(option => {
-                    const optionText = option.textContent;
-                    const optionValue = option.value;
-                    const price = parseInt(optionValue.split(' - ').pop().replace('k', '000'));
-                    
-                    menuItems.push({
-                        name: name,
-                        option: optionText,
-                        value: optionValue,
-                        price: price
-                    });
-                });
-            });
-        }
-        
-        // Initialize the application
-        function initApp() {
-            // Set current date
-            const now = new Date();
-            document.getElementById('currentDate').textContent = now.toLocaleDateString('vi-VN');
-            
-            // Parse menu items
-            parseMenuItems();
-            
-            // Update dashboard
-            updateDashboard();
-            
-            // Load orders table
-            loadOrdersTable();
-            
-            // Load history table
-            loadHistoryTable();
-        }
-        
-        // Update dashboard with current data
-        function updateDashboard() {
-            const today = new Date().toLocaleDateString('vi-VN');
-            const todayOrders = orders.filter(order => order.date === today);
-            const todayRevenue = todayOrders.reduce((total, order) => total + order.total, 0);
-            const avgOrderValue = todayOrders.length > 0 ? todayRevenue / todayOrders.length : 0;
-            
-            // Find best seller
-            let itemCount = {};
-            todayOrders.forEach(order => {
-                order.items.forEach(item => {
-                    if (itemCount[item.name]) {
-                        itemCount[item.name] += item.quantity;
-                    } else {
-                        itemCount[item.name] = item.quantity;
-                    }
-                });
-            });
-            
-            let bestSeller = '-';
-            let maxCount = 0;
-            for (const item in itemCount) {
-                if (itemCount[item] > maxCount) {
-                    maxCount = itemCount[item];
-                    bestSeller = item;
-                }
-            }
-            
-            // Update DOM
-            document.getElementById('todayRevenue').textContent = todayRevenue.toLocaleString('vi-VN') + ' đ';
-            document.getElementById('todayOrders').textContent = todayOrders.length;
-            document.getElementById('bestSeller').textContent = bestSeller;
-            document.getElementById('avgOrderValue').textContent = avgOrderValue.toLocaleString('vi-VN') + ' đ';
-            
-            // Update recent orders table
-            const recentOrdersTable = document.querySelector('#recentOrdersTable tbody');
-            recentOrdersTable.innerHTML = '';
-            
-            todayOrders.slice(-5).forEach(order => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${order.id}</td>
-                    <td>${order.time}</td>
-                    <td>${order.items.length}</td>
-                    <td>${order.total.toLocaleString('vi-VN')} đ</td>
-                    <td><span class="badge bg-success">Đã hoàn thành</span></td>
-                `;
-                recentOrdersTable.appendChild(row);
-            });
-            
-            // Update charts
-            updateRevenueChart();
-        }
-        
-        // Load orders table
-        function loadOrdersTable() {
-            const ordersTable = document.querySelector('#ordersTable tbody');
-            ordersTable.innerHTML = '';
-            
-            const today = new Date().toLocaleDateString('vi-VN');
-            const todayOrders = orders.filter(order => order.date === today);
-            
-            todayOrders.forEach(order => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${order.id}</td>
-                    <td>${order.time}</td>
-                    <td>${order.items.length}</td>
-                    <td>${order.total.toLocaleString('vi-VN')} đ</td>
-                    <td><span class="badge bg-success">Đã hoàn thành</span></td>
-                    <td>
-                        <button class="btn btn-sm btn-info view-order" data-id="${order.id}">Xem</button>
-                        <button class="btn btn-sm btn-danger delete-order" data-id="${order.id}">Xóa</button>
-                    </td>
-                `;
-                ordersTable.appendChild(row);
-            });
-            
-            // Add event listeners
-            document.querySelectorAll('.view-order').forEach(button => {
-                button.addEventListener('click', function() {
-                    const orderId = this.getAttribute('data-id');
-                    viewOrderDetails(orderId);
-                });
-            });
-            
-            document.querySelectorAll('.delete-order').forEach(button => {
-                button.addEventListener('click', function() {
-                    const orderId = this.getAttribute('data-id');
-                    deleteOrder(orderId);
-                });
-            });
-        }
-        
-        // Load history table
-        function loadHistoryTable() {
-            const historyTable = document.querySelector('#historyTable tbody');
-            historyTable.innerHTML = '';
-            
-            orders.forEach(order => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${order.id}</td>
-                    <td>${order.date} ${order.time}</td>
-                    <td>${order.items.map(item => `${item.name} (x${item.quantity})`).join(', ')}</td>
-                    <td>${order.total.toLocaleString('vi-VN')} đ</td>
-                    <td>
-                        <button class="btn btn-sm btn-info view-history-order" data-id="${order.id}">Xem</button>
-                    </td>
-                `;
-                historyTable.appendChild(row);
-            });
-            
-            // Add event listeners
-            document.querySelectorAll('.view-history-order').forEach(button => {
-                button.addEventListener('click', function() {
-                    const orderId = this.getAttribute('data-id');
-                    viewOrderDetails(orderId);
-                });
-            });
-        }
-        
-        // View order details
-        function viewOrderDetails(orderId) {
-            const order = orders.find(o => o.id === orderId);
-            if (!order) return;
-            
-            const modal = document.getElementById('orderDetailsModal');
-            const content = document.getElementById('orderDetailsContent');
-            
-            let itemsHtml = '';
-            order.items.forEach(item => {
-                itemsHtml += `
-                    <div class="d-flex justify-content-between">
-                        <div>${item.name} - ${item.option} (x${item.quantity})</div>
-                        <div>${(item.price * item.quantity).toLocaleString('vi-VN')} đ</div>
-                    </div>
-                `;
-            });
-            
-            content.innerHTML = `
-                <p><strong>Mã đơn:</strong> ${order.id}</p>
-                <p><strong>Thời gian:</strong> ${order.date} ${order.time}</p>
-                <h6>Chi tiết đơn hàng:</h6>
-                ${itemsHtml}
-                <hr>
-                <div class="d-flex justify-content-between">
-                    <strong>Tổng cộng:</strong>
-                    <strong>${order.total.toLocaleString('vi-VN')} đ</strong>
-                </div>
-            `;
-            
-            new bootstrap.Modal(modal).show();
-        }
-        
-        // Delete order
-        function deleteOrder(orderId) {
-            if (confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')) {
-                orders = orders.filter(order => order.id !== orderId);
-                localStorage.setItem('orders', JSON.stringify(orders));
-                loadOrdersTable();
-                updateDashboard();
-            }
-        }
-        
-        // Update revenue chart
-        function updateRevenueChart() {
-            // This is a simplified version - in a real app, you would use Chart.js
-            console.log('Revenue chart updated with current data');
-        }
-        
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
+        <!-- Orders -->
+        <div class="tab-pane fade" id="orders">
+          <div class="card mb-4"><div class="card-header">Quản lý đơn hàng</div>
+          <div class="card-body"><div class="table-responsive"><table class="table table-bordered" id="ordersTable"><thead><tr><th>Mã đơn</th><th>Thời gian</th><th>Số món</th><th>Tổng tiền</th></tr></thead><tbody></tbody></table></div></div></div>
+        </div>
+
+        <!-- Menu -->
+        <div class="tab-pane fade" id="menu">
+          <div class="card mb-4"><div class="card-header d-flex justify-content-between"><h6>Quản lý menu</h6><button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMenuItemModal"><i class="fas fa-plus"></i> Thêm món</button></div>
+          <div class="card-body"><div class="row" id="menuItemsContainer"></div></div></div>
+        </div>
+
+        <!-- Revenue -->
+        <div class="tab-pane fade" id="revenue">
+          <div class="card mb-4"><div class="card-header">Báo cáo doanh thu</div>
+          <div class="card-body"><canvas id="detailedRevenueChart" height="100"></canvas></div></div>
+        </div>
+
+        <!-- History -->
+        <div class="tab-pane fade" id="history">
+          <div class="card mb-4"><div class="card-header">Lịch sử đơn hàng</div>
+          <div class="card-body"><div class="table-responsive"><table class="table table-bordered" id="historyTable"><thead><tr><th>Mã đơn</th><th>Thời gian</th><th>Tổng tiền</th></tr></thead><tbody></tbody></table></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New Order Modal -->
+<div class="modal fade" id="newOrderModal"><div class="modal-dialog modal-lg"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Tạo đơn hàng mới</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-6"><label class="form-label">Chọn món</label><select id="menuSelect" class="form-select"></select></div>
+      <div class="col-md-3"><label class="form-label">Số lượng</label><input type="number" id="quantity" class="form-control" min="1" value="1"></div>
+      <div class="col-md-3 d-flex align-items-end"><button class="btn btn-success w-100" id="addToOrder">Thêm</button></div>
+    </div><hr>
+    <h6>Danh sách món:</h6><ul class="list-group" id="orderItems"></ul>
+    <div class="text-end mt-3"><strong>Tổng tiền: <span id="orderTotal">0</span> đ</strong></div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button><button class="btn btn-primary" id="saveOrder">Lưu đơn</button></div>
+</div></div></div>
+
+<!-- Add Menu Item Modal -->
+<div class="modal fade" id="addMenuItemModal"><div class="modal-dialog"><div class="modal-content">
+  <div class="modal-header"><h5 class="modal-title">Thêm món mới</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body">
+    <div class="mb-3"><label class="form-label">Tên món</label><input type="text" id="itemName" class="form-control"></div>
+    <div class="mb-3"><label class="form-label">Giá</label><input type="number" id="itemPrice" class="form-control"></div>
+    <div class="mb-3"><label class="form-label">Danh mục</label>
+      <select id="itemCategory" class="form-select"><option>Trà</option><option>Trà sữa</option><option>Sinh tố</option><option>Đồ ăn vặt</option></select>
+    </div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button><button class="btn btn-primary" id="saveMenuItem">Lưu</button></div>
+</div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let menuItems = [
+  {name:"Trà sữa truyền thống",price:20000,category:"Trà sữa"},
+  {name:"Hồng trà",price:15000,category:"Trà"}
+];
+let orders = [];
+let tempOrder = [];
+
+document.getElementById("currentDate").textContent = new Date().toLocaleDateString("vi-VN");
+
+// Render menu
+function renderMenu(){
+  const container=document.getElementById("menuItemsContainer");
+  container.innerHTML="";
+  menuItems.forEach((item,i)=>{
+    container.innerHTML+=`<div class="col-md-3 mb-3"><div class="card menu-item-card"><div class="card-body text-center"><h6>${item.name}</h6><p>${item.price.toLocaleString()} đ</p><small>${item.category}</small></div></div></div>`;
+  });
+  const select=document.getElementById("menuSelect");
+  select.innerHTML=menuItems.map((i,idx)=>`<option value="${idx}">${i.name} - ${i.price.toLocaleString()} đ</option>`).join("");
+}
+renderMenu();
+
+// Add menu item
+document.getElementById("saveMenuItem").onclick=()=>{
+  const name=document.getElementById("itemName").value;
+  const price=parseInt(document.getElementById("itemPrice").value);
+  const category=document.getElementById("itemCategory").value;
+  if(name&&price){menuItems.push({name,price,category});renderMenu();alert("Đã thêm món!");}
+};
+
+// Add to temp order
+document.getElementById("addToOrder").onclick=()=>{
+  const idx=document.getElementById("menuSelect").value;
+  const qty=parseInt(document.getElementById("quantity").value);
+  const item=menuItems[idx];
+  tempOrder.push({name:item.name,price:item.price,qty});
+  renderTempOrder();
+};
+function renderTempOrder(){
+  const list=document.getElementById("orderItems");
+  list.innerHTML="";
+  let total=0;
+  tempOrder.forEach(o=>{
+    total+=o.price*o.qty;
+    list.innerHTML+=`<li class="list-group-item d-flex justify-content-between">${o.name} x${o.qty}<span>${(o.price*o.qty).toLocaleString()} đ</span></li>`;
+  });
+  document.getElementById("orderTotal").textContent=total.toLocaleString();
+}
+
+// Save order
+document.getElementById("saveOrder").onclick=()=>{
+  if(tempOrder.length===0) return;
+  const total=tempOrder.reduce((s,o)=>s+o.price*o.qty,0);
+  const order={id:"DH"+(orders.length+1),time:new Date().toLocaleString("vi-VN"),items:[...tempOrder],total};
+  orders.push(order);
+  tempOrder=[];
+  renderTempOrder();
+  renderOrders();
+  renderDashboard();
+  document.querySelector("#newOrderModal .btn-close").click();
+};
+
+// Render orders
+function renderOrders(){
+  const tb=document.querySelector("#ordersTable tbody");
+  const hb=document.querySelector("#historyTable tbody");
+  tb.innerHTML="";hb.innerHTML="";
+  orders.forEach(o=>{
+    tb.innerHTML+=`<tr><td>${o.id}</td><td>${o.time}</td><td>${o.items.length}</td><td>${o.total.toLocaleString()} đ</td></tr>`;
+    hb.innerHTML+=`<tr><td>${o.id}</td><td>${o.time}</td><td>${o.total.toLocaleString()} đ</td></tr>`;
+  });
+}
+function renderDashboard(){
+  const todayOrders=orders.length;
+  const todayRevenue=orders.reduce((s,o)=>s+o.total,0);
+  document.getElementById("todayOrders").textContent=todayOrders;
+  document.getElementById("todayRevenue").textContent=todayRevenue.toLocaleString()+" đ";
+  document.getElementById("avgOrderValue").textContent=(todayOrders?Math.round(todayRevenue/todayOrders):0).toLocaleString()+" đ";
+  // best seller
+  let counts={};
+  orders.forEach(o=>o.items.forEach(i=>{counts[i.name]=(counts[i.name]||0)+i.qty;}));
+  let best=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById("bestSeller").textContent=best?best[0]:"-";
+  updateChart();
+}
+renderOrders();
+
+// Chart
+let ctx=document.getElementById("revenueChart");
+let revenueChart=new Chart(ctx,{type:"line",data:{labels:[],datasets:[{label:"Doanh thu",data:[],borderColor:"blue"}]}});
+function updateChart(){
+  let days=[...Array(7)].map((_,i)=>{let d=new Date();d.setDate(d.getDate()-6+i);return d;});
+  revenueChart.data.labels=days.map(d=>d.toLocaleDateString("vi-VN"));
+  revenueChart.data.datasets[0].data=days.map(d=>{
+    let dateStr=d.toLocaleDateString("vi-VN");
+    return orders.filter(o=>o.time.includes(dateStr)).reduce((s,o)=>s+o.total,0);
+  });
+  revenueChart.update();
+}
+</script>
 </body>
 </html>
