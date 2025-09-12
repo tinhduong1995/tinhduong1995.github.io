@@ -245,6 +245,49 @@
       width: 100%;
       padding-left: 35px;
     }
+    
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .close {
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    .edit-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
@@ -312,12 +355,20 @@
       </div>
       <table id="orderTable">
         <thead>
-          <tr><th>ID</th><th>Chi tiết món</th><th>Ghi chú</th><th>Tổng tiền</th><th>Thời gian</th><th>Hành động</th></tr>
+          <tr>
+            <th>STT</th>
+            <th>Chi tiết món</th>
+            <th>Ghi chú</th>
+            <th>Tổng tiền</th>
+            <th>Thời gian</th>
+            <th>Hành động</th>
+          </tr>
         </thead>
         <tbody>
           <!-- Orders will be inserted here -->
         </tbody>
       </table>
+      <div class="cart-total" id="filterTotal">Tổng các đơn đã lọc: 0đ</div>
     </div>
 
     <!-- Thống kê -->
@@ -344,12 +395,43 @@
     </div>
   </div>
 
+  <!-- Modal chỉnh sửa đơn hàng -->
+  <div id="editOrderModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Chỉnh sửa đơn hàng</h2>
+        <span class="close" onclick="closeEditModal()">&times;</span>
+      </div>
+      <div>
+        <h3>Món trong đơn</h3>
+        <div id="editOrderItems">
+          <!-- Items will be inserted here -->
+        </div>
+        <div class="flex">
+          <select id="editMenuSelect"></select>
+          <input type="number" id="editMenuQty" placeholder="Số lượng" value="1" min="1" style="width: 100px;">
+          <button onclick="addToEditOrder()"><i class="fas fa-plus"></i> Thêm món</button>
+        </div>
+        
+        <h3>Ghi chú</h3>
+        <textarea id="editOrderNote" rows="3" placeholder="Ghi chú đơn hàng" style="width: 100%;"></textarea>
+        
+        <div class="cart-total" id="editOrderTotal">Tổng cộng: 0đ</div>
+        
+        <button onclick="saveEditedOrder()" class="success" style="width: 100%; margin-top: 10px;">
+          <i class="fas fa-save"></i> Lưu thay đổi
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="notification" id="notification"></div>
 
 <script>
 let menu = JSON.parse(localStorage.getItem("menu")) || [];
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 let cart = [];
+let currentEditOrderIndex = -1;
 
 function saveData() {
   localStorage.setItem("menu", JSON.stringify(menu));
@@ -396,6 +478,13 @@ function renderMenu() {
   select.innerHTML = "";
   menu.forEach((m, i) => {
     select.innerHTML += `<option value="${i}">${m.name} - ${m.price.toLocaleString()}đ</option>`;
+  });
+  
+  // update edit select
+  const editSelect = document.getElementById("editMenuSelect");
+  editSelect.innerHTML = "";
+  menu.forEach((m, i) => {
+    editSelect.innerHTML += `<option value="${i}">${m.name} - ${m.price.toLocaleString()}đ</option>`;
   });
 }
 
@@ -525,7 +614,7 @@ function createOrder() {
   const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
   
   const order = {
-    id: Date.now(),
+    id: orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1,
     items: [...cart],
     note,
     total,
@@ -574,6 +663,10 @@ function renderOrders() {
       break;
   }
   
+  // Calculate total for filtered orders
+  const filterTotal = filteredOrders.reduce((sum, order) => sum + order.total, 0);
+  document.getElementById("filterTotal").textContent = `Tổng các đơn đã lọc: ${filterTotal.toLocaleString()}đ`;
+  
   if (filteredOrders.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" class="empty-state">
       <i class="fas fa-receipt"></i><br>Không tìm thấy đơn hàng nào
@@ -582,6 +675,7 @@ function renderOrders() {
   }
   
   filteredOrders.forEach((o, i) => {
+    const originalIndex = orders.findIndex(order => order.id === o.id);
     const detail = o.items.map(it => `${it.name} x${it.qty}`).join(", ");
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -591,23 +685,115 @@ function renderOrders() {
       <td>${o.total.toLocaleString()}đ</td>
       <td>${o.time}</td>
       <td>
-        <button onclick="editOrder(${i})" class="edit"><i class="fas fa-edit"></i></button>
-        <button onclick="deleteOrder(${i})" class="delete"><i class="fas fa-trash"></i></button>
+        <button onclick="openEditModal(${originalIndex})" class="edit"><i class="fas fa-edit"></i></button>
+        <button onclick="deleteOrder(${originalIndex})" class="delete"><i class="fas fa-trash"></i></button>
       </td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-function editOrder(i) {
-  const o = orders[i];
-  const newNote = prompt("Ghi chú:", o.note);
-  if (newNote !== null) {
-    o.note = newNote;
-    saveData();
-    renderOrders();
-    showNotification("Đã cập nhật ghi chú đơn hàng!");
+function openEditModal(orderIndex) {
+  currentEditOrderIndex = orderIndex;
+  const order = orders[orderIndex];
+  
+  // Render items in the edit modal
+  const itemsContainer = document.getElementById("editOrderItems");
+  itemsContainer.innerHTML = "";
+  
+  order.items.forEach((item, index) => {
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "edit-item";
+    itemDiv.innerHTML = `
+      <div style="flex-grow: 1;">
+        <b>${item.name}</b> - ${item.price.toLocaleString()}đ x 
+        <input type="number" value="${item.qty}" min="1" 
+               onchange="updateEditItemQty(${index}, this.value)" style="width: 60px;">
+        = ${(item.price * item.qty).toLocaleString()}đ
+      </div>
+      <button onclick="removeEditItem(${index})" class="delete"><i class="fas fa-trash"></i></button>
+    `;
+    itemsContainer.appendChild(itemDiv);
+  });
+  
+  // Set note
+  document.getElementById("editOrderNote").value = order.note;
+  
+  // Calculate and display total
+  updateEditOrderTotal();
+  
+  // Show modal
+  document.getElementById("editOrderModal").style.display = "flex";
+}
+
+function closeEditModal() {
+  document.getElementById("editOrderModal").style.display = "none";
+}
+
+function updateEditItemQty(itemIndex, newQty) {
+  const qty = parseInt(newQty);
+  if (isNaN(qty) || qty < 1) return;
+  
+  orders[currentEditOrderIndex].items[itemIndex].qty = qty;
+  updateEditOrderTotal();
+  
+  // Re-render the item to update the subtotal
+  const itemsContainer = document.getElementById("editOrderItems");
+  const itemDiv = itemsContainer.children[itemIndex];
+  const item = orders[currentEditOrderIndex].items[itemIndex];
+  itemDiv.querySelector('div').innerHTML = `
+    <b>${item.name}</b> - ${item.price.toLocaleString()}đ x 
+    <input type="number" value="${item.qty}" min="1" 
+           onchange="updateEditItemQty(${itemIndex}, this.value)" style="width: 60px;">
+    = ${(item.price * item.qty).toLocaleString()}đ
+  `;
+}
+
+function removeEditItem(itemIndex) {
+  orders[currentEditOrderIndex].items.splice(itemIndex, 1);
+  openEditModal(currentEditOrderIndex); // Re-render the modal
+}
+
+function addToEditOrder() {
+  const idx = document.getElementById("editMenuSelect").value;
+  const qtyInput = document.getElementById("editMenuQty");
+  const qty = parseInt(qtyInput.value);
+  
+  if (isNaN(idx) || qty <= 0) {
+    showNotification("Vui lòng chọn món và số lượng hợp lệ!", true);
+    return;
   }
+  
+  const item = menu[idx];
+  const exist = orders[currentEditOrderIndex].items.find(i => i.name === item.name);
+  
+  if (exist) {
+    exist.qty += qty;
+  } else {
+    orders[currentEditOrderIndex].items.push({name: item.name, price: item.price, qty});
+  }
+  
+  openEditModal(currentEditOrderIndex); // Re-render the modal
+  qtyInput.value = "1";
+}
+
+function updateEditOrderTotal() {
+  const order = orders[currentEditOrderIndex];
+  order.total = order.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  document.getElementById("editOrderTotal").textContent = `Tổng cộng: ${order.total.toLocaleString()}đ`;
+}
+
+function saveEditedOrder() {
+  const note = document.getElementById("editOrderNote").value;
+  orders[currentEditOrderIndex].note = note;
+  orders[currentEditOrderIndex].time = "Đã chỉnh sửa: " + new Date().toLocaleString();
+  
+  saveData();
+  renderOrders();
+  renderStats();
+  closeEditModal();
+  
+  showNotification("Đã cập nhật đơn hàng!");
 }
 
 function deleteOrder(i) {
