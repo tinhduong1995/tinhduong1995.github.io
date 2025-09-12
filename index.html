@@ -2,306 +2,207 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Quản lý doanh thu quán</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Quản lý đơn hàng</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body { background: #f8f9fa; }
-    .menu-item-card { cursor: pointer; }
+    .menu-item-card { border: 1px solid #ddd; border-radius: 10px; }
   </style>
 </head>
-<body>
-<div class="container py-4">
-  <h2 class="text-center mb-4">📊 Quản lý doanh thu quán</h2>
+<body class="p-4">
 
-  <!-- Thống kê -->
-  <div class="row mb-4">
-    <div class="col-md-4">
-      <div class="card text-center">
-        <div class="card-body">
-          <h5>Doanh thu hôm nay</h5>
-          <h3 id="totalRevenue">0 đ</h3>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card text-center">
-        <div class="card-body">
-          <h5>Số đơn hàng</h5>
-          <h3 id="totalOrders">0</h3>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card text-center">
-        <div class="card-body">
-          <h5>Món bán chạy</h5>
-          <h3 id="bestSeller">Chưa có</h3>
-        </div>
-      </div>
-    </div>
+  <h2 class="mb-3">📋 Quản lý đơn hàng</h2>
+
+  <!-- MENU -->
+  <div class="mb-4">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#menuModal">➕ Thêm món vào Menu</button>
+    <div id="menuItemsContainer" class="row mt-3"></div>
   </div>
 
-  <!-- Menu -->
-  <div class="d-flex justify-content-between align-items-center mb-2">
-    <h4>📖 Menu</h4>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMenuItemModal">+ Thêm món</button>
+  <!-- TẠO ĐƠN HÀNG -->
+  <div class="card p-3 mb-4">
+    <h5>Tạo đơn hàng</h5>
+    <select id="menuSelect" class="form-select mb-2"></select>
+    <input type="number" id="orderQty" class="form-control mb-2" placeholder="Số lượng" value="1" min="1">
+    <input type="text" id="orderNote" class="form-control mb-2" placeholder="Ghi chú (tùy chọn)">
+    <button class="btn btn-success" onclick="addOrder()">✅ Thêm đơn</button>
   </div>
-  <div class="row" id="menuItemsContainer"></div>
 
-  <!-- Đơn hàng -->
-  <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
-    <h4>🧾 Đơn hàng</h4>
-    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newOrderModal">+ Tạo đơn mới</button>
-  </div>
+  <!-- DANH SÁCH ĐƠN -->
+  <h5>Danh sách đơn hàng</h5>
   <table class="table table-bordered">
     <thead>
       <tr>
-        <th>#</th>
-        <th>Ngày</th>
-        <th>Chi tiết</th>
-        <th>Tổng tiền</th>
+        <th>#</th><th>Món</th><th>SL</th><th>Thành tiền</th><th>Ghi chú</th><th>Hành động</th>
       </tr>
     </thead>
     <tbody id="ordersTable"></tbody>
   </table>
 
-  <!-- Biểu đồ -->
-  <h4 class="mt-4">📈 Biểu đồ doanh thu</h4>
-  <canvas id="revenueChart" height="100"></canvas>
-</div>
-
-<!-- Modal thêm / sửa món -->
-<div class="modal fade" id="addMenuItemModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Thêm món mới</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label class="form-label">Tên món</label>
-          <input type="text" id="itemName" class="form-control">
+  <!-- Modal thêm/sửa món -->
+  <div class="modal fade" id="menuModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Thêm món mới</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <input id="itemName" class="form-control mb-2" placeholder="Tên món">
+          <input id="itemPrice" class="form-control mb-2" placeholder="Giá" type="number">
         </div>
-        <div class="mb-3">
-          <label class="form-label">Giá</label>
-          <input type="number" id="itemPrice" class="form-control">
+        <div class="modal-footer">
+          <button class="btn btn-primary" id="saveMenuItem">Lưu</button>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Danh mục</label>
-          <select id="itemCategory" class="form-select">
-            <option value="Trà">Trà</option>
-            <option value="Trà sữa">Trà sữa</option>
-            <option value="Sinh tố">Sinh tố</option>
-            <option value="Đồ ăn vặt">Đồ ăn vặt</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-        <button class="btn btn-primary" id="saveMenuItem">Lưu</button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Modal tạo đơn -->
-<div class="modal fade" id="newOrderModal">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Tạo đơn hàng mới</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-md-6">
-            <label class="form-label">Chọn món</label>
-            <select id="menuSelect" class="form-select"></select>
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Số lượng</label>
-            <input type="number" id="quantity" class="form-control" min="1" value="1">
-          </div>
-          <div class="col-md-3 d-flex align-items-end">
-            <button class="btn btn-success w-100" id="addToOrder">Thêm</button>
-          </div>
+  <!-- Modal sửa đơn hàng -->
+  <div class="modal fade" id="orderModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Sửa đơn hàng</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <select id="editMenuSelect" class="form-select mb-2"></select>
+          <input type="number" id="editOrderQty" class="form-control mb-2" min="1">
+          <input type="text" id="editOrderNote" class="form-control mb-2">
         </div>
-        <hr>
-        <h6>Danh sách món:</h6>
-        <ul class="list-group" id="orderItems"></ul>
-        <div class="text-end mt-3">
-          <strong>Tổng tiền: <span id="orderTotal">0</span> đ</strong>
+        <div class="modal-footer">
+          <button class="btn btn-primary" id="saveOrderEdit">Lưu thay đổi</button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-        <button class="btn btn-primary" id="saveOrder">Lưu đơn</button>
       </div>
     </div>
   </div>
-</div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-let menuItems = JSON.parse(localStorage.getItem("menuItems")) || [];
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
+let menuItems = JSON.parse(localStorage.getItem("menuItems") || "[]");
+let orders = JSON.parse(localStorage.getItem("orders") || "[]");
 let editIndex = null;
+let editOrderIndex = null;
 
-// ================= MENU =================
+// Render menu
 function renderMenu(){
   const container = document.getElementById("menuItemsContainer");
   container.innerHTML = "";
   menuItems.forEach((item, index) => {
     container.innerHTML += `
       <div class="col-md-3 mb-3">
-        <div class="card menu-item-card">
-          <div class="card-body text-center">
-            <h6>${item.name}</h6>
-            <p>${item.price.toLocaleString()} đ</p>
-            <small class="text-muted">${item.category}</small>
-            <div class="mt-2">
-              <button class="btn btn-sm btn-warning" onclick="editMenuItem(${index})">✏️ Sửa</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteMenuItem(${index})">🗑️ Xóa</button>
-            </div>
+        <div class="card menu-item-card p-2 text-center">
+          <h6>${item.name}</h6>
+          <p>${item.price.toLocaleString()} đ</p>
+          <div>
+            <button class="btn btn-sm btn-warning" onclick="editMenuItem(${index})">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteMenuItem(${index})">🗑️</button>
           </div>
         </div>
       </div>`;
   });
 
-  // Cập nhật select trong modal đơn
-  const select = document.getElementById("menuSelect");
-  select.innerHTML = menuItems.map((i, idx) =>
-    `<option value="${idx}">${i.name} - ${i.price.toLocaleString()} đ</option>`
-  ).join("");
+  document.getElementById("menuSelect").innerHTML = menuItems.map((i, idx)=>
+    `<option value="${idx}">${i.name} - ${i.price.toLocaleString()} đ</option>`).join("");
+
+  document.getElementById("editMenuSelect").innerHTML = document.getElementById("menuSelect").innerHTML;
 
   localStorage.setItem("menuItems", JSON.stringify(menuItems));
 }
 
+// Thêm/sửa món
+document.getElementById("saveMenuItem").addEventListener("click", ()=>{
+  const name = document.getElementById("itemName").value;
+  const price = parseInt(document.getElementById("itemPrice").value);
+  if(name && price){
+    if(editIndex !== null){
+      menuItems[editIndex] = { name, price };
+      editIndex = null;
+    } else {
+      menuItems.push({ name, price });
+    }
+    renderMenu();
+    document.querySelector("#menuModal .btn-close").click();
+    document.getElementById("itemName").value="";
+    document.getElementById("itemPrice").value="";
+  }
+});
+
 function editMenuItem(index){
   editIndex = index;
-  const item = menuItems[index];
-  document.getElementById("itemName").value = item.name;
-  document.getElementById("itemPrice").value = item.price;
-  document.getElementById("itemCategory").value = item.category;
-  document.querySelector("#addMenuItemModal .modal-title").textContent = "Sửa món";
-  new bootstrap.Modal(document.getElementById("addMenuItemModal")).show();
+  document.getElementById("itemName").value = menuItems[index].name;
+  document.getElementById("itemPrice").value = menuItems[index].price;
+  new bootstrap.Modal(document.getElementById("menuModal")).show();
 }
 
 function deleteMenuItem(index){
-  if(confirm("Bạn có chắc chắn muốn xóa món này không?")){
-    menuItems.splice(index, 1);
+  if(confirm("Xóa món này?")){
+    menuItems.splice(index,1);
     renderMenu();
   }
 }
 
-document.getElementById("saveMenuItem").addEventListener("click", () => {
-  const name = document.getElementById("itemName").value;
-  const price = parseInt(document.getElementById("itemPrice").value);
-  const category = document.getElementById("itemCategory").value;
-  if(name && price){
-    if(editIndex !== null){
-      menuItems[editIndex] = { name, price, category };
-      editIndex = null;
-      document.querySelector("#addMenuItemModal .modal-title").textContent = "Thêm món mới";
-    } else {
-      menuItems.push({ name, price, category });
-    }
-    renderMenu();
-    document.querySelector("#addMenuItemModal .btn-close").click();
-  }
-});
-
-// ================= ĐƠN HÀNG =================
-let currentOrder = [];
-
-document.getElementById("addToOrder").addEventListener("click", () => {
-  const idx = document.getElementById("menuSelect").value;
-  const qty = parseInt(document.getElementById("quantity").value);
-  if(menuItems[idx] && qty > 0){
-    currentOrder.push({ ...menuItems[idx], qty });
-    renderOrderItems();
-  }
-});
-
-function renderOrderItems(){
-  const list = document.getElementById("orderItems");
-  let total = 0;
-  list.innerHTML = "";
-  currentOrder.forEach((item, i) => {
-    const subtotal = item.price * item.qty;
-    total += subtotal;
-    list.innerHTML += `<li class="list-group-item d-flex justify-content-between">
-      ${item.name} x${item.qty} 
-      <strong>${subtotal.toLocaleString()} đ</strong>
-    </li>`;
-  });
-  document.getElementById("orderTotal").textContent = total.toLocaleString();
-}
-
-document.getElementById("saveOrder").addEventListener("click", () => {
-  if(currentOrder.length === 0) return alert("Đơn hàng trống!");
-  const total = currentOrder.reduce((sum, i) => sum + i.price*i.qty, 0);
-  orders.push({ date: new Date().toLocaleDateString("vi-VN"), items: currentOrder, total });
-  localStorage.setItem("orders", JSON.stringify(orders));
-  currentOrder = [];
-  renderOrders();
-  renderStats();
-  renderChart();
-  document.querySelector("#newOrderModal .btn-close").click();
-});
-
-// ================= HIỂN THỊ ĐƠN =================
+// Đơn hàng
 function renderOrders(){
-  const tbody = document.getElementById("ordersTable");
-  tbody.innerHTML = "";
-  orders.forEach((order, i) => {
-    tbody.innerHTML += `<tr>
-      <td>${i+1}</td>
-      <td>${order.date}</td>
-      <td>${order.items.map(it=>`${it.name} x${it.qty}`).join(", ")}</td>
-      <td>${order.total.toLocaleString()} đ</td>
-    </tr>`;
+  const tb = document.getElementById("ordersTable");
+  tb.innerHTML = "";
+  orders.forEach((o, i)=>{
+    tb.innerHTML += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${o.name}</td>
+        <td>${o.qty}</td>
+        <td>${(o.price*o.qty).toLocaleString()} đ</td>
+        <td>${o.note||""}</td>
+        <td>
+          <button class="btn btn-sm btn-warning" onclick="editOrder(${i})">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteOrder(${i})">🗑️</button>
+        </td>
+      </tr>`;
   });
+  localStorage.setItem("orders", JSON.stringify(orders));
 }
 
-// ================= THỐNG KÊ =================
-function renderStats(){
-  document.getElementById("totalOrders").textContent = orders.length;
-  const totalRevenue = orders.reduce((sum, o)=>sum+o.total, 0);
-  document.getElementById("totalRevenue").textContent = totalRevenue.toLocaleString()+" đ";
-
-  // best seller
-  let counts = {};
-  orders.forEach(o => o.items.forEach(i => {
-    counts[i.name] = (counts[i.name]||0) + i.qty;
-  }));
-  let best = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
-  document.getElementById("bestSeller").textContent = best ? best[0] : "Chưa có";
+function addOrder(){
+  const idx = document.getElementById("menuSelect").value;
+  const qty = parseInt(document.getElementById("orderQty").value);
+  const note = document.getElementById("orderNote").value;
+  if(idx!=="" && qty>0){
+    const item = menuItems[idx];
+    orders.push({ name:item.name, price:item.price, qty, note });
+    renderOrders();
+    document.getElementById("orderQty").value=1;
+    document.getElementById("orderNote").value="";
+  }
 }
 
-// ================= BIỂU ĐỒ =================
-let chart;
-function renderChart(){
-  const ctx = document.getElementById("revenueChart").getContext("2d");
-  const grouped = {};
-  orders.forEach(o => grouped[o.date] = (grouped[o.date]||0)+o.total);
-  const labels = Object.keys(grouped);
-  const data = Object.values(grouped);
-
-  if(chart) chart.destroy();
-  chart = new Chart(ctx, {
-    type: "bar",
-    data: { labels, datasets: [{ label: "Doanh thu", data }] }
-  });
+function editOrder(i){
+  editOrderIndex = i;
+  document.getElementById("editMenuSelect").value = menuItems.findIndex(m=>m.name===orders[i].name);
+  document.getElementById("editOrderQty").value = orders[i].qty;
+  document.getElementById("editOrderNote").value = orders[i].note||"";
+  new bootstrap.Modal(document.getElementById("orderModal")).show();
 }
 
-// ================= INIT =================
+document.getElementById("saveOrderEdit").addEventListener("click", ()=>{
+  const idx = document.getElementById("editMenuSelect").value;
+  const qty = parseInt(document.getElementById("editOrderQty").value);
+  const note = document.getElementById("editOrderNote").value;
+  if(idx!=="" && qty>0){
+    const item = menuItems[idx];
+    orders[editOrderIndex] = { name:item.name, price:item.price, qty, note };
+    renderOrders();
+    editOrderIndex=null;
+    document.querySelector("#orderModal .btn-close").click();
+  }
+});
+
+function deleteOrder(i){
+  if(confirm("Xóa đơn hàng này?")){
+    orders.splice(i,1);
+    renderOrders();
+  }
+}
+
+// Khởi động
 renderMenu();
 renderOrders();
-renderStats();
-renderChart();
 </script>
 </body>
 </html>
