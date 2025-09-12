@@ -2,220 +2,648 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Quản lý đơn hàng</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý đơn hàng - Bii Coffee</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    .menu-item-card { border: 1px solid #ddd; border-radius: 10px; }
+    :root {
+      --primary: #6f4e37;
+      --secondary: #c0a080;
+      --accent: #d8a868;
+      --light: #f5f5f5;
+      --dark: #333;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: #f9f6f2;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    
+    h2 {
+      color: var(--primary);
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--secondary);
+    }
+    
+    .container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 25px;
+    }
+    
+    @media (min-width: 992px) {
+      .container {
+        grid-template-columns: 1fr 1fr;
+      }
+      
+      .full-width {
+        grid-column: 1 / -1;
+      }
+    }
+    
+    .section {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+    }
+    
+    .section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .flex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+    
+    input, select, button, textarea {
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(216, 168, 104, 0.2);
+    }
+    
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    button:hover {
+      background-color: var(--secondary);
+    }
+    
+    button.edit {
+      background-color: var(--warning);
+      color: var(--dark);
+    }
+    
+    button.delete {
+      background-color: var(--danger);
+    }
+    
+    button.success {
+      background-color: var(--success);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    
+    th {
+      background-color: var(--primary);
+      color: white;
+      padding: 12px;
+      text-align: left;
+    }
+    
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+    
+    .cart-total {
+      font-weight: bold;
+      text-align: right;
+      margin: 15px 0;
+      font-size: 1.2rem;
+      color: var(--primary);
+    }
+    
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .stat-box {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin: 10px 0;
+    }
+    
+    .stat-label {
+      color: var(--dark);
+      font-size: 0.9rem;
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 5px;
+      color: white;
+      background-color: var(--success);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification.error {
+      background-color: var(--danger);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: #888;
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: #ddd;
+    }
+    
+    .search-box {
+      position: relative;
+      flex-grow: 1;
+    }
+    
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+    }
+    
+    .search-box input {
+      width: 100%;
+      padding-left: 35px;
+    }
   </style>
 </head>
-<body class="p-4">
+<body>
+  <header>
+    <h1><i class="fas fa-coffee"></i> Quản lý đơn hàng - Bii Coffee</h1>
+    <p>Hệ thống quản lý đơn hàng và thống kê</p>
+  </header>
 
-  <h2 class="mb-3">📋 Quản lý đơn hàng</h2>
+  <div class="container">
+    <!-- Quản lý menu -->
+    <div class="section">
+      <h2><i class="fas fa-utensils"></i> Menu</h2>
+      <div class="flex">
+        <input type="text" id="menuName" placeholder="Tên món">
+        <input type="number" id="menuPrice" placeholder="Giá (VNĐ)" min="0">
+        <button onclick="addMenuItem()"><i class="fas fa-plus"></i> Thêm món</button>
+      </div>
+      <table id="menuTable">
+        <thead>
+          <tr><th>Tên món</th><th>Giá</th><th>Hành động</th></tr>
+        </thead>
+        <tbody>
+          <!-- Menu items will be inserted here -->
+        </tbody>
+      </table>
+    </div>
 
-  <!-- MENU -->
-  <div class="mb-4">
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#menuModal">➕ Thêm món vào Menu</button>
-    <div id="menuItemsContainer" class="row mt-3"></div>
-  </div>
+    <!-- Giỏ hàng -->
+    <div class="section">
+      <h2><i class="fas fa-shopping-cart"></i> Giỏ hàng</h2>
+      <div class="flex">
+        <select id="menuSelect"></select>
+        <input type="number" id="menuQty" placeholder="Số lượng" value="1" min="1" style="width: 100px;">
+        <button onclick="addToCart()"><i class="fas fa-cart-plus"></i> Thêm vào giỏ</button>
+      </div>
+      <table id="cartTable">
+        <thead>
+          <tr><th>Tên món</th><th>Số lượng</th><th>Giá</th><th>Thành tiền</th><th>Hành động</th></tr>
+        </thead>
+        <tbody>
+          <!-- Cart items will be inserted here -->
+        </tbody>
+      </table>
+      <div class="cart-total" id="cartTotal">Tổng cộng: 0đ</div>
+      <textarea id="orderNote" rows="2" placeholder="Ghi chú đơn hàng" style="width: 100%;"></textarea><br>
+      <button onclick="createOrder()" class="success" style="width: 100%; margin-top: 10px;">
+        <i class="fas fa-check"></i> Tạo đơn hàng
+      </button>
+    </div>
 
-  <!-- TẠO ĐƠN HÀNG -->
-  <div class="card p-3 mb-4">
-    <h5>Tạo đơn hàng</h5>
-    <select id="menuSelect" class="form-select mb-2"></select>
-    <input type="number" id="orderQty" class="form-control mb-2" placeholder="Số lượng" value="1" min="1">
-    <input type="text" id="orderNote" class="form-control mb-2" placeholder="Ghi chú (tùy chọn)">
-    <button class="btn btn-success" onclick="addOrder()">✅ Thêm đơn</button>
-  </div>
-
-  <!-- DANH SÁCH ĐƠN -->
-  <h5>Danh sách đơn hàng</h5>
-  <input type="text" id="filterNote" class="form-control mb-2" placeholder="Lọc theo ghi chú...">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>#</th><th>Món</th><th>SL</th><th>Thành tiền</th><th>Ghi chú</th><th>Hành động</th>
-      </tr>
-    </thead>
-    <tbody id="ordersTable"></tbody>
-  </table>
-
-  <!-- Modal thêm/sửa món -->
-  <div class="modal fade" id="menuModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Thêm món mới</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body">
-          <input id="itemName" class="form-control mb-2" placeholder="Tên món">
-          <input id="itemPrice" class="form-control mb-2" placeholder="Giá" type="number">
+    <!-- Đơn hàng -->
+    <div class="section full-width">
+      <h2><i class="fas fa-list"></i> Danh sách đơn hàng</h2>
+      <div class="flex">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="filterNote" placeholder="Tìm kiếm theo ghi chú, món hoặc ID..." oninput="renderOrders()">
         </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary" id="saveMenuItem">Lưu</button>
+        <select id="sortOrders" onchange="renderOrders()">
+          <option value="newest">Mới nhất</option>
+          <option value="oldest">Cũ nhất</option>
+          <option value="highest">Giá cao nhất</option>
+          <option value="lowest">Giá thấp nhất</option>
+        </select>
+      </div>
+      <table id="orderTable">
+        <thead>
+          <tr><th>ID</th><th>Chi tiết món</th><th>Ghi chú</th><th>Tổng tiền</th><th>Thời gian</th><th>Hành động</th></tr>
+        </thead>
+        <tbody>
+          <!-- Orders will be inserted here -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Thống kê -->
+    <div class="section full-width">
+      <h2><i class="fas fa-chart-bar"></i> Thống kê</h2>
+      <div class="stats-container">
+        <div class="stat-box">
+          <div class="stat-label">Tổng số đơn</div>
+          <div class="stat-value" id="totalOrders">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Tổng doanh thu</div>
+          <div class="stat-value" id="totalRevenue">0đ</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Đơn cao nhất</div>
+          <div class="stat-value" id="highestOrder">0đ</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Món bán chạy</div>
+          <div class="stat-value" id="bestSeller">-</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal sửa đơn hàng -->
-  <div class="modal fade" id="orderModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Sửa đơn hàng</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body">
-          <select id="editMenuSelect" class="form-select mb-2"></select>
-          <input type="number" id="editOrderQty" class="form-control mb-2" min="1">
-          <input type="text" id="editOrderNote" class="form-control mb-2">
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary" id="saveOrderEdit">Lưu thay đổi</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div class="notification" id="notification"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-let menuItems = JSON.parse(localStorage.getItem("menuItems") || "[]");
-let orders = JSON.parse(localStorage.getItem("orders") || "[]");
-let editIndex = null;
-let editOrderIndex = null;
+let menu = JSON.parse(localStorage.getItem("menu")) || [];
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+let cart = [];
 
-// Render menu
-function renderMenu(){
-  const container = document.getElementById("menuItemsContainer");
-  container.innerHTML = "";
-  menuItems.forEach((item, index) => {
-    container.innerHTML += `
-      <div class="col-md-3 mb-3">
-        <div class="card menu-item-card p-2 text-center">
-          <h6>${item.name}</h6>
-          <p>${item.price.toLocaleString()} đ</p>
-          <div>
-            <button class="btn btn-sm btn-warning" onclick="editMenuItem(${index})">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteMenuItem(${index})">🗑️</button>
-          </div>
-        </div>
-      </div>`;
-  });
-
-  document.getElementById("menuSelect").innerHTML = menuItems.map((i, idx)=>
-    `<option value="${idx}">${i.name} - ${i.price.toLocaleString()} đ</option>`).join("");
-
-  document.getElementById("editMenuSelect").innerHTML = document.getElementById("menuSelect").innerHTML;
-
-  localStorage.setItem("menuItems", JSON.stringify(menuItems));
-}
-
-// Thêm/sửa món
-document.getElementById("saveMenuItem").addEventListener("click", ()=>{
-  const name = document.getElementById("itemName").value;
-  const price = parseInt(document.getElementById("itemPrice").value);
-  if(name && price){
-    if(editIndex !== null){
-      menuItems[editIndex] = { name, price };
-      editIndex = null;
-    } else {
-      menuItems.push({ name, price });
-    }
-    renderMenu();
-    document.querySelector("#menuModal .btn-close").click();
-    document.getElementById("itemName").value="";
-    document.getElementById("itemPrice").value="";
-  }
-});
-
-function editMenuItem(index){
-  editIndex = index;
-  document.getElementById("itemName").value = menuItems[index].name;
-  document.getElementById("itemPrice").value = menuItems[index].price;
-  new bootstrap.Modal(document.getElementById("menuModal")).show();
-}
-
-function deleteMenuItem(index){
-  if(confirm("Xóa món này?")){
-    menuItems.splice(index,1);
-    renderMenu();
-  }
-}
-
-// Đơn hàng
-function renderOrders(filtered = null){
-  const tb = document.getElementById("ordersTable");
-  tb.innerHTML = "";
-  const data = filtered || orders;
-  data.forEach((o, i)=>{
-    tb.innerHTML += `
-      <tr>
-        <td>${i+1}</td>
-        <td>${o.name}</td>
-        <td>${o.qty}</td>
-        <td>${(o.price*o.qty).toLocaleString()} đ</td>
-        <td>${o.note||""}</td>
-        <td>
-          <button class="btn btn-sm btn-warning" onclick="editOrder(${orders.indexOf(o)})">✏️</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteOrder(${orders.indexOf(o)})">🗑️</button>
-        </td>
-      </tr>`;
-  });
+function saveData() {
+  localStorage.setItem("menu", JSON.stringify(menu));
   localStorage.setItem("orders", JSON.stringify(orders));
 }
 
-function addOrder(){
+function showNotification(message, isError = false) {
+  const notification = document.getElementById("notification");
+  notification.textContent = message;
+  notification.className = "notification" + (isError ? " error" : "") + " show";
+  
+  setTimeout(() => {
+    notification.classList.remove("show");
+  }, 3000);
+}
+
+// ====== MENU ======
+function renderMenu() {
+  const tbody = document.querySelector("#menuTable tbody");
+  tbody.innerHTML = "";
+  
+  if (menu.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="3" class="empty-state">
+      <i class="fas fa-concierge-bell"></i><br>Chưa có món nào trong menu
+    </td></tr>`;
+    return;
+  }
+  
+  menu.forEach((m, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${m.name}</td>
+      <td>${m.price.toLocaleString()}đ</td>
+      <td>
+        <button onclick="editMenuItem(${i})" class="edit"><i class="fas fa-edit"></i></button>
+        <button onclick="deleteMenuItem(${i})" class="delete"><i class="fas fa-trash"></i></button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // update select
+  const select = document.getElementById("menuSelect");
+  select.innerHTML = "";
+  menu.forEach((m, i) => {
+    select.innerHTML += `<option value="${i}">${m.name} - ${m.price.toLocaleString()}đ</option>`;
+  });
+}
+
+function addMenuItem() {
+  const nameInput = document.getElementById("menuName");
+  const priceInput = document.getElementById("menuPrice");
+  
+  const name = nameInput.value.trim();
+  const price = parseInt(priceInput.value);
+  
+  if (!name || isNaN(price) || price <= 0) {
+    showNotification("Vui lòng nhập tên món và giá hợp lệ!", true);
+    return;
+  }
+  
+  menu.push({name, price});
+  saveData();
+  renderMenu();
+  
+  nameInput.value = "";
+  priceInput.value = "";
+  nameInput.focus();
+  
+  showNotification(`Đã thêm "${name}" vào menu!`);
+}
+
+function editMenuItem(i) {
+  const newName = prompt("Tên món:", menu[i].name);
+  if (newName === null) return;
+  
+  const newPrice = parseInt(prompt("Giá:", menu[i].price));
+  if (isNaN(newPrice)) {
+    showNotification("Giá không hợp lệ!", true);
+    return;
+  }
+  
+  menu[i] = {name: newName, price: newPrice};
+  saveData();
+  renderMenu();
+  showNotification("Đã cập nhật món!");
+}
+
+function deleteMenuItem(i) {
+  if (confirm(`Bạn có chắc muốn xóa "${menu[i].name}" khỏi menu?`)) {
+    const deletedName = menu[i].name;
+    menu.splice(i,1);
+    saveData();
+    renderMenu();
+    showNotification(`Đã xóa "${deletedName}" khỏi menu!`);
+  }
+}
+
+// ====== CART ======
+function renderCart() {
+  const tbody = document.querySelector("#cartTable tbody");
+  tbody.innerHTML = "";
+  
+  if (cart.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">
+      <i class="fas fa-shopping-cart"></i><br>Giỏ hàng trống
+    </td></tr>`;
+    document.getElementById("cartTotal").textContent = "Tổng cộng: 0đ";
+    return;
+  }
+  
+  let total = 0;
+  cart.forEach((c, i) => {
+    const itemTotal = c.price * c.qty;
+    total += itemTotal;
+    
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${c.name}</td>
+      <td>${c.qty}</td>
+      <td>${c.price.toLocaleString()}đ</td>
+      <td>${itemTotal.toLocaleString()}đ</td>
+      <td>
+        <button onclick="removeFromCart(${i})" class="delete"><i class="fas fa-trash"></i></button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  
+  document.getElementById("cartTotal").textContent = `Tổng cộng: ${total.toLocaleString()}đ`;
+}
+
+function addToCart() {
   const idx = document.getElementById("menuSelect").value;
-  const qty = parseInt(document.getElementById("orderQty").value);
-  const note = document.getElementById("orderNote").value;
-  if(idx!=="" && qty>0){
-    const item = menuItems[idx];
-    orders.push({ name:item.name, price:item.price, qty, note });
-    renderOrders();
-    document.getElementById("orderQty").value=1;
-    document.getElementById("orderNote").value="";
+  const qtyInput = document.getElementById("menuQty");
+  const qty = parseInt(qtyInput.value);
+  
+  if (isNaN(idx) || qty <= 0) {
+    showNotification("Vui lòng chọn món và số lượng hợp lệ!", true);
+    return;
   }
-}
-
-function editOrder(i){
-  editOrderIndex = i;
-  document.getElementById("editMenuSelect").value = menuItems.findIndex(m=>m.name===orders[i].name);
-  document.getElementById("editOrderQty").value = orders[i].qty;
-  document.getElementById("editOrderNote").value = orders[i].note||"";
-  new bootstrap.Modal(document.getElementById("orderModal")).show();
-}
-
-document.getElementById("saveOrderEdit").addEventListener("click", ()=>{
-  const idx = document.getElementById("editMenuSelect").value;
-  const qty = parseInt(document.getElementById("editOrderQty").value);
-  const note = document.getElementById("editOrderNote").value;
-  if(idx!=="" && qty>0){
-    const item = menuItems[idx];
-    orders[editOrderIndex] = { name:item.name, price:item.price, qty, note };
-    renderOrders();
-    editOrderIndex=null;
-    document.querySelector("#orderModal .btn-close").click();
-  }
-});
-
-function deleteOrder(i){
-  if(confirm("Xóa đơn hàng này?")){
-    orders.splice(i,1);
-    renderOrders();
-  }
-}
-
-// Lọc đơn hàng theo ghi chú
-document.getElementById("filterNote").addEventListener("keyup", (e)=>{
-  const keyword = e.target.value.toLowerCase();
-  if(keyword === ""){
-    renderOrders(); // hiển thị tất cả
+  
+  const item = menu[idx];
+  const exist = cart.find(c => c.name === item.name);
+  
+  if (exist) {
+    exist.qty += qty;
+    showNotification(`Đã thêm ${qty} "${item.name}" vào giỏ!`);
   } else {
-    const filtered = orders.filter(o => (o.note||"").toLowerCase().includes(keyword));
-    renderOrders(filtered);
+    cart.push({name: item.name, price: item.price, qty});
+    showNotification(`Đã thêm "${item.name}" vào giỏ!`);
   }
-});
+  
+  renderCart();
+  qtyInput.value = "1";
+}
 
-// Khởi động
+function removeFromCart(i) {
+  const removedItem = cart[i].name;
+  cart.splice(i, 1);
+  renderCart();
+  showNotification(`Đã xóa "${removedItem}" khỏi giỏ hàng!`);
+}
+
+// ====== ORDERS ======
+function createOrder() {
+  if (cart.length === 0) {
+    showNotification("Giỏ hàng trống!", true);
+    return;
+  }
+  
+  const note = document.getElementById("orderNote").value;
+  const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  
+  const order = {
+    id: Date.now(),
+    items: [...cart],
+    note,
+    total,
+    time: new Date().toLocaleString()
+  };
+  
+  orders.push(order);
+  saveData();
+  
+  cart = [];
+  document.getElementById("orderNote").value = "";
+  
+  renderCart();
+  renderOrders();
+  renderStats();
+  
+  showNotification(`Đã tạo đơn hàng #${order.id} thành công!`);
+}
+
+function renderOrders() {
+  const filter = document.getElementById("filterNote").value.toLowerCase();
+  const sortBy = document.getElementById("sortOrders").value;
+  const tbody = document.querySelector("#orderTable tbody");
+  tbody.innerHTML = "";
+  
+  // Filter orders
+  let filteredOrders = orders.filter(o => 
+    o.note.toLowerCase().includes(filter) || 
+    o.id.toString().includes(filter) ||
+    o.items.some(item => item.name.toLowerCase().includes(filter))
+  );
+  
+  // Sort orders
+  switch(sortBy) {
+    case "newest":
+      filteredOrders.sort((a, b) => b.id - a.id);
+      break;
+    case "oldest":
+      filteredOrders.sort((a, b) => a.id - b.id);
+      break;
+    case "highest":
+      filteredOrders.sort((a, b) => b.total - a.total);
+      break;
+    case "lowest":
+      filteredOrders.sort((a, b) => a.total - b.total);
+      break;
+  }
+  
+  if (filteredOrders.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">
+      <i class="fas fa-receipt"></i><br>Không tìm thấy đơn hàng nào
+    </td></tr>`;
+    return;
+  }
+  
+  filteredOrders.forEach((o, i) => {
+    const detail = o.items.map(it => `${it.name} x${it.qty}`).join(", ");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>#${o.id}</td>
+      <td>${detail}</td>
+      <td>${o.note}</td>
+      <td>${o.total.toLocaleString()}đ</td>
+      <td>${o.time}</td>
+      <td>
+        <button onclick="editOrder(${i})" class="edit"><i class="fas fa-edit"></i></button>
+        <button onclick="deleteOrder(${i})" class="delete"><i class="fas fa-trash"></i></button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function editOrder(i) {
+  const o = orders[i];
+  const newNote = prompt("Ghi chú:", o.note);
+  if (newNote !== null) {
+    o.note = newNote;
+    saveData();
+    renderOrders();
+    showNotification("Đã cập nhật ghi chú đơn hàng!");
+  }
+}
+
+function deleteOrder(i) {
+  if (confirm("Bạn có chắc muốn xóa đơn hàng này?")) {
+    orders.splice(i, 1);
+    saveData();
+    renderOrders();
+    renderStats();
+    showNotification("Đã xóa đơn hàng!");
+  }
+}
+
+// ====== STATS ======
+function renderStats() {
+  const totalOrders = orders.length;
+  const revenue = orders.reduce((s, o) => s + o.total, 0);
+  const highestOrder = orders.length ? Math.max(...orders.map(o => o.total)) : 0;
+  
+  let itemCount = {};
+  orders.forEach(o => o.items.forEach(it => {
+    itemCount[it.name] = (itemCount[it.name] || 0) + it.qty;
+  }));
+  
+  let top = Object.entries(itemCount).sort((a, b) => b[1] - a[1])[0];
+  
+  document.getElementById("totalOrders").textContent = totalOrders;
+  document.getElementById("totalRevenue").textContent = revenue.toLocaleString() + "đ";
+  document.getElementById("highestOrder").textContent = highestOrder.toLocaleString() + "đ";
+  document.getElementById("bestSeller").textContent = top ? `${top[0]} (${top[1]})` : "-";
+}
+
+// ====== INIT ======
 renderMenu();
 renderOrders();
+renderStats();
+renderCart();
 </script>
 </body>
 </html>
