@@ -29,6 +29,7 @@
 
   <!-- DANH SÁCH ĐƠN -->
   <h5>Danh sách đơn hàng</h5>
+  <input type="text" id="filterNote" class="form-control mb-2" placeholder="Lọc theo ghi chú...">
   <table class="table table-bordered">
     <thead>
       <tr>
@@ -139,10 +140,11 @@ function deleteMenuItem(index){
 }
 
 // Đơn hàng
-function renderOrders(){
+function renderOrders(filtered = null){
   const tb = document.getElementById("ordersTable");
   tb.innerHTML = "";
-  orders.forEach((o, i)=>{
+  const data = filtered || orders;
+  data.forEach((o, i)=>{
     tb.innerHTML += `
       <tr>
         <td>${i+1}</td>
@@ -151,8 +153,8 @@ function renderOrders(){
         <td>${(o.price*o.qty).toLocaleString()} đ</td>
         <td>${o.note||""}</td>
         <td>
-          <button class="btn btn-sm btn-warning" onclick="editOrder(${i})">✏️</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteOrder(${i})">🗑️</button>
+          <button class="btn btn-sm btn-warning" onclick="editOrder(${orders.indexOf(o)})">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteOrder(${orders.indexOf(o)})">🗑️</button>
         </td>
       </tr>`;
   });
@@ -199,6 +201,17 @@ function deleteOrder(i){
     renderOrders();
   }
 }
+
+// Lọc đơn hàng theo ghi chú
+document.getElementById("filterNote").addEventListener("keyup", (e)=>{
+  const keyword = e.target.value.toLowerCase();
+  if(keyword === ""){
+    renderOrders(); // hiển thị tất cả
+  } else {
+    const filtered = orders.filter(o => (o.note||"").toLowerCase().includes(keyword));
+    renderOrders(filtered);
+  }
+});
 
 // Khởi động
 renderMenu();
