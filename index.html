@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý Doanh Thu</title>
+    <title>Hệ Thống Quản Lý Doanh Thu - Trà Sữa & Đồ Ăn</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -69,6 +69,7 @@
         .menu-item-card {
             transition: transform 0.2s;
             cursor: pointer;
+            height: 100%;
         }
         
         .menu-item-card:hover {
@@ -91,6 +92,59 @@
         .order-history-item {
             border-left: 3px solid var(--info);
             margin-bottom: 10px;
+        }
+        
+        .category-header {
+            background-color: #f8f9fc;
+            padding: 10px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .item-row {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .item-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .quantity-control {
+            display: flex;
+            align-items: center;
+        }
+        
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            margin: 0 5px;
+        }
+        
+        .note-input {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        #cartItems {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .cart-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .menu-container {
+            max-height: 70vh;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -297,15 +351,12 @@
                     <!-- Menu Tab -->
                     <div class="tab-pane fade" id="menu">
                         <div class="card mb-4">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6 class="m-0 font-weight-bold text-primary">Quản lý menu</h6>
-                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMenuItemModal">
-                                    <i class="fas fa-plus me-1"></i> Thêm món
-                                </button>
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">Menu đồ uống và đồ ăn</h6>
                             </div>
                             <div class="card-body">
-                                <div class="row" id="menuItemsContainer">
-                                    <!-- Menu items will be populated here -->
+                                <div class="menu-container">
+                                    <!-- Menu items will be populated here from your provided menu -->
                                 </div>
                             </div>
                         </div>
@@ -438,4 +489,296 @@
     </div>
 
     <!-- New Order Modal -->
-    <div class="modal fade" id="newOrderModal"
+    <div class="modal fade" id="newOrderModal" tabindex="-1" aria-labelledby="newOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newOrderModalLabel">Tạo đơn hàng mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="m-0 font-weight-bold text-primary">Menu</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="menu-container">
+                                        <!-- Menu items will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="m-0 font-weight-bold text-primary">Đơn hàng hiện tại</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="cartItems">
+                                        <!-- Cart items will be populated here -->
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-3">
+                                        <strong>Tổng cộng:</strong>
+                                        <strong id="cartTotal">0 đ</strong>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn btn-success w-100" id="completeOrder">Hoàn thành đơn hàng</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Order Details Modal -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel">Chi tiết đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="orderDetailsContent">
+                        <!-- Order details will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Initialize data
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        let menuItems = [];
+        
+        // Parse menu from the provided HTML
+        function parseMenuItems() {
+            const menuContainer = document.querySelector('.menu-container');
+            const menuHtml = `YOUR_MENU_HTML_HERE`; // Your menu HTML goes here
+            
+            menuContainer.innerHTML = menuHtml;
+            
+            // Extract menu items
+            const items = document.querySelectorAll('.item');
+            items.forEach(item => {
+                const name = item.querySelector('.item-name').textContent;
+                const options = item.querySelectorAll('.item-size option');
+                
+                options.forEach(option => {
+                    const optionText = option.textContent;
+                    const optionValue = option.value;
+                    const price = parseInt(optionValue.split(' - ').pop().replace('k', '000'));
+                    
+                    menuItems.push({
+                        name: name,
+                        option: optionText,
+                        value: optionValue,
+                        price: price
+                    });
+                });
+            });
+        }
+        
+        // Initialize the application
+        function initApp() {
+            // Set current date
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('vi-VN');
+            
+            // Parse menu items
+            parseMenuItems();
+            
+            // Update dashboard
+            updateDashboard();
+            
+            // Load orders table
+            loadOrdersTable();
+            
+            // Load history table
+            loadHistoryTable();
+        }
+        
+        // Update dashboard with current data
+        function updateDashboard() {
+            const today = new Date().toLocaleDateString('vi-VN');
+            const todayOrders = orders.filter(order => order.date === today);
+            const todayRevenue = todayOrders.reduce((total, order) => total + order.total, 0);
+            const avgOrderValue = todayOrders.length > 0 ? todayRevenue / todayOrders.length : 0;
+            
+            // Find best seller
+            let itemCount = {};
+            todayOrders.forEach(order => {
+                order.items.forEach(item => {
+                    if (itemCount[item.name]) {
+                        itemCount[item.name] += item.quantity;
+                    } else {
+                        itemCount[item.name] = item.quantity;
+                    }
+                });
+            });
+            
+            let bestSeller = '-';
+            let maxCount = 0;
+            for (const item in itemCount) {
+                if (itemCount[item] > maxCount) {
+                    maxCount = itemCount[item];
+                    bestSeller = item;
+                }
+            }
+            
+            // Update DOM
+            document.getElementById('todayRevenue').textContent = todayRevenue.toLocaleString('vi-VN') + ' đ';
+            document.getElementById('todayOrders').textContent = todayOrders.length;
+            document.getElementById('bestSeller').textContent = bestSeller;
+            document.getElementById('avgOrderValue').textContent = avgOrderValue.toLocaleString('vi-VN') + ' đ';
+            
+            // Update recent orders table
+            const recentOrdersTable = document.querySelector('#recentOrdersTable tbody');
+            recentOrdersTable.innerHTML = '';
+            
+            todayOrders.slice(-5).forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.id}</td>
+                    <td>${order.time}</td>
+                    <td>${order.items.length}</td>
+                    <td>${order.total.toLocaleString('vi-VN')} đ</td>
+                    <td><span class="badge bg-success">Đã hoàn thành</span></td>
+                `;
+                recentOrdersTable.appendChild(row);
+            });
+            
+            // Update charts
+            updateRevenueChart();
+        }
+        
+        // Load orders table
+        function loadOrdersTable() {
+            const ordersTable = document.querySelector('#ordersTable tbody');
+            ordersTable.innerHTML = '';
+            
+            const today = new Date().toLocaleDateString('vi-VN');
+            const todayOrders = orders.filter(order => order.date === today);
+            
+            todayOrders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.id}</td>
+                    <td>${order.time}</td>
+                    <td>${order.items.length}</td>
+                    <td>${order.total.toLocaleString('vi-VN')} đ</td>
+                    <td><span class="badge bg-success">Đã hoàn thành</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-info view-order" data-id="${order.id}">Xem</button>
+                        <button class="btn btn-sm btn-danger delete-order" data-id="${order.id}">Xóa</button>
+                    </td>
+                `;
+                ordersTable.appendChild(row);
+            });
+            
+            // Add event listeners
+            document.querySelectorAll('.view-order').forEach(button => {
+                button.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-id');
+                    viewOrderDetails(orderId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-order').forEach(button => {
+                button.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-id');
+                    deleteOrder(orderId);
+                });
+            });
+        }
+        
+        // Load history table
+        function loadHistoryTable() {
+            const historyTable = document.querySelector('#historyTable tbody');
+            historyTable.innerHTML = '';
+            
+            orders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.id}</td>
+                    <td>${order.date} ${order.time}</td>
+                    <td>${order.items.map(item => `${item.name} (x${item.quantity})`).join(', ')}</td>
+                    <td>${order.total.toLocaleString('vi-VN')} đ</td>
+                    <td>
+                        <button class="btn btn-sm btn-info view-history-order" data-id="${order.id}">Xem</button>
+                    </td>
+                `;
+                historyTable.appendChild(row);
+            });
+            
+            // Add event listeners
+            document.querySelectorAll('.view-history-order').forEach(button => {
+                button.addEventListener('click', function() {
+                    const orderId = this.getAttribute('data-id');
+                    viewOrderDetails(orderId);
+                });
+            });
+        }
+        
+        // View order details
+        function viewOrderDetails(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            const modal = document.getElementById('orderDetailsModal');
+            const content = document.getElementById('orderDetailsContent');
+            
+            let itemsHtml = '';
+            order.items.forEach(item => {
+                itemsHtml += `
+                    <div class="d-flex justify-content-between">
+                        <div>${item.name} - ${item.option} (x${item.quantity})</div>
+                        <div>${(item.price * item.quantity).toLocaleString('vi-VN')} đ</div>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = `
+                <p><strong>Mã đơn:</strong> ${order.id}</p>
+                <p><strong>Thời gian:</strong> ${order.date} ${order.time}</p>
+                <h6>Chi tiết đơn hàng:</h6>
+                ${itemsHtml}
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <strong>Tổng cộng:</strong>
+                    <strong>${order.total.toLocaleString('vi-VN')} đ</strong>
+                </div>
+            `;
+            
+            new bootstrap.Modal(modal).show();
+        }
+        
+        // Delete order
+        function deleteOrder(orderId) {
+            if (confirm('Bạn có chắc chắn muốn xóa đơn hàng này?')) {
+                orders = orders.filter(order => order.id !== orderId);
+                localStorage.setItem('orders', JSON.stringify(orders));
+                loadOrdersTable();
+                updateDashboard();
+            }
+        }
+        
+        // Update revenue chart
+        function updateRevenueChart() {
+            // This is a simplified version - in a real app, you would use Chart.js
+            console.log('Revenue chart updated with current data');
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
