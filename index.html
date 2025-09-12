@@ -2,229 +2,306 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hệ Thống Quản Lý Doanh Thu</title>
+  <title>Quản lý doanh thu quán</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    :root {
-      --primary: #4e73df;
-      --success: #1cc88a;
-      --info: #36b9cc;
-      --warning: #f6c23e;
-      --danger: #e74a3b;
-      --light: #f8f9fc;
-      --dark: #5a5c69;
-    }
-    .sidebar {min-height: 100vh;background: linear-gradient(180deg, var(--primary) 10%, #224abe 100%);color: white;}
-    .sidebar .nav-link{color:rgba(255,255,255,0.8);padding:1rem;}
-    .sidebar .nav-link.active,.sidebar .nav-link:hover{color:white;font-weight:bold;}
-    .topbar{height:4.375rem;box-shadow:0 0.15rem 1.75rem 0 rgba(58,59,69,0.15);}
-    .card{border:none;box-shadow:0 0.15rem 1.75rem 0 rgba(58,59,69,0.1);}
-    .revenue-card{border-left:4px solid var(--primary);}
-    .orders-card{border-left:4px solid var(--success);}
-    .menu-item-card{transition:transform 0.2s;cursor:pointer;}
-    .menu-item-card:hover{transform:translateY(-5px);}
+    body { background: #f8f9fa; }
+    .menu-item-card { cursor: pointer; }
   </style>
 </head>
 <body>
-<div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar -->
-    <div class="col-md-3 col-lg-2 sidebar px-0">
-      <div class="text-center p-4"><h4>Quản Lý Doanh Thu</h4></div>
-      <ul class="nav flex-column">
-        <li class="nav-item"><a class="nav-link active" href="#dashboard" data-bs-toggle="tab"><i class="fas fa-fw fa-tachometer-alt"></i> Tổng quan</a></li>
-        <li class="nav-item"><a class="nav-link" href="#orders" data-bs-toggle="tab"><i class="fas fa-fw fa-shopping-cart"></i> Đơn hàng</a></li>
-        <li class="nav-item"><a class="nav-link" href="#menu" data-bs-toggle="tab"><i class="fas fa-fw fa-utensils"></i> Menu</a></li>
-        <li class="nav-item"><a class="nav-link" href="#revenue" data-bs-toggle="tab"><i class="fas fa-fw fa-chart-line"></i> Doanh thu</a></li>
-        <li class="nav-item"><a class="nav-link" href="#history" data-bs-toggle="tab"><i class="fas fa-fw fa-history"></i> Lịch sử</a></li>
-      </ul>
-    </div>
+<div class="container py-4">
+  <h2 class="text-center mb-4">📊 Quản lý doanh thu quán</h2>
 
-    <!-- Main Content -->
-    <div class="col-md-9 col-lg-10 px-4 py-4">
-      <!-- Topbar -->
-      <div class="topbar mb-4 d-flex justify-content-between align-items-center">
-        <h1 class="h3 mb-0">Hệ Thống Quản Lý Doanh Thu</h1>
-        <div class="d-flex align-items-center">
-          <span class="me-3" id="currentDate"></span>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newOrderModal">
-            <i class="fas fa-plus me-1"></i> Tạo đơn mới
-          </button>
+  <!-- Thống kê -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5>Doanh thu hôm nay</h5>
+          <h3 id="totalRevenue">0 đ</h3>
         </div>
       </div>
-
-      <!-- Tab Content -->
-      <div class="tab-content">
-        <!-- Dashboard -->
-        <div class="tab-pane fade show active" id="dashboard">
-          <div class="row">
-            <div class="col-xl-3 col-md-6 mb-4"><div class="card h-100 py-2 revenue-card"><div class="card-body"><div class="d-flex justify-content-between align-items-center"><div><div class="text-xs text-primary text-uppercase mb-1">Doanh thu hôm nay</div><div class="h5" id="todayRevenue">0 đ</div></div><i class="fas fa-dollar-sign fa-2x text-gray-300"></i></div></div></div></div>
-            <div class="col-xl-3 col-md-6 mb-4"><div class="card h-100 py-2 orders-card"><div class="card-body"><div class="d-flex justify-content-between align-items-center"><div><div class="text-xs text-success text-uppercase mb-1">Số đơn hôm nay</div><div class="h5" id="todayOrders">0</div></div><i class="fas fa-shopping-cart fa-2x text-gray-300"></i></div></div></div></div>
-            <div class="col-xl-3 col-md-6 mb-4"><div class="card h-100 py-2"><div class="card-body"><div class="d-flex justify-content-between align-items-center"><div><div class="text-xs text-info text-uppercase mb-1">Món bán chạy</div><div class="h5" id="bestSeller">-</div></div><i class="fas fa-utensils fa-2x text-gray-300"></i></div></div></div></div>
-            <div class="col-xl-3 col-md-6 mb-4"><div class="card h-100 py-2"><div class="card-body"><div class="d-flex justify-content-between align-items-center"><div><div class="text-xs text-warning text-uppercase mb-1">Giá trị đơn TB</div><div class="h5" id="avgOrderValue">0 đ</div></div><i class="fas fa-chart-pie fa-2x text-gray-300"></i></div></div></div></div>
-          </div>
-          <div class="card mb-4"><div class="card-header">Doanh thu 7 ngày gần đây</div><div class="card-body"><canvas id="revenueChart" height="100"></canvas></div></div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5>Số đơn hàng</h5>
+          <h3 id="totalOrders">0</h3>
         </div>
-
-        <!-- Orders -->
-        <div class="tab-pane fade" id="orders">
-          <div class="card mb-4"><div class="card-header">Quản lý đơn hàng</div>
-          <div class="card-body"><div class="table-responsive"><table class="table table-bordered" id="ordersTable"><thead><tr><th>Mã đơn</th><th>Thời gian</th><th>Số món</th><th>Tổng tiền</th></tr></thead><tbody></tbody></table></div></div></div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5>Món bán chạy</h5>
+          <h3 id="bestSeller">Chưa có</h3>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <!-- Menu -->
-        <div class="tab-pane fade" id="menu">
-          <div class="card mb-4"><div class="card-header d-flex justify-content-between"><h6>Quản lý menu</h6><button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMenuItemModal"><i class="fas fa-plus"></i> Thêm món</button></div>
-          <div class="card-body"><div class="row" id="menuItemsContainer"></div></div></div>
-        </div>
+  <!-- Menu -->
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h4>📖 Menu</h4>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMenuItemModal">+ Thêm món</button>
+  </div>
+  <div class="row" id="menuItemsContainer"></div>
 
-        <!-- Revenue -->
-        <div class="tab-pane fade" id="revenue">
-          <div class="card mb-4"><div class="card-header">Báo cáo doanh thu</div>
-          <div class="card-body"><canvas id="detailedRevenueChart" height="100"></canvas></div></div>
-        </div>
+  <!-- Đơn hàng -->
+  <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+    <h4>🧾 Đơn hàng</h4>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newOrderModal">+ Tạo đơn mới</button>
+  </div>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Ngày</th>
+        <th>Chi tiết</th>
+        <th>Tổng tiền</th>
+      </tr>
+    </thead>
+    <tbody id="ordersTable"></tbody>
+  </table>
 
-        <!-- History -->
-        <div class="tab-pane fade" id="history">
-          <div class="card mb-4"><div class="card-header">Lịch sử đơn hàng</div>
-          <div class="card-body"><div class="table-responsive"><table class="table table-bordered" id="historyTable"><thead><tr><th>Mã đơn</th><th>Thời gian</th><th>Tổng tiền</th></tr></thead><tbody></tbody></table></div></div></div>
+  <!-- Biểu đồ -->
+  <h4 class="mt-4">📈 Biểu đồ doanh thu</h4>
+  <canvas id="revenueChart" height="100"></canvas>
+</div>
+
+<!-- Modal thêm / sửa món -->
+<div class="modal fade" id="addMenuItemModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Thêm món mới</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Tên món</label>
+          <input type="text" id="itemName" class="form-control">
         </div>
+        <div class="mb-3">
+          <label class="form-label">Giá</label>
+          <input type="number" id="itemPrice" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Danh mục</label>
+          <select id="itemCategory" class="form-select">
+            <option value="Trà">Trà</option>
+            <option value="Trà sữa">Trà sữa</option>
+            <option value="Sinh tố">Sinh tố</option>
+            <option value="Đồ ăn vặt">Đồ ăn vặt</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button class="btn btn-primary" id="saveMenuItem">Lưu</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- New Order Modal -->
-<div class="modal fade" id="newOrderModal"><div class="modal-dialog modal-lg"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">Tạo đơn hàng mới</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-  <div class="modal-body">
-    <div class="row">
-      <div class="col-md-6"><label class="form-label">Chọn món</label><select id="menuSelect" class="form-select"></select></div>
-      <div class="col-md-3"><label class="form-label">Số lượng</label><input type="number" id="quantity" class="form-control" min="1" value="1"></div>
-      <div class="col-md-3 d-flex align-items-end"><button class="btn btn-success w-100" id="addToOrder">Thêm</button></div>
-    </div><hr>
-    <h6>Danh sách món:</h6><ul class="list-group" id="orderItems"></ul>
-    <div class="text-end mt-3"><strong>Tổng tiền: <span id="orderTotal">0</span> đ</strong></div>
-  </div>
-  <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button><button class="btn btn-primary" id="saveOrder">Lưu đơn</button></div>
-</div></div></div>
-
-<!-- Add Menu Item Modal -->
-<div class="modal fade" id="addMenuItemModal"><div class="modal-dialog"><div class="modal-content">
-  <div class="modal-header"><h5 class="modal-title">Thêm món mới</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-  <div class="modal-body">
-    <div class="mb-3"><label class="form-label">Tên món</label><input type="text" id="itemName" class="form-control"></div>
-    <div class="mb-3"><label class="form-label">Giá</label><input type="number" id="itemPrice" class="form-control"></div>
-    <div class="mb-3"><label class="form-label">Danh mục</label>
-      <select id="itemCategory" class="form-select"><option>Trà</option><option>Trà sữa</option><option>Sinh tố</option><option>Đồ ăn vặt</option></select>
+<!-- Modal tạo đơn -->
+<div class="modal fade" id="newOrderModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Tạo đơn hàng mới</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label">Chọn món</label>
+            <select id="menuSelect" class="form-select"></select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Số lượng</label>
+            <input type="number" id="quantity" class="form-control" min="1" value="1">
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button class="btn btn-success w-100" id="addToOrder">Thêm</button>
+          </div>
+        </div>
+        <hr>
+        <h6>Danh sách món:</h6>
+        <ul class="list-group" id="orderItems"></ul>
+        <div class="text-end mt-3">
+          <strong>Tổng tiền: <span id="orderTotal">0</span> đ</strong>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button class="btn btn-primary" id="saveOrder">Lưu đơn</button>
+      </div>
     </div>
   </div>
-  <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button><button class="btn btn-primary" id="saveMenuItem">Lưu</button></div>
-</div></div></div>
+</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-let menuItems = [
-  {name:"Trà sữa truyền thống",price:20000,category:"Trà sữa"},
-  {name:"Hồng trà",price:15000,category:"Trà"}
-];
-let orders = [];
-let tempOrder = [];
+let menuItems = JSON.parse(localStorage.getItem("menuItems")) || [];
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+let editIndex = null;
 
-document.getElementById("currentDate").textContent = new Date().toLocaleDateString("vi-VN");
-
-// Render menu
+// ================= MENU =================
 function renderMenu(){
-  const container=document.getElementById("menuItemsContainer");
-  container.innerHTML="";
-  menuItems.forEach((item,i)=>{
-    container.innerHTML+=`<div class="col-md-3 mb-3"><div class="card menu-item-card"><div class="card-body text-center"><h6>${item.name}</h6><p>${item.price.toLocaleString()} đ</p><small>${item.category}</small></div></div></div>`;
+  const container = document.getElementById("menuItemsContainer");
+  container.innerHTML = "";
+  menuItems.forEach((item, index) => {
+    container.innerHTML += `
+      <div class="col-md-3 mb-3">
+        <div class="card menu-item-card">
+          <div class="card-body text-center">
+            <h6>${item.name}</h6>
+            <p>${item.price.toLocaleString()} đ</p>
+            <small class="text-muted">${item.category}</small>
+            <div class="mt-2">
+              <button class="btn btn-sm btn-warning" onclick="editMenuItem(${index})">✏️ Sửa</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteMenuItem(${index})">🗑️ Xóa</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
   });
-  const select=document.getElementById("menuSelect");
-  select.innerHTML=menuItems.map((i,idx)=>`<option value="${idx}">${i.name} - ${i.price.toLocaleString()} đ</option>`).join("");
-}
-renderMenu();
 
-// Add menu item
-document.getElementById("saveMenuItem").onclick=()=>{
-  const name=document.getElementById("itemName").value;
-  const price=parseInt(document.getElementById("itemPrice").value);
-  const category=document.getElementById("itemCategory").value;
-  if(name&&price){menuItems.push({name,price,category});renderMenu();alert("Đã thêm món!");}
-};
+  // Cập nhật select trong modal đơn
+  const select = document.getElementById("menuSelect");
+  select.innerHTML = menuItems.map((i, idx) =>
+    `<option value="${idx}">${i.name} - ${i.price.toLocaleString()} đ</option>`
+  ).join("");
 
-// Add to temp order
-document.getElementById("addToOrder").onclick=()=>{
-  const idx=document.getElementById("menuSelect").value;
-  const qty=parseInt(document.getElementById("quantity").value);
-  const item=menuItems[idx];
-  tempOrder.push({name:item.name,price:item.price,qty});
-  renderTempOrder();
-};
-function renderTempOrder(){
-  const list=document.getElementById("orderItems");
-  list.innerHTML="";
-  let total=0;
-  tempOrder.forEach(o=>{
-    total+=o.price*o.qty;
-    list.innerHTML+=`<li class="list-group-item d-flex justify-content-between">${o.name} x${o.qty}<span>${(o.price*o.qty).toLocaleString()} đ</span></li>`;
-  });
-  document.getElementById("orderTotal").textContent=total.toLocaleString();
+  localStorage.setItem("menuItems", JSON.stringify(menuItems));
 }
 
-// Save order
-document.getElementById("saveOrder").onclick=()=>{
-  if(tempOrder.length===0) return;
-  const total=tempOrder.reduce((s,o)=>s+o.price*o.qty,0);
-  const order={id:"DH"+(orders.length+1),time:new Date().toLocaleString("vi-VN"),items:[...tempOrder],total};
-  orders.push(order);
-  tempOrder=[];
-  renderTempOrder();
+function editMenuItem(index){
+  editIndex = index;
+  const item = menuItems[index];
+  document.getElementById("itemName").value = item.name;
+  document.getElementById("itemPrice").value = item.price;
+  document.getElementById("itemCategory").value = item.category;
+  document.querySelector("#addMenuItemModal .modal-title").textContent = "Sửa món";
+  new bootstrap.Modal(document.getElementById("addMenuItemModal")).show();
+}
+
+function deleteMenuItem(index){
+  if(confirm("Bạn có chắc chắn muốn xóa món này không?")){
+    menuItems.splice(index, 1);
+    renderMenu();
+  }
+}
+
+document.getElementById("saveMenuItem").addEventListener("click", () => {
+  const name = document.getElementById("itemName").value;
+  const price = parseInt(document.getElementById("itemPrice").value);
+  const category = document.getElementById("itemCategory").value;
+  if(name && price){
+    if(editIndex !== null){
+      menuItems[editIndex] = { name, price, category };
+      editIndex = null;
+      document.querySelector("#addMenuItemModal .modal-title").textContent = "Thêm món mới";
+    } else {
+      menuItems.push({ name, price, category });
+    }
+    renderMenu();
+    document.querySelector("#addMenuItemModal .btn-close").click();
+  }
+});
+
+// ================= ĐƠN HÀNG =================
+let currentOrder = [];
+
+document.getElementById("addToOrder").addEventListener("click", () => {
+  const idx = document.getElementById("menuSelect").value;
+  const qty = parseInt(document.getElementById("quantity").value);
+  if(menuItems[idx] && qty > 0){
+    currentOrder.push({ ...menuItems[idx], qty });
+    renderOrderItems();
+  }
+});
+
+function renderOrderItems(){
+  const list = document.getElementById("orderItems");
+  let total = 0;
+  list.innerHTML = "";
+  currentOrder.forEach((item, i) => {
+    const subtotal = item.price * item.qty;
+    total += subtotal;
+    list.innerHTML += `<li class="list-group-item d-flex justify-content-between">
+      ${item.name} x${item.qty} 
+      <strong>${subtotal.toLocaleString()} đ</strong>
+    </li>`;
+  });
+  document.getElementById("orderTotal").textContent = total.toLocaleString();
+}
+
+document.getElementById("saveOrder").addEventListener("click", () => {
+  if(currentOrder.length === 0) return alert("Đơn hàng trống!");
+  const total = currentOrder.reduce((sum, i) => sum + i.price*i.qty, 0);
+  orders.push({ date: new Date().toLocaleDateString("vi-VN"), items: currentOrder, total });
+  localStorage.setItem("orders", JSON.stringify(orders));
+  currentOrder = [];
   renderOrders();
-  renderDashboard();
+  renderStats();
+  renderChart();
   document.querySelector("#newOrderModal .btn-close").click();
-};
+});
 
-// Render orders
+// ================= HIỂN THỊ ĐƠN =================
 function renderOrders(){
-  const tb=document.querySelector("#ordersTable tbody");
-  const hb=document.querySelector("#historyTable tbody");
-  tb.innerHTML="";hb.innerHTML="";
-  orders.forEach(o=>{
-    tb.innerHTML+=`<tr><td>${o.id}</td><td>${o.time}</td><td>${o.items.length}</td><td>${o.total.toLocaleString()} đ</td></tr>`;
-    hb.innerHTML+=`<tr><td>${o.id}</td><td>${o.time}</td><td>${o.total.toLocaleString()} đ</td></tr>`;
+  const tbody = document.getElementById("ordersTable");
+  tbody.innerHTML = "";
+  orders.forEach((order, i) => {
+    tbody.innerHTML += `<tr>
+      <td>${i+1}</td>
+      <td>${order.date}</td>
+      <td>${order.items.map(it=>`${it.name} x${it.qty}`).join(", ")}</td>
+      <td>${order.total.toLocaleString()} đ</td>
+    </tr>`;
   });
 }
-function renderDashboard(){
-  const todayOrders=orders.length;
-  const todayRevenue=orders.reduce((s,o)=>s+o.total,0);
-  document.getElementById("todayOrders").textContent=todayOrders;
-  document.getElementById("todayRevenue").textContent=todayRevenue.toLocaleString()+" đ";
-  document.getElementById("avgOrderValue").textContent=(todayOrders?Math.round(todayRevenue/todayOrders):0).toLocaleString()+" đ";
-  // best seller
-  let counts={};
-  orders.forEach(o=>o.items.forEach(i=>{counts[i.name]=(counts[i.name]||0)+i.qty;}));
-  let best=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
-  document.getElementById("bestSeller").textContent=best?best[0]:"-";
-  updateChart();
-}
-renderOrders();
 
-// Chart
-let ctx=document.getElementById("revenueChart");
-let revenueChart=new Chart(ctx,{type:"line",data:{labels:[],datasets:[{label:"Doanh thu",data:[],borderColor:"blue"}]}});
-function updateChart(){
-  let days=[...Array(7)].map((_,i)=>{let d=new Date();d.setDate(d.getDate()-6+i);return d;});
-  revenueChart.data.labels=days.map(d=>d.toLocaleDateString("vi-VN"));
-  revenueChart.data.datasets[0].data=days.map(d=>{
-    let dateStr=d.toLocaleDateString("vi-VN");
-    return orders.filter(o=>o.time.includes(dateStr)).reduce((s,o)=>s+o.total,0);
-  });
-  revenueChart.update();
+// ================= THỐNG KÊ =================
+function renderStats(){
+  document.getElementById("totalOrders").textContent = orders.length;
+  const totalRevenue = orders.reduce((sum, o)=>sum+o.total, 0);
+  document.getElementById("totalRevenue").textContent = totalRevenue.toLocaleString()+" đ";
+
+  // best seller
+  let counts = {};
+  orders.forEach(o => o.items.forEach(i => {
+    counts[i.name] = (counts[i.name]||0) + i.qty;
+  }));
+  let best = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById("bestSeller").textContent = best ? best[0] : "Chưa có";
 }
+
+// ================= BIỂU ĐỒ =================
+let chart;
+function renderChart(){
+  const ctx = document.getElementById("revenueChart").getContext("2d");
+  const grouped = {};
+  orders.forEach(o => grouped[o.date] = (grouped[o.date]||0)+o.total);
+  const labels = Object.keys(grouped);
+  const data = Object.values(grouped);
+
+  if(chart) chart.destroy();
+  chart = new Chart(ctx, {
+    type: "bar",
+    data: { labels, datasets: [{ label: "Doanh thu", data }] }
+  });
+}
+
+// ================= INIT =================
+renderMenu();
+renderOrders();
+renderStats();
+renderChart();
 </script>
 </body>
 </html>
