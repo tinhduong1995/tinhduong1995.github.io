@@ -289,51 +289,8 @@
       align-items: center;
     }
     
-    .hidden-menu-container {
-      margin-top: 20px;
-      border-top: 1px dashed #ccc;
-      padding-top: 15px;
-    }
-    
-    .toggle-hidden-menu {
-      background: none;
-      border: none;
-      color: var(--primary);
-      cursor: pointer;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px;
-    }
-    
-    .hidden-menu {
-      display: none;
-      margin-top: 10px;
-    }
-    
-    .hidden-menu.show {
-      display: block;
-    }
-    
-    .hidden-menu-item {
-      display: inline-block;
-      background-color: #f0f0f0;
-      padding: 5px 10px;
-      border-radius: 15px;
-      margin: 5px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    
-    .hidden-menu-item:hover {
-      background-color: var(--accent);
-      color: white;
-    }
-    
-    /* Styles for the full hidden menu */
-    .full-hidden-menu {
-      display: none;
+    /* Styles for the main menu */
+    .main-menu {
       margin-top: 20px;
       max-height: 500px;
       overflow-y: auto;
@@ -341,10 +298,6 @@
       background-color: #f9f9f9;
       border-radius: 8px;
       border: 1px solid #eee;
-    }
-    
-    .full-hidden-menu.show {
-      display: block;
     }
     
     .menu-category {
@@ -384,6 +337,33 @@
       padding: 5px 10px;
       font-size: 0.8rem;
     }
+    
+    /* Category filter */
+    .category-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .category-btn {
+      padding: 8px 15px;
+      background-color: #f0f0f0;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .category-btn:hover {
+      background-color: var(--secondary);
+      color: white;
+    }
+    
+    .category-btn.active {
+      background-color: var(--primary);
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -393,42 +373,23 @@
   </header>
 
   <div class="container">
-    <!-- Quản lý menu -->
-    <div class="section">
+    <!-- Menu chính -->
+    <div class="section full-width">
       <h2><i class="fas fa-utensils"></i> Menu</h2>
-      <div class="flex">
-        <input type="text" id="menuName" placeholder="Tên món">
-        <input type="number" id="menuPrice" placeholder="Giá (VNĐ)" min="0">
-        <button onclick="addMenuItem()"><i class="fas fa-plus"></i> Thêm món</button>
-      </div>
-      <table id="menuTable">
-        <thead>
-          <tr><th>Tên món</th><th>Giá</th><th>Hành động</th></tr>
-        </thead>
-        <tbody>
-          <!-- Menu items will be inserted here -->
-        </tbody>
-      </table>
       
-      <!-- Menu ẩn có sẵn -->
-      <div class="hidden-menu-container">
-        <button class="toggle-hidden-menu" onclick="toggleHiddenMenu()">
-          <i class="fas fa-chevron-down"></i> Menu có sẵn
-        </button>
-        <div class="full-hidden-menu" id="fullHiddenMenu">
-          <!-- Các món có sẵn sẽ được thêm ở đây bằng JavaScript -->
-        </div>
+      <!-- Thanh lọc danh mục -->
+      <div class="category-filter" id="categoryFilter">
+        <!-- Categories will be inserted here -->
+      </div>
+      
+      <div class="main-menu" id="mainMenu">
+        <!-- Các món sẽ được thêm ở đây bằng JavaScript -->
       </div>
     </div>
 
     <!-- Giỏ hàng -->
     <div class="section">
       <h2><i class="fas fa-shopping-cart"></i> Giỏ hàng</h2>
-      <div class="flex">
-        <select id="menuSelect"></select>
-        <input type="number" id="menuQty" placeholder="Số lượng" value="1" min="1" style="width: 100px;">
-        <button onclick="addToCart()"><i class="fas fa-cart-plus"></i> Thêm vào giỏ</button>
-      </div>
       <table id="cartTable">
         <thead>
           <tr><th>Tên món</th><th>Số lượng</th><th>Giá</th><th>Thành tiền</th><th>Hành động</th></tr>
@@ -513,11 +474,6 @@
         <div id="editOrderItems">
           <!-- Items will be inserted here -->
         </div>
-        <div class="flex">
-          <select id="editMenuSelect"></select>
-          <input type="number" id="editMenuQty" placeholder="Số lượng" value="1" min="1" style="width: 100px;">
-          <button onclick="addToEditOrder()"><i class="fas fa-plus"></i> Thêm món</button>
-        </div>
         
         <h3>Ghi chú</h3>
         <textarea id="editOrderNote" rows="3" placeholder="Ghi chú đơn hàng" style="width: 100%;"></textarea>
@@ -534,8 +490,8 @@
   <div class="notification" id="notification"></div>
 
 <script>
-// Menu có sẵn ẩn với tất cả các món
-const hiddenMenuItems = [
+// Menu với tất cả các món
+const menuItems = [
   // TRÀ
   { name: "Trà chanh", price: 10000, category: "TRÀ" },
   { name: "Trà chanh nha đam", price: 15000, category: "TRÀ" },
@@ -636,7 +592,7 @@ const hiddenMenuItems = [
   { name: "Gà viên chiên sốt cay", price: 35000, category: "ĐỒ ĂN VẶT" },
   { name: "Đùi gà KFC", price: 25000, category: "ĐỒ ĂN VẶT" },
   { name: "Đùi gà KFC sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
-  { name: "Cánh gà KFC", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { name: "Cánh gà KFC", price: 25000, category: "ĐỒ Ăn VẶT" },
   { name: "Cánh gà KFC sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
   { name: "Cá viên chiên", price: 25000, category: "ĐỒ ĂN VẶT" },
   { name: "Cá viên chiên sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
@@ -656,13 +612,12 @@ const hiddenMenuItems = [
   { name: "Bún đậu thêm dồi sụn", price: 45000, category: "BÚN ĐẬU" }
 ];
 
-let menu = JSON.parse(localStorage.getItem("menu")) || [];
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 let cart = [];
 let currentEditOrderIndex = -1;
+let currentCategory = "TẤT CẢ";
 
 function saveData() {
-  localStorage.setItem("menu", JSON.stringify(menu));
   localStorage.setItem("orders", JSON.stringify(orders));
 }
 
@@ -678,66 +633,24 @@ function showNotification(message, isError = false) {
 
 // ====== MENU ======
 function renderMenu() {
-  const tbody = document.querySelector("#menuTable tbody");
-  tbody.innerHTML = "";
-  
-  if (menu.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="3" class="empty-state">
-      <i class="fas fa-concierge-bell"></i><br>Chưa có món nào trong menu
-    </td></tr>`;
-  } else {
-    menu.forEach((m, i) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${m.name}</td>
-        <td>${m.price.toLocaleString()}đ</td>
-        <td>
-          <button onclick="editMenuItem(${i})" class="edit"><i class="fas fa-edit"></i></button>
-          <button onclick="deleteMenuItem(${i})" class="delete"><i class="fas fa-trash"></i></button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  // Cập nhật select menu
-  updateMenuSelects();
-  
-  // Cập nhật menu ẩn
-  renderFullHiddenMenu();
-}
-
-function updateMenuSelects() {
-  // Update main menu select
-  const select = document.getElementById("menuSelect");
-  select.innerHTML = "";
-  menu.forEach((m, i) => {
-    select.innerHTML += `<option value="${i}">${m.name} - ${m.price.toLocaleString()}đ</option>`;
-  });
-  
-  // Update edit menu select
-  const editSelect = document.getElementById("editMenuSelect");
-  editSelect.innerHTML = "";
-  menu.forEach((m, i) => {
-    editSelect.innerHTML += `<option value="${i}">${m.name} - ${m.price.toLocaleString()}đ</option>`;
-  });
-}
-
-function renderFullHiddenMenu() {
-  const hiddenMenuContainer = document.getElementById("fullHiddenMenu");
-  hiddenMenuContainer.innerHTML = "";
+  const menuContainer = document.getElementById("mainMenu");
+  menuContainer.innerHTML = "";
   
   // Nhóm các món theo danh mục
   const categories = {};
-  hiddenMenuItems.forEach(item => {
+  menuItems.forEach(item => {
     if (!categories[item.category]) {
       categories[item.category] = [];
     }
     categories[item.category].push(item);
   });
   
-  // Tạo HTML cho từng danh mục
+  // Hiển thị các món theo danh mục đã chọn
   for (const category in categories) {
+    if (currentCategory !== "TẤT CẢ" && currentCategory !== category) {
+      continue;
+    }
+    
     const categoryDiv = document.createElement("div");
     categoryDiv.className = "menu-category";
     categoryDiv.innerHTML = `<h3>${category}</h3>`;
@@ -748,93 +661,59 @@ function renderFullHiddenMenu() {
       itemDiv.innerHTML = `
         <div class="menu-item-name">${item.name}</div>
         <div class="menu-item-price">${item.price.toLocaleString()}đ</div>
-        <button class="add-item-btn" onclick="addHiddenMenuItemToMenu('${item.name}', ${item.price})">
-          <i class="fas fa-plus"></i> Thêm vào menu
+        <button class="add-item-btn" onclick="addToCartFromMenu('${item.name}', ${item.price})">
+          <i class="fas fa-cart-plus"></i> Thêm vào đơn
         </button>
       `;
       categoryDiv.appendChild(itemDiv);
     });
     
-    hiddenMenuContainer.appendChild(categoryDiv);
+    menuContainer.appendChild(categoryDiv);
   }
 }
 
-function toggleHiddenMenu() {
-  const hiddenMenu = document.getElementById("fullHiddenMenu");
-  const toggleBtn = document.querySelector(".toggle-hidden-menu");
+function renderCategoryFilter() {
+  const categoryFilter = document.getElementById("categoryFilter");
+  categoryFilter.innerHTML = "";
   
-  hiddenMenu.classList.toggle("show");
+  // Tạo nút "Tất cả"
+  const allButton = document.createElement("button");
+  allButton.className = `category-btn ${currentCategory === "TẤT CẢ" ? "active" : ""}`;
+  allButton.textContent = "TẤT CẢ";
+  allButton.onclick = () => filterByCategory("TẤT CẢ");
+  categoryFilter.appendChild(allButton);
   
-  if (hiddenMenu.classList.contains("show")) {
-    toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Ẩn menu có sẵn';
+  // Lấy tất cả các danh mục duy nhất
+  const categories = [...new Set(menuItems.map(item => item.category))];
+  
+  // Tạo nút cho từng danh mục
+  categories.forEach(category => {
+    const button = document.createElement("button");
+    button.className = `category-btn ${currentCategory === category ? "active" : ""}`;
+    button.textContent = category;
+    button.onclick = () => filterByCategory(category);
+    categoryFilter.appendChild(button);
+  });
+}
+
+function filterByCategory(category) {
+  currentCategory = category;
+  renderCategoryFilter();
+  renderMenu();
+}
+
+function addToCartFromMenu(name, price) {
+  const exist = cart.find(c => c.name === name);
+  
+  if (exist) {
+    exist.qty += 1;
+    showNotification(`Đã thêm 1 "${name}" vào giỏ!`);
   } else {
-    toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> Hiện menu có sẵn';
-  }
-}
-
-function addHiddenMenuItemToMenu(name, price) {
-  // Kiểm tra xem món đã có trong menu chưa
-  const exists = menu.some(m => m.name === name);
-  
-  if (exists) {
-    showNotification(`"${name}" đã có trong menu!`, true);
-    return;
+    cart.push({name, price, qty: 1});
+    showNotification(`Đã thêm "${name}" vào giỏ!`);
   }
   
-  // Thêm món vào menu
-  menu.push({name, price});
-  saveData();
-  renderMenu();
-  showNotification(`Đã thêm "${name}" vào menu!`);
-}
-
-function addMenuItem() {
-  const nameInput = document.getElementById("menuName");
-  const priceInput = document.getElementById("menuPrice");
-  
-  const name = nameInput.value.trim();
-  const price = parseInt(priceInput.value);
-  
-  if (!name || isNaN(price) || price <= 0) {
-    showNotification("Vui lòng nhập tên món và giá hợp lệ!", true);
-    return;
-  }
-  
-  menu.push({name, price});
-  saveData();
-  renderMenu();
-  
-  nameInput.value = "";
-  priceInput.value = "";
-  nameInput.focus();
-  
-  showNotification(`Đã thêm "${name}" vào menu!`);
-}
-
-function editMenuItem(i) {
-  const newName = prompt("Tên món:", menu[i].name);
-  if (newName === null) return;
-  
-  const newPrice = parseInt(prompt("Giá:", menu[i].price));
-  if (isNaN(newPrice)) {
-    showNotification("Giá không hợp lệ!", true);
-    return;
-  }
-  
-  menu[i] = {name: newName, price: newPrice};
-  saveData();
-  renderMenu();
-  showNotification("Đã cập nhật món!");
-}
-
-function deleteMenuItem(i) {
-  if (confirm(`Bạn có chắc muốn xóa "${menu[i].name}" khỏi menu?`)) {
-    const deletedName = menu[i].name;
-    menu.splice(i,1);
-    saveData();
-    renderMenu();
-    showNotification(`Đã xóa "${deletedName}" khỏi menu!`);
-  }
+  renderCart();
 }
 
 // ====== CART ======
@@ -858,7 +737,11 @@ function renderCart() {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${c.name}</td>
-      <td>${c.qty}</td>
+      <td>
+        <button onclick="changeCartItemQty(${i}, -1)">-</button>
+        ${c.qty}
+        <button onclick="changeCartItemQty(${i}, 1)">+</button>
+      </td>
       <td>${c.price.toLocaleString()}đ</td>
       <td>${itemTotal.toLocaleString()}đ</td>
       <td>
@@ -871,29 +754,16 @@ function renderCart() {
   document.getElementById("cartTotal").textContent = `Tổng cộng: ${total.toLocaleString()}đ`;
 }
 
-function addToCart() {
-  const idx = document.getElementById("menuSelect").value;
-  const qtyInput = document.getElementById("menuQty");
-  const qty = parseInt(qtyInput.value);
-  
-  if (isNaN(idx) || qty <= 0) {
-    showNotification("Vui lòng chọn món và số lượng hợp lệ!", true);
+function changeCartItemQty(index, change) {
+  const newQty = cart[index].qty + change;
+  if (newQty < 1) {
+    removeFromCart(index);
     return;
   }
   
-  const item = menu[idx];
-  const exist = cart.find(c => c.name === item.name);
-  
-  if (exist) {
-    exist.qty += qty;
-    showNotification(`Đã thêm ${qty} "${item.name}" vào giỏ!`);
-  } else {
-    cart.push({name: item.name, price: item.price, qty});
-    showNotification(`Đã thêm "${item.name}" vào giỏ!`);
-  }
-  
+  cart[index].qty = newQty;
   renderCart();
-  qtyInput.value = "1";
+  showNotification(`Đã cập nhật số lượng "${cart[index].name}" thành ${newQty}`);
 }
 
 function removeFromCart(i) {
@@ -1054,29 +924,6 @@ function removeEditItem(itemIndex) {
   openEditModal(currentEditOrderIndex); // Re-render the modal
 }
 
-function addToEditOrder() {
-  const idx = document.getElementById("editMenuSelect").value;
-  const qtyInput = document.getElementById("editMenuQty");
-  const qty = parseInt(qtyInput.value);
-  
-  if (isNaN(idx) || qty <= 0) {
-    showNotification("Vui lòng chọn món và số lượng hợp lệ!", true);
-    return;
-  }
-  
-  const item = menu[idx];
-  const exist = orders[currentEditOrderIndex].items.find(i => i.name === item.name);
-  
-  if (exist) {
-    exist.qty += qty;
-  } else {
-    orders[currentEditOrderIndex].items.push({name: item.name, price: item.price, qty});
-  }
-  
-  openEditModal(currentEditOrderIndex); // Re-render the modal
-  qtyInput.value = "1";
-}
-
 function updateEditOrderTotal() {
   const order = orders[currentEditOrderIndex];
   order.total = order.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
@@ -1126,14 +973,7 @@ function renderStats() {
 }
 
 // ====== INIT ======
-// Thêm menu ẩn vào menu chính nếu chưa có
-hiddenMenuItems.forEach(item => {
-  if (!menu.some(m => m.name === item.name)) {
-    menu.push(item);
-  }
-});
-
-saveData();
+renderCategoryFilter();
 renderMenu();
 renderOrders();
 renderStats();
