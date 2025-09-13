@@ -399,6 +399,29 @@
       margin-bottom: 5px;
       font-weight: bold;
     }
+    
+    /* Menu table styles */
+    .menu-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    
+    .menu-table th {
+      background-color: var(--primary);
+      color: white;
+      padding: 12px;
+      text-align: left;
+    }
+    
+    .menu-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .menu-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
   </style>
 </head>
 <body>
@@ -408,9 +431,9 @@
   </header>
 
   <div class="container">
-    <!-- Menu chính -->
-    <div class="section full-width">
-      <h2><i class="fas fa-utensils"></i> Menu</h2>
+    <!-- Quản lý menu -->
+    <div class="section">
+      <h2><i class="fas fa-utensils"></i> Quản lý Menu</h2>
       
       <!-- Form thêm món thủ công -->
       <div class="manual-add-form">
@@ -447,6 +470,29 @@
         </div>
       </div>
       
+      <!-- Bảng menu -->
+      <table class="menu-table">
+        <thead>
+          <tr>
+            <th>Tên món</th>
+            <th>Danh mục</th>
+            <th>Giá</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody id="menuTableBody">
+          <!-- Menu items will be inserted here -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Giỏ hàng -->
+    <div class="section">
+      <h2><i class="fas fa-shopping-cart"></i> Giỏ hàng</h2>
+      
+      <!-- Menu chính để order -->
+      <h3>Menu Order</h3>
+      
       <!-- Thanh lọc danh mục -->
       <div class="category-filter" id="categoryFilter">
         <!-- Categories will be inserted here -->
@@ -455,11 +501,7 @@
       <div class="main-menu" id="mainMenu">
         <!-- Các món sẽ được thêm ở đây bằng JavaScript -->
       </div>
-    </div>
-
-    <!-- Giỏ hàng -->
-    <div class="section">
-      <h2><i class="fas fa-shopping-cart"></i> Giỏ hàng</h2>
+      
       <table id="cartTable">
         <thead>
           <tr><th>Tên món</th><th>Số lượng</th><th>Giá</th><th>Thành tiền</th><th>Hành động</th></tr>
@@ -619,7 +661,120 @@ let menuItems = [
   { id: 1, name: "Trà chanh", price: 10000, category: "TRÀ" },
   { id: 2, name: "Trà chanh nha đam", price: 15000, category: "TRÀ" },
   { id: 3, name: "Trà quất", price: 10000, category: "TRÀ" },
-  // ... (thêm tất cả các món khác với id duy nhất)
+  { id: 4, name: "Trà quất nha đam", price: 15000, category: "TRÀ" },
+  { id: 5, name: "Trà dưa lưới", price: 20000, category: "TRÀ" },
+  { id: 6, name: "Trà đào", price: 20000, category: "TRÀ" },
+  { id: 7, name: "Trà đào cam xả", price: 25000, category: "TRÀ" },
+  { id: 8, name: "Trà quất lắc sữa", price: 25000, category: "TRÀ" },
+  { id: 9, name: "Trà táo xanh", price: 25000, category: "TRÀ" },
+  { id: 10, name: "Trà vải", price: 25000, category: "TRÀ" },
+  { id: 11, name: "Trà dâu", price: 25000, category: "TRÀ" },
+  { id: 12, name: "Trà hoa quả nhiệt đới", price: 25000, category: "TRÀ" },
+  { id: 13, name: "Trà chanh bạc hà", price: 20000, category: "TRÀ" },
+  { id: 14, name: "Trà chanh dâu", price: 20000, category: "TRÀ" },
+  { id: 15, name: "Trà xoài chanh leo", price: 20000, category: "TRÀ" },
+  { id: 16, name: "Trà đào chanh dây", price: 20000, category: "TRÀ" },
+  { id: 17, name: "Trà đào nhài", price: 20000, category: "TRÀ" },
+  { id: 18, name: "Trà chanh leo", price: 20000, category: "TRÀ" },
+  
+  // SODA
+  { id: 19, name: "Soda việt quất", price: 20000, category: "SODA" },
+  { id: 20, name: "Soda bạc hà", price: 20000, category: "SODA" },
+  { id: 21, name: "Soda dâu", price: 20000, category: "SODA" },
+  { id: 22, name: "Soda dưa lưới", price: 20000, category: "SODA" },
+  
+  // SINH TỐ
+  { id: 23, name: "Sinh tố bơ", price: 30000, category: "SINH TỐ" },
+  { id: 24, name: "Sinh tố xoài", price: 30000, category: "SINH TỐ" },
+  { id: 25, name: "Sinh tố dâu tây", price: 30000, category: "SINH TỐ" },
+  
+  // ĐÁ XAY
+  { id: 26, name: "Đá xay việt quất", price: 35000, category: "ĐÁ XAY" },
+  { id: 27, name: "Đá xay matcha", price: 35000, category: "ĐÁ XAY" },
+  { id: 28, name: "Đá xay bạc hà", price: 35000, category: "ĐÁ XAY" },
+  { id: 29, name: "Đá xay khoai môn", price: 35000, category: "ĐÁ XAY" },
+  
+  // CÀ PHÊ
+  { id: 30, name: "Cà phê bạc xỉu", price: 25000, category: "CÀ PHÊ" },
+  { id: 31, name: "Cà phê nâu sữa", price: 20000, category: "CÀ PHÊ" },
+  { id: 32, name: "Cà phê nâu nóng", price: 20000, category: "CÀ PHÊ" },
+  
+  // TRÀ SỮA
+  { id: 33, name: "Trà sữa khoai môn", price: 25000, category: "TRÀ SỮA" },
+  { id: 34, name: "Trà sữa sốt xoài", price: 25000, category: "TRÀ SỮA" },
+  { id: 35, name: "Trà sữa socola", price: 25000, category: "TRÀ SỮA" },
+  { id: 36, name: "Trà sữa matcha", price: 25000, category: "TRÀ SỮA" },
+  { id: 37, name: "Trà sữa dưa lưới", price: 25000, category: "TRÀ SỮA" },
+  { id: 38, name: "Trà sữa hồng trà sữa", price: 25000, category: "TRÀ SỮA" },
+  { id: 39, name: "Trà sữa dâu", price: 25000, category: "TRÀ SỮA" },
+  { id: 40, name: "Trà sữa đào", price: 25000, category: "TRÀ SỮA" },
+  { id: 41, name: "Trà sữa dừa", price: 25000, category: "TRÀ S�ữA" },
+  { id: 42, name: "Trà sữa lá nếp", price: 25000, category: "TRÀ SỮA" },
+  { id: 43, name: "Trà sữa táo xanh", price: 25000, category: "TRÀ SỮA" },
+  { id: 44, name: "Trà sữa caramen", price: 25000, category: "TRÀ SỮA" },
+  { id: 45, name: "Trà sữa hạt dẻ", price: 25000, category: "TRÀ SỮA" },
+  { id: 46, name: "Trà sữa cacao", price: 25000, category: "TRÀ SỮA" },
+  { id: 47, name: "Trà sữa việt quất", price: 25000, category: "TRÀ SỮA" },
+  { id: 48, name: "Trà sữa matcha latte", price: 25000, category: "TRÀ SỮA" },
+  { id: 49, name: "Trà sữa bạc hà", price: 25000, category: "TRÀ SỮA" },
+  { id: 50, name: "Trà sữa khoai lang tím", price: 30000, category: "TRÀ SỮA" },
+  { id: 51, name: "Trà sữa trân châu đường đen", price: 30000, category: "TRÀ SỮA" },
+  { id: 52, name: "Trà sữa kem trứng dừa nướng", price: 30000, category: "TRÀ SỮA" },
+  { id: 53, name: "Trà sữa sốt xoài kem bông", price: 30000, category: "TRÀ SỮA" },
+  { id: 54, name: "Trà sữa xoài matcha", price: 30000, category: "TRÀ SỮA" },
+  { id: 55, name: "Trà sữa khoai môn kem dừa nướng", price: 30000, category: "TRÀ SỮA" },
+  { id: 56, name: "Trà sữa đường đen kem dừa nướng", price: 30000, category: "TRÀ SỮA" },
+  { id: 57, name: "Trà sữa khoai lang tím kem trứng", price: 35000, category: "TRÀ SỮA" },
+  
+  // SỮA CHUA
+  { id: 58, name: "Sữa chua lắc dâu", price: 25000, category: "SỮA CHUA" },
+  { id: 59, name: "Sữa chua lắc xoài", price: 25000, category: "SỮA CHUA" },
+  { id: 60, name: "Sữa chua lắc việt quất", price: 25000, category: "SỮA CHUA" },
+  { id: 61, name: "Sữa chua hoa quả", price: 30000, category: "SỮA CHUA" },
+  
+  // NƯỚC ÉP
+  { id: 62, name: "Nước ép cam", price: 25000, category: "NƯỚC ÉP" },
+  { id: 63, name: "Nước ép dưa hấu", price: 25000, category: "NƯỚC ÉP" },
+  { id: 64, name: "Nước ép dứa", price: 25000, category: "NƯỚC ÉP" },
+  
+  // PIZZA
+  { id: 65, name: "Pizza xúc xích", price: 60000, category: "PIZZA" },
+  { id: 66, name: "Pizza bò ngô", price: 60000, category: "PIZZA" },
+  { id: 67, name: "Pizza thập cẩm", price: 60000, category: "PIZZA" },
+  
+  // ĐỒ ĂN VẶT
+  { id: 68, name: "Xúc xích", price: 8000, category: "ĐỒ ĂN VẶT" },
+  { id: 69, name: "Lạp xưởng", price: 8000, category: "ĐỒ ĂN VẶT" },
+  { id: 70, name: "Phô mai que", price: 8000, category: "ĐỒ ĂN VẶT" },
+  { id: 71, name: "Hướng dương đen", price: 15000, category: "ĐỒ ĂN VẶT" },
+  { id: 72, name: "Hướng dương trắng", price: 15000, category: "ĐỒ ĂN VẶT" },
+  { id: 73, name: "Khoai lang kén", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { id: 74, name: "Khoai tây chiên", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { id: 75, name: "Nem chua rán", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { id: 76, name: "Khoai môn lệ phố", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { id: 77, name: "Mực vòng chiên", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { id: 78, name: "Gà viên chiên", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { id: 79, name: "Gà viên chiên sốt cay", price: 35000, category: "ĐỒ ĂN VẶT" },
+  { id: 80, name: "Đùi gà KFC", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { id: 81, name: "Đùi gà KFC sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { id: 82, name: "Cánh gà KFC", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { id: 83, name: "Cánh gà KFC sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { id: 84, name: "Cá viên chiên", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { id: 85, name: "Cá viên chiên sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
+  
+  // MỲ CAY
+  { id: 86, name: "Mỳ cay xúc xích", price: 40000, category: "MỲ CAY" },
+  { id: 87, name: "Mỳ cay bò", price: 45000, category: "MỲ CAY" },
+  { id: 88, name: "Mỳ cay sườn sụn", price: 45000, category: "MỲ CAY" },
+  { id: 89, name: "Mỳ cay hải sản", price: 50000, category: "MỲ CAY" },
+  { id: 90, name: "Mỳ cay thập cẩm", price: 55000, category: "MỲ CAY" },
+  
+  // BÚN ĐẬU
+  { id: 91, name: "Bún đậu đầy đủ", price: 35000, category: "BÚN ĐẬU" },
+  { id: 92, name: "Bún đậu thêm bún", price: 40000, category: "BÚN ĐẬU" },
+  { id: 93, name: "Bún đậu thêm đậu", price: 40000, category: "BÚN ĐậU" },
+  { id: 94, name: "Bún đậu thêm chả cốm", price: 45000, category: "BÚN ĐẬU" },
+  { id: 95, name: "Bún đậu thêm dồi sụn", price: 45000, category: "BÚN ĐẬU" }
 ];
 
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
@@ -693,12 +848,6 @@ function renderMenu() {
           <button class="add-item-btn" onclick="addToCartFromMenu('${item.name}', ${item.price})">
             <i class="fas fa-cart-plus"></i> Thêm vào đơn
           </button>
-          <button class="edit" onclick="openEditMenuItemModal(${originalIndex})" style="margin-left: 5px;">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button class="delete" onclick="deleteMenuItem(${originalIndex})" style="margin-left: 5px;">
-            <i class="fas fa-trash"></i>
-          </button>
         </div>
       `;
       categoryDiv.appendChild(itemDiv);
@@ -706,6 +855,35 @@ function renderMenu() {
     
     menuContainer.appendChild(categoryDiv);
   }
+  
+  // Render bảng menu quản lý
+  renderMenuTable();
+}
+
+function renderMenuTable() {
+  const tbody = document.getElementById("menuTableBody");
+  tbody.innerHTML = "";
+  
+  if (menuItems.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="empty-state">
+      <i class="fas fa-concierge-bell"></i><br>Chưa có món nào trong menu
+    </td></tr>`;
+    return;
+  }
+  
+  menuItems.forEach((item, index) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${item.name}</td>
+      <td>${item.category}</td>
+      <td>${item.price.toLocaleString()}đ</td>
+      <td>
+        <button onclick="openEditMenuItemModal(${index})" class="edit"><i class="fas fa-edit"></i></button>
+        <button onclick="deleteMenuItem(${index})" class="delete"><i class="fas fa-trash"></i></button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
 function renderCategoryFilter() {
