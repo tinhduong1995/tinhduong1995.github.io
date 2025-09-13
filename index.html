@@ -292,7 +292,7 @@
     /* Styles for the main menu */
     .main-menu {
       margin-top: 20px;
-      max-height: 500px;
+      max-height: 400px; /* Giảm chiều cao để tiết kiệm không gian */
       overflow-y: auto;
       padding: 15px;
       background-color: #f9f9f9;
@@ -309,6 +309,29 @@
       padding-bottom: 5px;
       border-bottom: 1px solid #ddd;
       margin-bottom: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .menu-category h3 .toggle-icon {
+      font-size: 0.8rem;
+      transition: transform 0.3s;
+    }
+    
+    .menu-category.collapsed h3 .toggle-icon {
+      transform: rotate(-90deg);
+    }
+    
+    .menu-category-content {
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      max-height: 1000px;
+    }
+    
+    .menu-category.collapsed .menu-category-content {
+      max-height: 0;
     }
     
     .menu-item {
@@ -422,6 +445,66 @@
     .menu-table tr:nth-child(even) {
       background-color: #f9f9f9;
     }
+    
+    /* Scrollable menu container */
+    .scrollable-menu-container {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 10px;
+      background-color: #f9f9f9;
+    }
+    
+    /* Compact menu item */
+    .compact-menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 5px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .compact-menu-item:hover {
+      background-color: #f0f0f0;
+    }
+    
+    .compact-menu-item:last-child {
+      border-bottom: none;
+    }
+    
+    .compact-item-name {
+      flex-grow: 1;
+      font-size: 0.9rem;
+    }
+    
+    .compact-item-price {
+      color: var(--primary);
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin: 0 5px;
+    }
+    
+    .compact-add-btn {
+      padding: 3px 8px;
+      font-size: 0.7rem;
+      border-radius: 3px;
+    }
+    
+    /* Toggle menu view button */
+    .toggle-menu-view {
+      display: block;
+      text-align: center;
+      margin: 10px 0;
+      padding: 5px;
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -454,7 +537,7 @@
               <option value="SODA">SODA</option>
               <option value="SINH TỐ">SINH TỐ</option>
               <option value="ĐÁ XAY">ĐÁ XAY</option>
-              <option value="CÀ PHÊ">CÀ PHÊ</option>
+              <option value="CÀ PHê">CÀ PHÊ</option>
               <option value="TRÀ SỮA">TRÀ SỮA</option>
               <option value="SỮA CHUA">SỮA CHUA</option>
               <option value="NƯỚC ÉP">NƯỚC ÉP</option>
@@ -471,19 +554,21 @@
       </div>
       
       <!-- Bảng menu -->
-      <table class="menu-table">
-        <thead>
-          <tr>
-            <th>Tên món</th>
-            <th>Danh mục</th>
-            <th>Giá</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody id="menuTableBody">
-          <!-- Menu items will be inserted here -->
-        </tbody>
-      </table>
+      <div class="scrollable-menu-container">
+        <table class="menu-table">
+          <thead>
+            <tr>
+              <th>Tên món</th>
+              <th>Danh mục</th>
+              <th>Giá</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="menuTableBody">
+            <!-- Menu items will be inserted here -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Giỏ hàng -->
@@ -498,9 +583,16 @@
         <!-- Categories will be inserted here -->
       </div>
       
-      <div class="main-menu" id="mainMenu">
-        <!-- Các món sẽ được thêm ở đây bằng JavaScript -->
+      <!-- Menu dạng cuộn -->
+      <div class="scrollable-menu-container">
+        <div id="mainMenu">
+          <!-- Các món sẽ được thêm ở đây bằng JavaScript -->
+        </div>
       </div>
+      
+      <button class="toggle-menu-view" onclick="toggleMenuView()">
+        <i class="fas fa-exchange-alt"></i> Chuyển chế độ xem
+      </button>
       
       <table id="cartTable">
         <thead>
@@ -532,21 +624,23 @@
           <option value="lowest">Giá thấp nhất</option>
         </select>
       </div>
-      <table id="orderTable">
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>Chi tiết món</th>
-            <th>Ghi chú</th>
-            <th>Tổng tiền</th>
-            <th>Thời gian</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Orders will be inserted here -->
-        </tbody>
-      </table>
+      <div class="scrollable-menu-container">
+        <table id="orderTable">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Chi tiết món</th>
+              <th>Ghi chú</th>
+              <th>Tổng tiền</th>
+              <th>Thời gian</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Orders will be inserted here -->
+          </tbody>
+        </table>
+      </div>
       <div class="cart-total" id="filterTotal">Tổng các đơn đã lọc: 0đ</div>
     </div>
 
@@ -783,6 +877,7 @@ let currentEditOrderIndex = -1;
 let currentEditMenuItemIndex = -1;
 let currentCategory = "TẤT CẢ";
 let currentStatsDate = "all";
+let compactMenuView = false;
 
 // Khởi tạo dữ liệu
 function initializeData() {
@@ -818,6 +913,17 @@ function renderMenu() {
   const menuContainer = document.getElementById("mainMenu");
   menuContainer.innerHTML = "";
   
+  if (compactMenuView) {
+    renderCompactMenu(menuContainer);
+  } else {
+    renderCategorizedMenu(menuContainer);
+  }
+  
+  // Render bảng menu quản lý
+  renderMenuTable();
+}
+
+function renderCategorizedMenu(container) {
   // Nhóm các món theo danh mục
   const categories = {};
   menuItems.forEach(item => {
@@ -835,29 +941,59 @@ function renderMenu() {
     
     const categoryDiv = document.createElement("div");
     categoryDiv.className = "menu-category";
-    categoryDiv.innerHTML = `<h3>${category}</h3>`;
+    categoryDiv.innerHTML = `
+      <h3>
+        <span>${category}</span>
+        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+      </h3>
+      <div class="menu-category-content">
+        ${categories[category].map(item => `
+          <div class="menu-item">
+            <div class="menu-item-name">${item.name}</div>
+            <div class="menu-item-price">${item.price.toLocaleString()}đ</div>
+            <button class="add-item-btn" onclick="addToCartFromMenu('${item.name}', ${item.price})">
+              <i class="fas fa-cart-plus"></i> Thêm vào đơn
+            </button>
+          </div>
+        `).join('')}
+      </div>
+    `;
     
-    categories[category].forEach((item, index) => {
-      const originalIndex = menuItems.findIndex(m => m.id === item.id);
-      const itemDiv = document.createElement("div");
-      itemDiv.className = "menu-item";
-      itemDiv.innerHTML = `
-        <div class="menu-item-name">${item.name}</div>
-        <div class="menu-item-price">${item.price.toLocaleString()}đ</div>
-        <div>
-          <button class="add-item-btn" onclick="addToCartFromMenu('${item.name}', ${item.price})">
-            <i class="fas fa-cart-plus"></i> Thêm vào đơn
-          </button>
-        </div>
-      `;
-      categoryDiv.appendChild(itemDiv);
-    });
+    // Thêm sự kiện click để thu gọn/mở rộng danh mục
+    const header = categoryDiv.querySelector('h3');
+    header.onclick = () => {
+      categoryDiv.classList.toggle('collapsed');
+    };
     
-    menuContainer.appendChild(categoryDiv);
+    container.appendChild(categoryDiv);
+  }
+}
+
+function renderCompactMenu(container) {
+  // Lọc các món theo danh mục nếu cần
+  let filteredItems = menuItems;
+  if (currentCategory !== "TẤT CẢ") {
+    filteredItems = menuItems.filter(item => item.category === currentCategory);
   }
   
-  // Render bảng menu quản lý
-  renderMenuTable();
+  // Hiển thị tất cả các món trong một danh sách thu gọn
+  filteredItems.forEach(item => {
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "compact-menu-item";
+    itemDiv.innerHTML = `
+      <div class="compact-item-name">${item.name}</div>
+      <div class="compact-item-price">${item.price.toLocaleString()}đ</div>
+      <button class="compact-add-btn" onclick="addToCartFromMenu('${item.name}', ${item.price})">
+        <i class="fas fa-plus"></i>
+      </button>
+    `;
+    container.appendChild(itemDiv);
+  });
+}
+
+function toggleMenuView() {
+  compactMenuView = !compactMenuView;
+  renderMenu();
 }
 
 function renderMenuTable() {
