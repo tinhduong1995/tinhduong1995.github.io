@@ -288,6 +288,102 @@
       margin-bottom: 10px;
       align-items: center;
     }
+    
+    .hidden-menu-container {
+      margin-top: 20px;
+      border-top: 1px dashed #ccc;
+      padding-top: 15px;
+    }
+    
+    .toggle-hidden-menu {
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px;
+    }
+    
+    .hidden-menu {
+      display: none;
+      margin-top: 10px;
+    }
+    
+    .hidden-menu.show {
+      display: block;
+    }
+    
+    .hidden-menu-item {
+      display: inline-block;
+      background-color: #f0f0f0;
+      padding: 5px 10px;
+      border-radius: 15px;
+      margin: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .hidden-menu-item:hover {
+      background-color: var(--accent);
+      color: white;
+    }
+    
+    /* Styles for the full hidden menu */
+    .full-hidden-menu {
+      display: none;
+      margin-top: 20px;
+      max-height: 500px;
+      overflow-y: auto;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      border: 1px solid #eee;
+    }
+    
+    .full-hidden-menu.show {
+      display: block;
+    }
+    
+    .menu-category {
+      margin-bottom: 20px;
+    }
+    
+    .menu-category h3 {
+      color: var(--primary);
+      padding-bottom: 5px;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 10px;
+    }
+    
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dotted #eee;
+    }
+    
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+    
+    .menu-item-name {
+      flex-grow: 1;
+    }
+    
+    .menu-item-price {
+      color: var(--primary);
+      font-weight: bold;
+      margin: 0 10px;
+    }
+    
+    .add-item-btn {
+      padding: 5px 10px;
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
@@ -313,6 +409,16 @@
           <!-- Menu items will be inserted here -->
         </tbody>
       </table>
+      
+      <!-- Menu ẩn có sẵn -->
+      <div class="hidden-menu-container">
+        <button class="toggle-hidden-menu" onclick="toggleHiddenMenu()">
+          <i class="fas fa-chevron-down"></i> Menu có sẵn
+        </button>
+        <div class="full-hidden-menu" id="fullHiddenMenu">
+          <!-- Các món có sẵn sẽ được thêm ở đây bằng JavaScript -->
+        </div>
+      </div>
     </div>
 
     <!-- Giỏ hàng -->
@@ -428,6 +534,128 @@
   <div class="notification" id="notification"></div>
 
 <script>
+// Menu có sẵn ẩn với tất cả các món
+const hiddenMenuItems = [
+  // TRÀ
+  { name: "Trà chanh", price: 10000, category: "TRÀ" },
+  { name: "Trà chanh nha đam", price: 15000, category: "TRÀ" },
+  { name: "Trà quất", price: 10000, category: "TRÀ" },
+  { name: "Trà quất nha đam", price: 15000, category: "TRÀ" },
+  { name: "Trà dưa lưới", price: 20000, category: "TRÀ" },
+  { name: "Trà đào", price: 20000, category: "TRÀ" },
+  { name: "Trà đào cam xả", price: 25000, category: "TRÀ" },
+  { name: "Trà quất lắc sữa", price: 25000, category: "TRÀ" },
+  { name: "Trà táo xanh", price: 25000, category: "TRÀ" },
+  { name: "Trà vải", price: 25000, category: "TRÀ" },
+  { name: "Trà dâu", price: 25000, category: "TRÀ" },
+  { name: "Trà hoa quả nhiệt đới", price: 25000, category: "TRÀ" },
+  { name: "Trà chanh bạc hà", price: 20000, category: "TRÀ" },
+  { name: "Trà chanh dâu", price: 20000, category: "TRÀ" },
+  { name: "Trà xoài chanh leo", price: 20000, category: "TRÀ" },
+  { name: "Trà đào chanh dây", price: 20000, category: "TRÀ" },
+  { name: "Trà đào nhài", price: 20000, category: "TRÀ" },
+  { name: "Trà chanh leo", price: 20000, category: "TRÀ" },
+  
+  // SODA
+  { name: "Soda việt quất", price: 20000, category: "SODA" },
+  { name: "Soda bạc hà", price: 20000, category: "SODA" },
+  { name: "Soda dâu", price: 20000, category: "SODA" },
+  { name: "Soda dưa lưới", price: 20000, category: "SODA" },
+  
+  // SINH TỐ
+  { name: "Sinh tố bơ", price: 30000, category: "SINH TỐ" },
+  { name: "Sinh tố xoài", price: 30000, category: "SINH TỐ" },
+  { name: "Sinh tố dâu tây", price: 30000, category: "SINH TỐ" },
+  
+  // ĐÁ XAY
+  { name: "Đá xay việt quất", price: 35000, category: "ĐÁ XAY" },
+  { name: "Đá xay matcha", price: 35000, category: "ĐÁ XAY" },
+  { name: "Đá xay bạc hà", price: 35000, category: "ĐÁ XAY" },
+  { name: "Đá xay khoai môn", price: 35000, category: "ĐÁ XAY" },
+  
+  // CÀ PHÊ
+  { name: "Cà phê bạc xỉu", price: 25000, category: "CÀ PHÊ" },
+  { name: "Cà phê nâu sữa", price: 20000, category: "CÀ PHÊ" },
+  { name: "Cà phê nâu nóng", price: 20000, category: "CÀ PHÊ" },
+  
+  // TRÀ SỮA
+  { name: "Trà sữa khoai môn", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa sốt xoài", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa socola", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa matcha", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa dưa lưới", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa hồng trà sữa", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa dâu", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa đào", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa dừa", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa lá nếp", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa táo xanh", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa caramen", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa hạt dẻ", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa cacao", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa việt quất", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa matcha latte", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa bạc hà", price: 25000, category: "TRÀ SỮA" },
+  { name: "Trà sữa khoai lang tím", price: 30000, category: "TRÀ SỮA" },
+  { name: "Trà sữa trân châu đường đen", price: 30000, category: "TRÀ SỮA" },
+  { name: "Trà sữa kem trứng dừa nướng", price: 30000, category: "TRÀ SỮA" },
+  { name: "Trà sữa sốt xoài kem bông", price: 30000, category: "TRÀ SỮA" },
+  { name: "Trà sữa xoài matcha", price: 30000, category: "TRÀ SỮA" },
+  { name: "Trà sữa khoai môn kem dừa nướng", price: 30000, category: "TRÀ SỮA" },
+  { name: "Trà sữa đường đen kem dừa nướng", price: 30000, category: "TRÀ SỮA" },
+  { name: "Trà sữa khoai lang tím kem trứng", price: 35000, category: "TRÀ SỮA" },
+  
+  // SỮA CHUA
+  { name: "Sữa chua lắc dâu", price: 25000, category: "SỮA CHUA" },
+  { name: "Sữa chua lắc xoài", price: 25000, category: "SỮA CHUA" },
+  { name: "Sữa chua lắc việt quất", price: 25000, category: "SỮA CHUA" },
+  { name: "Sữa chua hoa quả", price: 30000, category: "SỮA CHUA" },
+  
+  // NƯỚC ÉP
+  { name: "Nước ép cam", price: 25000, category: "NƯỚC ÉP" },
+  { name: "Nước ép dưa hấu", price: 25000, category: "NƯỚC ÉP" },
+  { name: "Nước ép dứa", price: 25000, category: "NƯỚC ÉP" },
+  
+  // PIZZA
+  { name: "Pizza xúc xích", price: 60000, category: "PIZZA" },
+  { name: "Pizza bò ngô", price: 60000, category: "PIZZA" },
+  { name: "Pizza thập cẩm", price: 60000, category: "PIZZA" },
+  
+  // ĐỒ ĂN VẶT
+  { name: "Xúc xích", price: 8000, category: "ĐỒ ĂN VẶT" },
+  { name: "Lạp xưởng", price: 8000, category: "ĐỒ ĂN VẶT" },
+  { name: "Phô mai que", price: 8000, category: "ĐỒ ĂN VẶT" },
+  { name: "Hướng dương đen", price: 15000, category: "ĐỒ ĂN VẶT" },
+  { name: "Hướng dương trắng", price: 15000, category: "ĐỒ ĂN VẶT" },
+  { name: "Khoai lang kén", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { name: "Khoai tây chiên", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { name: "Nem chua rán", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { name: "Khoai môn lệ phố", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { name: "Mực vòng chiên", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { name: "Gà viên chiên", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { name: "Gà viên chiên sốt cay", price: 35000, category: "ĐỒ ĂN VẶT" },
+  { name: "Đùi gà KFC", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { name: "Đùi gà KFC sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { name: "Cánh gà KFC", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { name: "Cánh gà KFC sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { name: "Cá viên chiên", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { name: "Cá viên chiên sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
+  
+  // MỲ CAY
+  { name: "Mỳ cay xúc xích", price: 40000, category: "MỲ CAY" },
+  { name: "Mỳ cay bò", price: 45000, category: "MỲ CAY" },
+  { name: "Mỳ cay sườn sụn", price: 45000, category: "MỲ CAY" },
+  { name: "Mỳ cay hải sản", price: 50000, category: "MỲ CAY" },
+  { name: "Mỳ cay thập cẩm", price: 55000, category: "MỲ CAY" },
+  
+  // BÚN ĐẬU
+  { name: "Bún đậu đầy đủ", price: 35000, category: "BÚN ĐẬU" },
+  { name: "Bún đậu thêm bún", price: 40000, category: "BÚN ĐẬU" },
+  { name: "Bún đậu thêm đậu", price: 40000, category: "BÚN ĐẬU" },
+  { name: "Bún đậu thêm chả cốm", price: 45000, category: "BÚN ĐẬU" },
+  { name: "Bún đậu thêm dồi sụn", price: 45000, category: "BÚN ĐẬU" }
+];
+
 let menu = JSON.parse(localStorage.getItem("menu")) || [];
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
 let cart = [];
@@ -457,35 +685,107 @@ function renderMenu() {
     tbody.innerHTML = `<tr><td colspan="3" class="empty-state">
       <i class="fas fa-concierge-bell"></i><br>Chưa có món nào trong menu
     </td></tr>`;
-    return;
+  } else {
+    menu.forEach((m, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${m.name}</td>
+        <td>${m.price.toLocaleString()}đ</td>
+        <td>
+          <button onclick="editMenuItem(${i})" class="edit"><i class="fas fa-edit"></i></button>
+          <button onclick="deleteMenuItem(${i})" class="delete"><i class="fas fa-trash"></i></button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
   }
-  
-  menu.forEach((m, i) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${m.name}</td>
-      <td>${m.price.toLocaleString()}đ</td>
-      <td>
-        <button onclick="editMenuItem(${i})" class="edit"><i class="fas fa-edit"></i></button>
-        <button onclick="deleteMenuItem(${i})" class="delete"><i class="fas fa-trash"></i></button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
 
-  // update select
+  // Cập nhật select menu
+  updateMenuSelects();
+  
+  // Cập nhật menu ẩn
+  renderFullHiddenMenu();
+}
+
+function updateMenuSelects() {
+  // Update main menu select
   const select = document.getElementById("menuSelect");
   select.innerHTML = "";
   menu.forEach((m, i) => {
     select.innerHTML += `<option value="${i}">${m.name} - ${m.price.toLocaleString()}đ</option>`;
   });
   
-  // update edit select
+  // Update edit menu select
   const editSelect = document.getElementById("editMenuSelect");
   editSelect.innerHTML = "";
   menu.forEach((m, i) => {
     editSelect.innerHTML += `<option value="${i}">${m.name} - ${m.price.toLocaleString()}đ</option>`;
   });
+}
+
+function renderFullHiddenMenu() {
+  const hiddenMenuContainer = document.getElementById("fullHiddenMenu");
+  hiddenMenuContainer.innerHTML = "";
+  
+  // Nhóm các món theo danh mục
+  const categories = {};
+  hiddenMenuItems.forEach(item => {
+    if (!categories[item.category]) {
+      categories[item.category] = [];
+    }
+    categories[item.category].push(item);
+  });
+  
+  // Tạo HTML cho từng danh mục
+  for (const category in categories) {
+    const categoryDiv = document.createElement("div");
+    categoryDiv.className = "menu-category";
+    categoryDiv.innerHTML = `<h3>${category}</h3>`;
+    
+    categories[category].forEach(item => {
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "menu-item";
+      itemDiv.innerHTML = `
+        <div class="menu-item-name">${item.name}</div>
+        <div class="menu-item-price">${item.price.toLocaleString()}đ</div>
+        <button class="add-item-btn" onclick="addHiddenMenuItemToMenu('${item.name}', ${item.price})">
+          <i class="fas fa-plus"></i> Thêm vào menu
+        </button>
+      `;
+      categoryDiv.appendChild(itemDiv);
+    });
+    
+    hiddenMenuContainer.appendChild(categoryDiv);
+  }
+}
+
+function toggleHiddenMenu() {
+  const hiddenMenu = document.getElementById("fullHiddenMenu");
+  const toggleBtn = document.querySelector(".toggle-hidden-menu");
+  
+  hiddenMenu.classList.toggle("show");
+  
+  if (hiddenMenu.classList.contains("show")) {
+    toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Ẩn menu có sẵn';
+  } else {
+    toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> Hiện menu có sẵn';
+  }
+}
+
+function addHiddenMenuItemToMenu(name, price) {
+  // Kiểm tra xem món đã có trong menu chưa
+  const exists = menu.some(m => m.name === name);
+  
+  if (exists) {
+    showNotification(`"${name}" đã có trong menu!`, true);
+    return;
+  }
+  
+  // Thêm món vào menu
+  menu.push({name, price});
+  saveData();
+  renderMenu();
+  showNotification(`Đã thêm "${name}" vào menu!`);
 }
 
 function addMenuItem() {
@@ -826,6 +1126,14 @@ function renderStats() {
 }
 
 // ====== INIT ======
+// Thêm menu ẩn vào menu chính nếu chưa có
+hiddenMenuItems.forEach(item => {
+  if (!menu.some(m => m.name === item.name)) {
+    menu.push(item);
+  }
+});
+
+saveData();
 renderMenu();
 renderOrders();
 renderStats();
