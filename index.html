@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản lý đơn hàng - Bii Coffee</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Thêm thư viện html2canvas để chụp ảnh bill -->
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
     :root {
@@ -525,7 +524,7 @@
       max-width: 400px;
       margin: 0 auto;
       font-family: 'Courier New', monospace;
-      color: #000000; /* Chữ màu đen */
+      color: #000000;
     }
     
     .bill-header {
@@ -533,36 +532,36 @@
       margin-bottom: 15px;
       border-bottom: 2px dashed #ddd;
       padding-bottom: 10px;
-      color: #000000; /* Chữ màu đen */
+      color: #000000;
     }
     
     .bill-title {
       font-size: 1.5rem;
       font-weight: bold;
-      color: #000000; /* Chữ màu đen */
+      color: #000000;
     }
     
     .bill-subtitle {
       font-size: 0.9rem;
-      color: #000000; /* Chữ màu đen */
+      color: #000000;
     }
     
     .bill-info {
       margin-bottom: 15px;
-      color: #000000; /* Chữ màu đen */
+      color: #000000;
     }
     
     .bill-info p {
       margin: 5px 0;
       font-size: 0.9rem;
-      color: #000000; /* Chữ màu đen */
+      color: #000000;
     }
     
     .bill-items {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 15px;
-      color: #000000; /* Chữ màu đen */
+      color: #000000;
     }
     
     .bill-items th {
@@ -570,7 +569,7 @@
       padding: 8px 5px;
       text-align: left;
       font-size: 0.9rem;
-      color: #000000; /* Chữ màu đen */
+      color: #000000;
       border-bottom: 1px solid #000000;
     }
     
@@ -578,7 +577,7 @@
       padding: 6px 5px;
       border-bottom: 1px dashed #000000;
       font-size: 0.85rem;
-      color: #000000; /* Chữ màu đen */
+      color: #000000;
     }
     
     .bill-total {
@@ -588,14 +587,40 @@
       padding-top: 10px;
       border-top: 2px dashed #000000;
       font-size: 1.1rem;
-      color: #000000; /* Chữ màu đen */
+      color: #000000;
     }
     
     .bill-footer {
       text-align: center;
       margin-top: 15px;
       font-size: 0.8rem;
-      color: #000000; /* Chữ màu đen */
+      color: #000000;
+    }
+
+    /* Thêm style cho hướng dẫn */
+    .save-instructions {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 15px 0;
+      font-size: 0.85rem;
+      color: #495057;
+    }
+
+    .save-instructions h4 {
+      margin: 0 0 8px 0;
+      color: #000000;
+      font-size: 0.9rem;
+    }
+
+    .save-instructions ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .save-instructions li {
+      margin-bottom: 5px;
     }
     
     /* Mobile-specific styles */
@@ -918,14 +943,31 @@
         <div id="billPreview" class="bill-preview">
           <!-- Bill content will be inserted here -->
         </div>
+
+        <!-- Hướng dẫn lưu ảnh trên mobile -->
+        <div class="save-instructions">
+          <h4><i class="fas fa-info-circle"></i> Hướng dẫn lưu ảnh:</h4>
+          <ol>
+            <li>Nhấn "Tạo ảnh bill" để tạo ảnh</li>
+            <li>Nhấn giữ vào ảnh bill bên dưới</li>
+            <li>Chọn "Lưu ảnh" hoặc "Tải ảnh xuống"</li>
+            <li>Ảnh sẽ được lưu vào thư viện ảnh của bạn</li>
+          </ol>
+        </div>
         
         <div class="flex" style="margin-top: 15px; justify-content: space-between;">
-          <button onclick="saveBillToGallery()" class="info">
-            <i class="fas fa-image"></i> Lưu ảnh
+          <button onclick="generateBillImage()" class="info">
+            <i class="fas fa-image"></i> Tạo ảnh bill
           </button>
           <button onclick="shareBill()" class="success">
-            <i class="fas fa-share-alt"></i> Chia sẻ
+            <i class="fas fa-share-alt"></i> Chia sẻ ngay
           </button>
+        </div>
+
+        <!-- Nơi hiển thị ảnh bill để người dùng có thể nhấn giữ để lưu -->
+        <div id="billImageContainer" style="display: none; margin-top: 15px; text-align: center;">
+          <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">Nhấn giữ vào ảnh để lưu:</p>
+          <img id="billImage" src="" alt="Bill Bii Coffee" style="max-width: 100%; border: 1px solid #ddd; border-radius: 5px;">
         </div>
       </div>
     </div>
@@ -1662,6 +1704,9 @@ function showBill(orderIndex) {
     </div>
   `;
   
+  // Ẩn container ảnh khi mới mở modal
+  document.getElementById("billImageContainer").style.display = "none";
+  
   // Show bill modal
   document.getElementById("billModal").style.display = "flex";
 }
@@ -1670,35 +1715,32 @@ function closeBillModal() {
   document.getElementById("billModal").style.display = "none";
 }
 
-function saveBillToGallery() {
+function generateBillImage() {
   const billElement = document.getElementById("billPreview");
   
   html2canvas(billElement, {
-    scale: 2, // Tăng độ phân giải
+    scale: 2,
     useCORS: true,
     logging: false,
-    backgroundColor: '#ffffff' // Đảm bảo nền trắng
+    backgroundColor: '#ffffff'
   }).then(canvas => {
-    // Chuyển canvas thành blob
-    canvas.toBlob(blob => {
-      // Tạo URL từ blob
-      const imageUrl = URL.createObjectURL(blob);
-      
-      // Tạo thẻ a để tải ảnh
-      const link = document.createElement('a');
-      link.href = imageUrl;
-      link.download = `bill-bii-coffee-${currentBillOrder.id}.png`;
-      
-      // Tạo sự kiện click để tải ảnh
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Giải phóng URL
-      setTimeout(() => URL.revokeObjectURL(imageUrl), 100);
-      
-      showNotification("Đã lưu bill thành ảnh vào thư viện!");
-    }, 'image/png');
+    // Chuyển canvas thành data URL
+    const imageDataUrl = canvas.toDataURL('image/png');
+    
+    // Hiển thị ảnh để người dùng có thể nhấn giữ để lưu
+    const billImage = document.getElementById("billImage");
+    const billImageContainer = document.getElementById("billImageContainer");
+    
+    billImage.src = imageDataUrl;
+    billImageContainer.style.display = "block";
+    
+    // Thêm thuộc tính download để hỗ trợ một số trình duyệt
+    billImage.setAttribute('download', `bill-bii-coffee-${currentBillOrder.id}.png`);
+    
+    // Cuộn xuống để hiển thị ảnh
+    billImageContainer.scrollIntoView({ behavior: 'smooth' });
+    
+    showNotification("Đã tạo ảnh bill! Nhấn giữ vào ảnh để lưu.");
   }).catch(error => {
     console.error("Lỗi khi tạo bill:", error);
     showNotification("Có lỗi xảy ra khi tạo bill!", true);
@@ -1729,16 +1771,16 @@ function shareBill() {
             showNotification("Đã chia sẻ bill thành công!");
           }).catch(error => {
             console.error("Lỗi khi chia sẻ:", error);
-            // Fallback: Lưu ảnh nếu không thể chia sẻ
-            saveBillToGallery();
+            // Fallback: Tạo ảnh để người dùng tự lưu
+            generateBillImage();
           });
         } else {
-          // Fallback: Lưu ảnh nếu không thể chia sẻ
-          saveBillToGallery();
+          // Fallback: Tạo ảnh để người dùng tự lưu
+          generateBillImage();
         }
       } else {
-        // Fallback: Lưu ảnh nếu trình duyệt không hỗ trợ Web Share API
-        saveBillToGallery();
+        // Fallback: Tạo ảnh để người dùng tự lưu
+        generateBillImage();
       }
     });
   }).catch(error => {
