@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản lý đơn hàng - Bii Coffee</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Thêm thư viện html2canvas để chụp ảnh bill -->
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
     :root {
       --primary: #6f4e37;
@@ -125,6 +127,10 @@
     
     button.success {
       background-color: var(--success);
+    }
+    
+    button.info {
+      background-color: #17a2b8;
     }
     
     table {
@@ -510,6 +516,79 @@
       width: 100%;
     }
     
+    /* Bill preview styles */
+    .bill-preview {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: 0 auto;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .bill-header {
+      text-align: center;
+      margin-bottom: 15px;
+      border-bottom: 2px dashed #ddd;
+      padding-bottom: 10px;
+    }
+    
+    .bill-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .bill-subtitle {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .bill-info {
+      margin-bottom: 15px;
+    }
+    
+    .bill-info p {
+      margin: 5px 0;
+      font-size: 0.9rem;
+    }
+    
+    .bill-items {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+    
+    .bill-items th {
+      background-color: #f5f5f5;
+      padding: 8px 5px;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    
+    .bill-items td {
+      padding: 6px 5px;
+      border-bottom: 1px dashed #eee;
+      font-size: 0.85rem;
+    }
+    
+    .bill-total {
+      text-align: right;
+      font-weight: bold;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 2px dashed #ddd;
+      font-size: 1.1rem;
+    }
+    
+    .bill-footer {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.8rem;
+      color: #666;
+    }
+    
     /* Mobile-specific styles */
     @media (min-width: 768px) {
       body {
@@ -819,6 +898,30 @@
     </div>
   </div>
 
+  <!-- Modal xem và xuất bill -->
+  <div id="billModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Hóa đơn đơn hàng</h2>
+        <span class="close" onclick="closeBillModal()">&times;</span>
+      </div>
+      <div>
+        <div id="billPreview" class="bill-preview">
+          <!-- Bill content will be inserted here -->
+        </div>
+        
+        <div class="flex" style="margin-top: 15px; justify-content: space-between;">
+          <button onclick="downloadBill()" class="info">
+            <i class="fas fa-download"></i> Tải bill
+          </button>
+          <button onclick="shareBill()" class="success">
+            <i class="fas fa-share-alt"></i> Chia sẻ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="notification" id="notification"></div>
 
 <script>
@@ -952,6 +1055,7 @@ let currentCategory = "TẤT CẢ";
 let currentMenuManagementCategory = "TẤT CẢ";
 let currentStatsDate = "all";
 let compactMenuView = false;
+let currentBillOrder = null;
 
 // Khởi tạo dữ liệu
 function initializeData() {
@@ -1401,6 +1505,7 @@ function renderOrders() {
       <td>${o.total.toLocaleString()}đ</td>
       <td>
         <button onclick="openEditModal(${originalIndex})" class="edit"><i class="fas fa-edit"></i></button>
+        <button onclick="showBill(${originalIndex})" class="info"><i class="fas fa-receipt"></i></button>
         <button onclick="deleteOrder(${originalIndex})" class="delete"><i class="fas fa-trash"></i></button>
       </td>
     `;
@@ -1496,6 +1601,125 @@ function deleteOrder(i) {
     renderStats();
     showNotification("Đã xóa đơn hàng!");
   }
+}
+
+// ====== BILL EXPORT ======
+function showBill(orderIndex) {
+  currentBillOrder = orders[orderIndex];
+  
+  // Render bill preview
+  const billPreview = document.getElementById("billPreview");
+  billPreview.innerHTML = `
+    <div class="bill-header">
+      <div class="bill-title">BII COFFEE</div>
+      <div class="bill-subtitle">Địa chỉ: 123 Đường ABC, Quận XYZ</div>
+      <div class="bill-subtitle">Điện thoại: 0123 456 789</div>
+    </div>
+    
+    <div class="bill-info">
+      <p><strong>Mã đơn hàng:</strong> #${currentBillOrder.id}</p>
+      <p><strong>Thời gian:</strong> ${currentBillOrder.time}</p>
+      <p><strong>Ghi chú:</strong> ${currentBillOrder.note || "Không có"}</p>
+    </div>
+    
+    <table class="bill-items">
+      <thead>
+        <tr>
+          <th>Tên món</th>
+          <th>SL</th>
+          <th>Đơn giá</th>
+          <th>Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${currentBillOrder.items.map(item => `
+          <tr>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>${item.price.toLocaleString()}đ</td>
+            <td>${(item.price * item.qty).toLocaleString()}đ</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    
+    <div class="bill-total">
+      Tổng cộng: ${currentBillOrder.total.toLocaleString()}đ
+    </div>
+    
+    <div class="bill-footer">
+      <p>Cảm ơn quý khách!</p>
+      <p>Hẹn gặp lại!</p>
+    </div>
+  `;
+  
+  // Show bill modal
+  document.getElementById("billModal").style.display = "flex";
+}
+
+function closeBillModal() {
+  document.getElementById("billModal").style.display = "none";
+}
+
+function downloadBill() {
+  const billElement = document.getElementById("billPreview");
+  
+  html2canvas(billElement, {
+    scale: 2, // Tăng độ phân giải
+    useCORS: true,
+    logging: false
+  }).then(canvas => {
+    // Tạo link tải xuống
+    const link = document.createElement('a');
+    link.download = `bill-bii-coffee-${currentBillOrder.id}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    
+    showNotification("Đã tải bill thành công!");
+  }).catch(error => {
+    console.error("Lỗi khi tạo bill:", error);
+    showNotification("Có lỗi xảy ra khi tạo bill!", true);
+  });
+}
+
+function shareBill() {
+  const billElement = document.getElementById("billPreview");
+  
+  html2canvas(billElement, {
+    scale: 2,
+    useCORS: true,
+    logging: false
+  }).then(canvas => {
+    // Chuyển canvas thành blob để chia sẻ
+    canvas.toBlob(blob => {
+      if (navigator.share && navigator.canShare) {
+        // Sử dụng Web Share API nếu trình duyệt hỗ trợ
+        const file = new File([blob], `bill-bii-coffee-${currentBillOrder.id}.png`, { type: 'image/png' });
+        
+        if (navigator.canShare({ files: [file] })) {
+          navigator.share({
+            title: `Hóa đơn Bii Coffee #${currentBillOrder.id}`,
+            text: `Hóa đơn đơn hàng #${currentBillOrder.id} từ Bii Coffee`,
+            files: [file]
+          }).then(() => {
+            showNotification("Đã chia sẻ bill thành công!");
+          }).catch(error => {
+            console.error("Lỗi khi chia sẻ:", error);
+            showNotification("Có lỗi xảy ra khi chia sẻ!", true);
+          });
+        } else {
+          // Fallback: Tải xuống nếu không thể chia sẻ
+          downloadBill();
+        }
+      } else {
+        // Fallback: Tải xuống nếu trình duyệt không hỗ trợ Web Share API
+        downloadBill();
+      }
+    });
+  }).catch(error => {
+    console.error("Lỗi khi tạo bill:", error);
+    showNotification("Có lỗi xảy ra khi tạo bill!", true);
+  });
 }
 
 // ====== STATS ======
