@@ -525,6 +525,7 @@
       max-width: 400px;
       margin: 0 auto;
       font-family: 'Courier New', monospace;
+      color: #000000; /* Chữ màu đen */
     }
     
     .bill-header {
@@ -532,32 +533,36 @@
       margin-bottom: 15px;
       border-bottom: 2px dashed #ddd;
       padding-bottom: 10px;
+      color: #000000; /* Chữ màu đen */
     }
     
     .bill-title {
       font-size: 1.5rem;
       font-weight: bold;
-      color: var(--primary);
+      color: #000000; /* Chữ màu đen */
     }
     
     .bill-subtitle {
       font-size: 0.9rem;
-      color: #666;
+      color: #000000; /* Chữ màu đen */
     }
     
     .bill-info {
       margin-bottom: 15px;
+      color: #000000; /* Chữ màu đen */
     }
     
     .bill-info p {
       margin: 5px 0;
       font-size: 0.9rem;
+      color: #000000; /* Chữ màu đen */
     }
     
     .bill-items {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 15px;
+      color: #000000; /* Chữ màu đen */
     }
     
     .bill-items th {
@@ -565,12 +570,15 @@
       padding: 8px 5px;
       text-align: left;
       font-size: 0.9rem;
+      color: #000000; /* Chữ màu đen */
+      border-bottom: 1px solid #000000;
     }
     
     .bill-items td {
       padding: 6px 5px;
-      border-bottom: 1px dashed #eee;
+      border-bottom: 1px dashed #000000;
       font-size: 0.85rem;
+      color: #000000; /* Chữ màu đen */
     }
     
     .bill-total {
@@ -578,15 +586,16 @@
       font-weight: bold;
       margin-top: 10px;
       padding-top: 10px;
-      border-top: 2px dashed #ddd;
+      border-top: 2px dashed #000000;
       font-size: 1.1rem;
+      color: #000000; /* Chữ màu đen */
     }
     
     .bill-footer {
       text-align: center;
       margin-top: 15px;
       font-size: 0.8rem;
-      color: #666;
+      color: #000000; /* Chữ màu đen */
     }
     
     /* Mobile-specific styles */
@@ -911,8 +920,8 @@
         </div>
         
         <div class="flex" style="margin-top: 15px; justify-content: space-between;">
-          <button onclick="downloadBill()" class="info">
-            <i class="fas fa-download"></i> Tải bill
+          <button onclick="saveBillToGallery()" class="info">
+            <i class="fas fa-image"></i> Lưu ảnh
           </button>
           <button onclick="shareBill()" class="success">
             <i class="fas fa-share-alt"></i> Chia sẻ
@@ -1661,21 +1670,35 @@ function closeBillModal() {
   document.getElementById("billModal").style.display = "none";
 }
 
-function downloadBill() {
+function saveBillToGallery() {
   const billElement = document.getElementById("billPreview");
   
   html2canvas(billElement, {
     scale: 2, // Tăng độ phân giải
     useCORS: true,
-    logging: false
+    logging: false,
+    backgroundColor: '#ffffff' // Đảm bảo nền trắng
   }).then(canvas => {
-    // Tạo link tải xuống
-    const link = document.createElement('a');
-    link.download = `bill-bii-coffee-${currentBillOrder.id}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    
-    showNotification("Đã tải bill thành công!");
+    // Chuyển canvas thành blob
+    canvas.toBlob(blob => {
+      // Tạo URL từ blob
+      const imageUrl = URL.createObjectURL(blob);
+      
+      // Tạo thẻ a để tải ảnh
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = `bill-bii-coffee-${currentBillOrder.id}.png`;
+      
+      // Tạo sự kiện click để tải ảnh
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Giải phóng URL
+      setTimeout(() => URL.revokeObjectURL(imageUrl), 100);
+      
+      showNotification("Đã lưu bill thành ảnh vào thư viện!");
+    }, 'image/png');
   }).catch(error => {
     console.error("Lỗi khi tạo bill:", error);
     showNotification("Có lỗi xảy ra khi tạo bill!", true);
@@ -1688,7 +1711,8 @@ function shareBill() {
   html2canvas(billElement, {
     scale: 2,
     useCORS: true,
-    logging: false
+    logging: false,
+    backgroundColor: '#ffffff'
   }).then(canvas => {
     // Chuyển canvas thành blob để chia sẻ
     canvas.toBlob(blob => {
@@ -1705,15 +1729,16 @@ function shareBill() {
             showNotification("Đã chia sẻ bill thành công!");
           }).catch(error => {
             console.error("Lỗi khi chia sẻ:", error);
-            showNotification("Có lỗi xảy ra khi chia sẻ!", true);
+            // Fallback: Lưu ảnh nếu không thể chia sẻ
+            saveBillToGallery();
           });
         } else {
-          // Fallback: Tải xuống nếu không thể chia sẻ
-          downloadBill();
+          // Fallback: Lưu ảnh nếu không thể chia sẻ
+          saveBillToGallery();
         }
       } else {
-        // Fallback: Tải xuống nếu trình duyệt không hỗ trợ Web Share API
-        downloadBill();
+        // Fallback: Lưu ảnh nếu trình duyệt không hỗ trợ Web Share API
+        saveBillToGallery();
       }
     });
   }).catch(error => {
