@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Bii Coffee - Đặt hàng</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
     :root {
       --primary: #6f4e37;
@@ -17,6 +16,8 @@
       --danger: #dc3545;
       --warning: #ffc107;
       --telegram: #0088cc;
+      --size-s: #4caf50;
+      --size-l: #ff9800;
     }
     
     * {
@@ -145,6 +146,45 @@
       background-color: #218838;
     }
     
+    button.warning {
+      background-color: var(--warning);
+      color: var(--dark);
+    }
+    
+    button.warning:hover {
+      background-color: #e0a800;
+    }
+    
+    /* Size selector */
+    .size-selector {
+      display: flex;
+      gap: 5px;
+      margin-top: 5px;
+    }
+    
+    .size-btn {
+      flex: 1;
+      padding: 5px;
+      font-size: 0.8rem;
+      background-color: #f0f0f0;
+      color: var(--dark);
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .size-btn.small-active {
+      background-color: var(--size-s);
+      color: white;
+      border-color: var(--size-s);
+    }
+    
+    .size-btn.large-active {
+      background-color: var(--size-l);
+      color: white;
+      border-color: var(--size-l);
+    }
+    
     /* Customer info form */
     .customer-info {
       background-color: #f8f9fa;
@@ -227,7 +267,7 @@
       margin-top: 8px;
     }
     
-    /* Login modal */
+    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -247,7 +287,7 @@
       padding: 25px;
       border-radius: 10px;
       width: 100%;
-      max-width: 400px;
+      max-width: 500px;
       max-height: 80vh;
       overflow-y: auto;
     }
@@ -264,29 +304,59 @@
       cursor: pointer;
     }
     
-    .login-form input {
-      margin-bottom: 15px;
-      width: 100%;
+    .close:hover {
+      color: var(--danger);
     }
     
-    .login-form button {
-      width: 100%;
+    /* Confirm order modal */
+    .confirm-items {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+    
+    .confirm-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px dotted #eee;
+    }
+    
+    .confirm-item:last-child {
+      border-bottom: none;
+    }
+    
+    .confirm-info {
+      background-color: #f8f9fa;
+      padding: 12px;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+    
+    .confirm-info p {
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .confirm-info i {
+      width: 20px;
+      color: var(--primary);
+    }
+    
+    .confirm-total {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--success);
+      text-align: right;
       margin-top: 10px;
     }
     
-    /* Order section styles */
-    .telegram-status-badge {
-      background-color: #e8f4fd;
-      border-radius: 20px;
-      padding: 8px 15px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.9rem;
-      color: var(--telegram);
-      margin-bottom: 15px;
-    }
-    
+    /* Category filter */
     .category-filter {
       display: flex;
       flex-wrap: wrap;
@@ -299,7 +369,7 @@
     
     .category-btn {
       padding: 8px 15px;
-      background-color: #9c7c5b;
+      background-color: #df2626;
       border: none;
       border-radius: 20px;
       cursor: pointer;
@@ -318,163 +388,120 @@
       color: white;
     }
     
-    .scrollable-menu-container {
-      max-height: 400px;
+    /* Menu grid */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+      max-height: 450px;
       overflow-y: auto;
-      border: 1px solid #eee;
-      border-radius: 8px;
       padding: 10px;
-      background-color: #f9f9f9;
-      margin-bottom: 20px;
-    }
-    
-    /* Menu categories */
-    .menu-category {
+      background: #f9f9f9;
+      border-radius: 8px;
       margin-bottom: 15px;
     }
     
-    .menu-category h3 {
-      color: var(--primary);
-      padding: 8px 0;
-      border-bottom: 2px solid var(--secondary);
-      margin-bottom: 10px;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 1rem;
-    }
-    
-    .menu-category h3 .toggle-icon {
-      font-size: 0.8rem;
-      transition: transform 0.3s;
-    }
-    
-    .menu-category.collapsed h3 .toggle-icon {
-      transform: rotate(-90deg);
-    }
-    
-    .menu-category-content {
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-      max-height: 1000px;
-    }
-    
-    .menu-category.collapsed .menu-category-content {
-      max-height: 0;
-    }
-    
     .menu-item {
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px dotted #eee;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform 0.2s;
     }
     
-    .menu-item:last-child {
-      border-bottom: none;
+    .menu-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
     
     .menu-item-name {
-      flex-grow: 1;
-      font-size: 0.95rem;
+      font-weight: bold;
+      font-size: 1rem;
+      color: var(--primary);
     }
     
     .menu-item-price {
-      color: var(--primary);
-      font-weight: bold;
-      margin: 0 10px;
-      font-size: 0.95rem;
-    }
-    
-    .add-item-btn {
-      padding: 5px 12px;
-      font-size: 0.8rem;
-      background-color: var(--success);
-    }
-    
-    /* Compact menu view */
-    .compact-menu-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 5px;
-      border-bottom: 1px solid #eee;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    
-    .compact-menu-item:hover {
-      background-color: #f0f0f0;
-    }
-    
-    .compact-item-name {
-      flex-grow: 1;
-      font-size: 0.95rem;
-    }
-    
-    .compact-item-price {
-      color: var(--primary);
       font-weight: bold;
       font-size: 0.95rem;
-      margin: 0 10px;
     }
     
-    .compact-add-btn {
-      padding: 5px 12px;
-      font-size: 0.8rem;
-      border-radius: 5px;
-      background-color: var(--success);
+    .price-small {
+      color: var(--size-s);
     }
     
-    .toggle-menu-view {
-      display: block;
-      text-align: center;
-      margin: 10px 0;
-      padding: 8px;
-      background: none;
-      border: 1px dashed var(--primary);
+    .price-large {
+      color: var(--size-l);
+      margin-left: 5px;
+    }
+    
+    .price-single {
       color: var(--primary);
-      cursor: pointer;
-      font-size: 0.9rem;
-      width: 100%;
-      border-radius: 5px;
     }
     
-    .toggle-menu-view:hover {
-      background-color: var(--primary);
+    .add-to-cart-btn {
+      background: var(--success);
       color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 0.9rem;
+      margin-top: 5px;
     }
     
-    table {
+    .add-to-cart-btn:hover {
+      background: #218838;
+    }
+    
+    /* Cart table */
+    .cart-table {
       width: 100%;
       border-collapse: collapse;
       margin: 15px 0;
       font-size: 0.9rem;
     }
     
-    th {
-      background-color: var(--primary);
+    .cart-table th {
+      background: var(--primary);
       color: white;
-      padding: 12px;
+      padding: 10px;
       text-align: left;
     }
     
-    td {
-      padding: 10px;
+    .cart-table td {
+      padding: 8px;
       border-bottom: 1px solid #eee;
     }
     
-    .cart-total {
-      font-weight: bold;
-      text-align: right;
-      margin: 15px 0;
-      font-size: 1.2rem;
-      color: var(--primary);
+    .cart-table button {
+      padding: 2px 8px;
+      font-size: 0.8rem;
     }
     
-    /* Admin sections - hidden by default */
+    .size-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      margin-left: 5px;
+    }
+    
+    .size-s-badge {
+      background-color: var(--size-s);
+      color: white;
+    }
+    
+    .size-l-badge {
+      background-color: var(--size-l);
+      color: white;
+    }
+    
+    /* Admin sections */
     .admin-only {
       display: none;
     }
@@ -483,7 +510,6 @@
       display: block;
     }
     
-    /* Admin badge */
     .admin-badge {
       background-color: var(--warning);
       color: var(--dark);
@@ -492,6 +518,29 @@
       font-size: 0.8rem;
       display: inline-block;
       margin-left: 10px;
+    }
+    
+    /* Stats */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .stat-box {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-top: 5px;
     }
     
     /* Notification */
@@ -519,47 +568,7 @@
       background-color: var(--danger);
     }
     
-    /* Stats grid */
-    .stats-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-top: 15px;
-    }
-    
-    .stat-box {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    
-    .stat-value {
-      font-size: 1.3rem;
-      font-weight: bold;
-      color: var(--primary);
-      margin-top: 5px;
-    }
-    
-    /* Responsive */
-    @media (min-width: 768px) {
-      .stats-container {
-        grid-template-columns: repeat(4, 1fr);
-      }
-      
-      .customer-info .flex {
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-      }
-    }
-    
-    /* Required field indicator */
-    .required::after {
-      content: " *";
-      color: var(--danger);
-    }
-    
+    /* Empty state */
     .empty-state {
       text-align: center;
       padding: 30px;
@@ -570,6 +579,72 @@
       font-size: 3rem;
       margin-bottom: 10px;
       color: #ddd;
+    }
+    
+    /* Required field indicator */
+    .required::after {
+      content: " *";
+      color: var(--danger);
+    }
+    
+    /* Order list in admin */
+    .order-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+    
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    
+    .order-status {
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    
+    .status-new {
+      background-color: #28a745;
+      color: white;
+    }
+    
+    .status-processing {
+      background-color: #ffc107;
+      color: var(--dark);
+    }
+    
+    .status-completed {
+      background-color: #6c757d;
+      color: white;
+    }
+    
+    .order-actions {
+      display: flex;
+      gap: 5px;
+      margin-top: 10px;
+    }
+    
+    .order-actions button {
+      flex: 1;
+      padding: 8px;
+      font-size: 0.8rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .menu-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+      
+      .stats-container {
+        grid-template-columns: 1fr 1fr;
+      }
     }
   </style>
 </head>
@@ -584,47 +659,32 @@
   </header>
 
   <div class="container">
-    <!-- PUBLIC SECTION: Order - Luôn hiển thị cho mọi người -->
+    <!-- PUBLIC ORDER SECTION -->
     <div class="section">
       <h2><i class="fas fa-shopping-cart"></i> Đặt hàng</h2>
-      
-      <div class="telegram-status-badge">
       </div>
       
-      <!-- Danh mục món -->
-      <div class="category-filter" id="publicCategoryFilter">
-        <!-- Categories will be inserted here -->
-      </div>
+      <!-- Category Filter -->
+      <div class="category-filter" id="categoryFilter"></div>
       
-      <!-- Nút chuyển chế độ xem menu -->
-      <button class="toggle-menu-view" onclick="togglePublicMenuView()">
-        <i class="fas fa-exchange-alt"></i> Chuyển chế độ xem menu
-      </button>
+      <!-- Menu Grid -->
+      <div class="menu-grid" id="menuGrid"></div>
       
-      <!-- Menu -->
-      <div class="scrollable-menu-container">
-        <div id="publicMenu">
-          <!-- Menu items will be inserted here -->
-        </div>
-      </div>
-      
-      <!-- Giỏ hàng -->
-      <table id="cartTable">
+      <!-- Cart -->
+      <table class="cart-table" id="cartTable">
         <thead>
           <tr>
-            <th>Món</th>
+            <th>Món (Size)</th>
             <th>SL</th>
             <th>Đơn giá</th>
             <th>Thành tiền</th>
             <th></th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Cart items -->
-        </tbody>
+        <tbody id="cartBody"></tbody>
       </table>
       
-      <!-- Thông tin khách hàng -->
+      <!-- Customer Info -->
       <div class="customer-info">
         <h3>
           <i class="fas fa-user-circle"></i> Thông tin người nhận
@@ -642,7 +702,7 @@
           <label class="required">Địa chỉ</label>
           <div class="input-with-icon">
             <i class="fas fa-map-marker-alt"></i>
-            <input type="text" id="customerAddress" placeholder="Nhập địa chỉ nhận hàng" value="Trung Mầu-Cổng phụ KCN bá hiện 2">
+            <input type="text" id="customerAddress" placeholder="Nhập địa chỉ nhận hàng" value="">
           </div>
         </div>
         
@@ -652,7 +712,7 @@
         </div>
       </div>
       
-      <!-- Tổng kết đơn hàng -->
+      <!-- Order Summary -->
       <div class="order-summary">
         <p>
           <span>Tạm tính:</span>
@@ -668,12 +728,13 @@
         </p>
       </div>
       
-      <button onclick="createOrder()" class="success" style="width: 100%; padding: 15px; font-size: 1.1rem;">
-        <i class="fas fa-paper-plane"></i> Gửi đơn hàng
+      <!-- Submit Button -->
+      <button onclick="showConfirmModal()" class="success" style="width: 100%; padding: 15px; font-size: 1.1rem;">
+        <i class="fas fa-check-circle"></i> XEM LẠI ĐƠN HÀNG
       </button>
     </div>
 
-    <!-- ADMIN SECTION: Thống kê (Chỉ hiện khi đăng nhập) -->
+    <!-- ADMIN STATS SECTION -->
     <div id="statsSection" class="section admin-only">
       <h2>
         <i class="fas fa-chart-bar"></i> Thống kê 
@@ -681,9 +742,10 @@
       </h2>
       
       <div class="flex">
-        <input type="date" id="statsDate" onchange="renderStats()" style="flex: 1;">
-        <button onclick="showTodayStats()" style="flex: 0 0 auto;">Hôm nay</button>
-        <button onclick="showAllStats()" style="flex: 0 0 auto;">Tất cả</button>
+        <input type="date" id="statsDate" style="flex: 1;">
+        <button onclick="showTodayStats()">Hôm nay</button>
+        <button onclick="showAllStats()">Tất cả</button>
+        <button onclick="loadOrders()"><i class="fas fa-sync-alt"></i> Làm mới</button>
       </div>
       
       <div class="stats-container">
@@ -705,56 +767,42 @@
         </div>
       </div>
       
-      <div id="dailyStatsDetails" style="margin-top: 20px;"></div>
+      <div id="recentOrders" style="margin-top: 20px;"></div>
     </div>
 
-    <!-- ADMIN SECTION: Quản lý đơn hàng (Chỉ hiện khi đăng nhập) -->
+    <!-- ADMIN ORDERS SECTION -->
     <div id="ordersSection" class="section admin-only">
       <h2>
-        <i class="fas fa-list"></i> Đơn hàng 
+        <i class="fas fa-list"></i> Quản lý đơn hàng 
         <span class="admin-badge">Admin</span>
       </h2>
       
       <div class="flex">
-        <input type="text" id="filterNote" placeholder="Tìm theo tên, SĐT, địa chỉ..." oninput="renderOrders()" style="flex: 2;">
-        <select id="sortOrders" onchange="renderOrders()" style="flex: 1;">
-          <option value="newest">Mới nhất</option>
-          <option value="oldest">Cũ nhất</option>
-          <option value="highest">Cao nhất</option>
+        <input type="text" id="searchOrders" placeholder="Tìm kiếm (SĐT, tên, địa chỉ...)" style="flex: 2;">
+        <select id="orderStatus" style="flex: 1;">
+          <option value="all">Tất cả</option>
+          <option value="new">Mới</option>
+          <option value="processing">Đang xử lý</option>
+          <option value="completed">Hoàn thành</option>
         </select>
       </div>
       
-      <div class="scrollable-menu-container">
-        <table id="orderTable">
-          <thead>
-            <tr>
-              <th>Mã</th>
-              <th>Khách hàng</th>
-              <th>Món</th>
-              <th>Tổng</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      
-      <div class="cart-total" id="filterTotal">Tổng đơn đã lọc: 0đ</div>
+      <div id="ordersList" style="max-height: 500px; overflow-y: auto;"></div>
     </div>
 
-    <!-- ADMIN SECTION: Quản lý menu (Chỉ hiện khi đăng nhập) -->
+    <!-- ADMIN MENU SECTION -->
     <div id="menuSection" class="section admin-only">
       <h2>
         <i class="fas fa-utensils"></i> Quản lý menu 
         <span class="admin-badge">Admin</span>
       </h2>
       
-      <!-- Form thêm món -->
-      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
         <h3>Thêm món mới</h3>
         <div class="flex">
           <input type="text" id="menuName" placeholder="Tên món" style="flex: 2;">
-          <input type="number" id="menuPrice" placeholder="Giá" min="0" style="flex: 1;">
+          <input type="number" id="menuPriceS" placeholder="Giá S" style="flex: 1;">
+          <input type="number" id="menuPriceL" placeholder="Giá L" style="flex: 1;">
           <select id="menuCategory" style="flex: 1;">
             <option value="TRÀ">TRÀ</option>
             <option value="SODA">SODA</option>
@@ -771,19 +819,19 @@
           </select>
           <button onclick="addMenuItem()"><i class="fas fa-plus"></i> Thêm</button>
         </div>
+        <small><i class="fas fa-info-circle"></i> Nếu món chỉ có 1 size, nhập giá vào ô S và để trống ô L</small>
       </div>
       
-      <!-- Bộ lọc danh mục -->
       <div class="category-filter" id="adminCategoryFilter"></div>
       
-      <!-- Bảng menu -->
-      <div class="scrollable-menu-container">
-        <table class="menu-table">
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table style="width: 100%;">
           <thead>
             <tr>
               <th>Tên món</th>
               <th>Danh mục</th>
-              <th>Giá</th>
+              <th>Giá S</th>
+              <th>Giá L</th>
               <th>Thao tác</th>
             </tr>
           </thead>
@@ -793,74 +841,48 @@
     </div>
   </div>
 
-  <!-- Modal đăng nhập -->
+  <!-- Login Modal -->
   <div id="loginModal" class="modal">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2><i class="fas fa-lock"></i> Đăng nhập</h2>
-        <span class="close" onclick="closeLoginModal()">&times;</span>
-      </div>
-      <div class="login-form">
-        <input type="password" id="passwordInput" placeholder="Mật khẩu quản lý" onkeypress="if(event.key==='Enter') checkLogin()">
-        <button onclick="checkLogin()"><i class="fas fa-sign-in-alt"></i> Đăng nhập</button>
-      </div>
+      <h2><i class="fas fa-lock"></i> Đăng nhập quản lý</h2>
+      <input type="password" id="adminPassword" placeholder="Mật khẩu" style="width: 100%; margin: 15px 0;">
+      <button onclick="checkLogin()" style="width: 100%;">Đăng nhập</button>
     </div>
   </div>
 
-  <!-- Modal chỉnh sửa đơn hàng (Admin) -->
-  <div id="editOrderModal" class="modal">
+  <!-- Confirm Order Modal -->
+  <div id="confirmModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Chỉnh sửa đơn</h2>
-        <span class="close" onclick="closeEditModal()">&times;</span>
+        <h2><i class="fas fa-check-circle" style="color: var(--success);"></i> Xác nhận đơn hàng</h2>
+        <span class="close" onclick="closeConfirmModal()">&times;</span>
       </div>
       
-      <h3>Thông tin khách hàng</h3>
-      <div style="margin-bottom: 15px;">
-        <input type="text" id="editCustomerPhone" placeholder="Số điện thoại" style="margin-bottom: 8px;">
-        <input type="text" id="editCustomerAddress" placeholder="Địa chỉ">
+      <div id="confirmContent">
+        <div class="confirm-info">
+          <p><i class="fas fa-phone-alt"></i> <span id="confirmPhone"></span></p>
+          <p><i class="fas fa-map-marker-alt"></i> <span id="confirmAddress"></span></p>
+          <p><i class="fas fa-pencil-alt"></i> <span id="confirmNote"></span></p>
+        </div>
+        
+        <h3>Món đã chọn:</h3>
+        <div class="confirm-items" id="confirmItems"></div>
+        
+        <div class="confirm-total" id="confirmTotal"></div>
       </div>
       
-      <h3>Món trong đơn</h3>
-      <div id="editOrderItems"></div>
-      
-      <h3>Ghi chú</h3>
-      <textarea id="editOrderNote" rows="3" placeholder="Ghi chú" style="width: 100%; margin: 10px 0;"></textarea>
-      
-      <div class="cart-total" id="editOrderTotal"></div>
-      
-      <button onclick="saveEditedOrder()" class="success" style="width: 100%; padding: 12px;">Lưu thay đổi</button>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button onclick="closeConfirmModal()" class="warning" style="flex: 1;">
+          <i class="fas fa-edit"></i> Sửa lại
+        </button>
+        <button onclick="createOrder()" class="success" style="flex: 2;">
+          <i class="fas fa-paper-plane"></i> XÁC NHẬN GỬI
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Modal chỉnh sửa món (Admin) -->
-  <div id="editMenuItemModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Sửa món</h2>
-        <span class="close" onclick="closeEditMenuItemModal()">&times;</span>
-      </div>
-      <input type="text" id="editMenuItemName" placeholder="Tên món">
-      <input type="number" id="editMenuItemPrice" placeholder="Giá" style="margin: 10px 0;">
-      <select id="editMenuItemCategory">
-        <option value="TRÀ">TRÀ</option>
-        <option value="SODA">SODA</option>
-        <option value="SINH TỐ">SINH TỐ</option>
-        <option value="ĐÁ XAY">ĐÁ XAY</option>
-        <option value="CÀ PHÊ">CÀ PHÊ</option>
-        <option value="TRÀ SỮA">TRÀ SỮA</option>
-        <option value="SỮA CHUA">SỮA CHUA</option>
-        <option value="NƯỚC ÉP">NƯỚC ÉP</option>
-        <option value="PIZZA">PIZZA</option>
-        <option value="ĐỒ ĂN VẶT">ĐỒ ĂN VẶT</option>
-        <option value="MỲ CAY">MỲ CAY</option>
-        <option value="BÚN ĐẬU">BÚN ĐẬU</option>
-      </select>
-      <button onclick="saveEditedMenuItem()" class="success" style="width: 100%; margin-top: 15px;">Lưu</button>
-    </div>
-  </div>
-
-  <!-- Modal xem chi tiết đơn hàng -->
+  <!-- Order Detail Modal -->
   <div id="orderDetailModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -873,899 +895,829 @@
 
   <div class="notification" id="notification"></div>
 
-<script>
-// =============================================
-// CẤU HÌNH TELEGRAM - THAY ĐỔI THÔNG TIN CỦA BẠN
-// =============================================
-const TELEGRAM_BOT_TOKEN = "8628768143:AAH7KlHFMESJNDYUQN_TkXBqSVblnM_r82o";
-const TELEGRAM_CHAT_ID = "6315315253";
-const ADMIN_PASSWORD = "admin123";
-// =============================================
+  <script>
+    // =============================================
+    // CẤU HÌNH TELEGRAM
+    // =============================================
+    const TELEGRAM_BOT_TOKEN = "8628768143:AAH7KlHFMESJNDYUQN_TkXBqSVblnM_r82o";
+    const TELEGRAM_CHAT_ID = "6315315253";
+    const ADMIN_PASSWORD = "admin123";
 
-// Menu đầy đủ với tất cả các món từ file gốc
-let menuItems = [
-  // TRÀ
-  { id: 1, name: "Trà chanh", price: 10000, category: "TRÀ" },
-  { id: 2, name: "Trà chanh nha đam", price: 15000, category: "TRÀ" },
-  { id: 3, name: "Trà quất", price: 10000, category: "TRÀ" },
-  { id: 4, name: "Trà quất nha đam", price: 15000, category: "TRÀ" },
-  { id: 5, name: "Trà dưa lưới", price: 20000, category: "TRÀ" },
-  { id: 6, name: "Trà đào", price: 20000, category: "TRÀ" },
-  { id: 7, name: "Trà đào cam xả", price: 25000, category: "TRÀ" },
-  { id: 8, name: "Trà quất lắc sữa", price: 25000, category: "TRÀ" },
-  { id: 9, name: "Trà táo xanh", price: 25000, category: "TRÀ" },
-  { id: 10, name: "Trà vải", price: 25000, category: "TRÀ" },
-  { id: 11, name: "Trà dâu", price: 25000, category: "TRÀ" },
-  { id: 12, name: "Trà hoa quả nhiệt đới", price: 25000, category: "TRÀ" },
-  { id: 13, name: "Trà chanh bạc hà", price: 20000, category: "TRÀ" },
-  { id: 14, name: "Trà chanh dâu", price: 20000, category: "TRÀ" },
-  { id: 15, name: "Trà xoài chanh leo", price: 20000, category: "TRÀ" },
-  { id: 16, name: "Trà đào chanh dây", price: 20000, category: "TRÀ" },
-  { id: 17, name: "Trà đào nhài", price: 20000, category: "TRÀ" },
-  { id: 18, name: "Trà chanh leo", price: 20000, category: "TRÀ" },
-  
-  // SODA
-  { id: 19, name: "Soda việt quất", price: 20000, category: "SODA" },
-  { id: 20, name: "Soda bạc hà", price: 20000, category: "SODA" },
-  { id: 21, name: "Soda dâu", price: 20000, category: "SODA" },
-  { id: 22, name: "Soda dưa lưới", price: 20000, category: "SODA" },
-  
-  // SINH TỐ
-  { id: 23, name: "Sinh tố bơ", price: 30000, category: "SINH TỐ" },
-  { id: 24, name: "Sinh tố xoài", price: 30000, category: "SINH TỐ" },
-  { id: 25, name: "Sinh tố dâu tây", price: 30000, category: "SINH TỐ" },
-  
-  // ĐÁ XAY
-  { id: 26, name: "Đá xay việt quất", price: 35000, category: "ĐÁ XAY" },
-  { id: 27, name: "Đá xay matcha", price: 35000, category: "ĐÁ XAY" },
-  { id: 28, name: "Đá xay bạc hà", price: 35000, category: "ĐÁ XAY" },
-  { id: 29, name: "Đá xay khoai môn", price: 35000, category: "ĐÁ XAY" },
-  
-  // CÀ PHÊ
-  { id: 30, name: "Cà phê bạc xỉu", price: 25000, category: "CÀ PHÊ" },
-  { id: 31, name: "Cà phê nâu sữa", price: 20000, category: "CÀ PHÊ" },
-  { id: 32, name: "Cà phê nâu nóng", price: 20000, category: "CÀ PHÊ" },
-  
-  // TRÀ SỮA
-  { id: 33, name: "Trà sữa khoai môn", price: 25000, category: "TRÀ SỮA" },
-  { id: 34, name: "Trà sữa sốt xoài", price: 25000, category: "TRÀ SỮA" },
-  { id: 35, name: "Trà sữa socola", price: 25000, category: "TRÀ SỮA" },
-  { id: 36, name: "Trà sữa matcha", price: 25000, category: "TRÀ SỮA" },
-  { id: 37, name: "Trà sữa dưa lưới", price: 25000, category: "TRÀ SỮA" },
-  { id: 38, name: "Trà sữa hồng trà", price: 25000, category: "TRÀ SỮA" },
-  { id: 39, name: "Trà sữa dâu", price: 25000, category: "TRÀ SỮA" },
-  { id: 40, name: "Trà sữa đào", price: 25000, category: "TRÀ SỮA" },
-  { id: 41, name: "Trà sữa dừa", price: 25000, category: "TRÀ SỮA" },
-  { id: 42, name: "Trà sữa lá nếp", price: 25000, category: "TRÀ SỮA" },
-  { id: 43, name: "Trà sữa táo xanh", price: 25000, category: "TRÀ SỮA" },
-  { id: 44, name: "Trà sữa caramen", price: 25000, category: "TRÀ SỮA" },
-  { id: 45, name: "Trà sữa hạt dẻ", price: 25000, category: "TRÀ SỮA" },
-  { id: 46, name: "Trà sữa cacao", price: 25000, category: "TRÀ SỮA" },
-  { id: 47, name: "Trà sữa việt quất", price: 25000, category: "TRÀ SỮA" },
-  { id: 48, name: "Trà sữa matcha latte", price: 25000, category: "TRÀ SỮA" },
-  { id: 49, name: "Trà sữa bạc hà", price: 25000, category: "TRÀ SỮA" },
-  { id: 50, name: "Trà sữa khoai lang tím", price: 30000, category: "TRÀ SỮA" },
-  { id: 51, name: "Trà sữa trân châu đường đen", price: 30000, category: "TRÀ SỮA" },
-  { id: 52, name: "Trà sữa kem trứng dừa nướng", price: 30000, category: "TRÀ SỮA" },
-  { id: 53, name: "Trà sữa sốt xoài kem bông", price: 30000, category: "TRÀ SỮA" },
-  { id: 54, name: "Trà sữa xoài matcha", price: 30000, category: "TRÀ SỮA" },
-  { id: 55, name: "Trà sữa khoai môn kem dừa nướng", price: 30000, category: "TRÀ SỮA" },
-  { id: 56, name: "Trà sữa đường đen kem dừa nướng", price: 30000, category: "TRÀ SỮA" },
-  { id: 57, name: "Trà sữa khoai lang tím kem trứng", price: 35000, category: "TRÀ SỮA" },
-  
-  // SỮA CHUA
-  { id: 58, name: "Sữa chua lắc dâu", price: 25000, category: "SỮA CHUA" },
-  { id: 59, name: "Sữa chua lắc xoài", price: 25000, category: "SỮA CHUA" },
-  { id: 60, name: "Sữa chua lắc việt quất", price: 25000, category: "SỮA CHUA" },
-  { id: 61, name: "Sữa chua hoa quả", price: 30000, category: "SỮA CHUA" },
-  
-  // NƯỚC ÉP
-  { id: 62, name: "Nước ép cam", price: 25000, category: "NƯỚC ÉP" },
-  { id: 63, name: "Nước ép dưa hấu", price: 25000, category: "NƯỚC ÉP" },
-  { id: 64, name: "Nước ép dứa", price: 25000, category: "NƯỚC ÉP" },
-  
-  // PIZZA
-  { id: 65, name: "Pizza xúc xích", price: 60000, category: "PIZZA" },
-  { id: 66, name: "Pizza bò ngô", price: 60000, category: "PIZZA" },
-  { id: 67, name: "Pizza thập cẩm", price: 60000, category: "PIZZA" },
-  
-  // ĐỒ ĂN VẶT
-  { id: 68, name: "Xúc xích", price: 8000, category: "ĐỒ ĂN VẶT" },
-  { id: 69, name: "Lạp xưởng", price: 8000, category: "ĐỒ ĂN VẶT" },
-  { id: 70, name: "Phô mai que", price: 8000, category: "ĐỒ ĂN VẶT" },
-  { id: 71, name: "Hướng dương đen", price: 15000, category: "ĐỒ ĂN VẶT" },
-  { id: 72, name: "Hướng dương trắng", price: 15000, category: "ĐỒ ĂN VẶT" },
-  { id: 73, name: "Khoai lang kén", price: 25000, category: "ĐỒ ĂN VẶT" },
-  { id: 74, name: "Khoai tây chiên", price: 25000, category: "ĐỒ ĂN VẶT" },
-  { id: 75, name: "Nem chua rán", price: 30000, category: "ĐỒ ĂN VẶT" },
-  { id: 76, name: "Khoai môn lệ phố", price: 30000, category: "ĐỒ ĂN VẶT" },
-  { id: 77, name: "Mực vòng chiên", price: 30000, category: "ĐỒ ĂN VẶT" },
-  { id: 78, name: "Gà viên chiên", price: 30000, category: "ĐỒ ĂN VẶT" },
-  { id: 79, name: "Gà viên chiên sốt cay", price: 35000, category: "ĐỒ ĂN VẶT" },
-  { id: 80, name: "Đùi gà KFC", price: 25000, category: "ĐỒ ĂN VẶT" },
-  { id: 81, name: "Đùi gà KFC sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
-  { id: 82, name: "Cánh gà KFC", price: 25000, category: "ĐỒ ĂN VẶT" },
-  { id: 83, name: "Cánh gà KFC sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
-  { id: 84, name: "Cá viên chiên", price: 25000, category: "ĐỒ ĂN VẶT" },
-  { id: 85, name: "Cá viên chiên sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
-  
-  // MỲ CAY
-  { id: 86, name: "Mỳ cay xúc xích", price: 40000, category: "MỲ CAY" },
-  { id: 87, name: "Mỳ cay bò", price: 45000, category: "MỲ CAY" },
-  { id: 88, name: "Mỳ cay sườn sụn", price: 45000, category: "MỲ CAY" },
-  { id: 89, name: "Mỳ cay hải sản", price: 50000, category: "MỲ CAY" },
-  { id: 90, name: "Mỳ cay thập cẩm", price: 55000, category: "MỲ CAY" },
-  
-  // BÚN ĐẬU
-  { id: 91, name: "Bún đậu đầy đủ", price: 35000, category: "BÚN ĐẬU" },
-  { id: 92, name: "Bún đậu thêm bún", price: 40000, category: "BÚN ĐẬU" },
-  { id: 93, name: "Bún đậu thêm đậu", price: 40000, category: "BÚN ĐẬU" },
-  { id: 94, name: "Bún đậu thêm chả cốm", price: 45000, category: "BÚN ĐẬU" },
-  { id: 95, name: "Bún đậu thêm dồi sụn", price: 45000, category: "BÚN ĐẬU" }
-];
+    // =============================================
+    // DỮ LIỆU MENU (ĐẦY ĐỦ 95 MÓN)
+    // =============================================
+    let menuItems = [
+      // TRÀ (18 món) - Có size L
+      { id: 1, name: "Trà chanh", priceS: 10000, priceL: 15000, category: "TRÀ", hasSize: true },
+      { id: 2, name: "Trà chanh nha đam", priceS: 15000, priceL: 20000, category: "TRÀ", hasSize: true },
+      { id: 3, name: "Trà quất", priceS: 10000, priceL: 15000, category: "TRÀ", hasSize: true },
+      { id: 4, name: "Trà quất nha đam", priceS: 15000, priceL: 20000, category: "TRÀ", hasSize: true },
+      { id: 5, name: "Trà dưa lưới", priceS: 20000, priceL: 25000, category: "TRÀ", hasSize: true },
+      { id: 6, name: "Trà đào", priceS: 20000, priceL: 25000, category: "TRÀ", hasSize: true },
+      { id: 7, name: "Trà đào cam xả", priceS: 25000, priceL: 30000, category: "TRÀ", hasSize: true },
+      { id: 8, name: "Trà quất lắc sữa", priceS: 25000, priceL: 30000, category: "TRÀ", hasSize: true },
+      { id: 9, name: "Trà táo xanh", priceS: 25000, priceL: 30000, category: "TRÀ", hasSize: true },
+      { id: 10, name: "Trà vải", priceS: 25000, priceL: 30000, category: "TRÀ", hasSize: true },
+      { id: 11, name: "Trà dâu", priceS: 25000, priceL: 30000, category: "TRÀ", hasSize: true },
+      { id: 12, name: "Trà hoa quả nhiệt đới", priceS: 25000, priceL: 30000, category: "TRÀ", hasSize: true },
+      { id: 13, name: "Trà chanh bạc hà", priceS: 20000, priceL: 25000, category: "TRÀ", hasSize: true },
+      { id: 14, name: "Trà chanh dâu", priceS: 20000, priceL: 25000, category: "TRÀ", hasSize: true },
+      { id: 15, name: "Trà xoài chanh leo", priceS: 20000, priceL: 25000, category: "TRÀ", hasSize: true },
+      { id: 16, name: "Trà đào chanh dây", priceS: 20000, priceL: 25000, category: "TRÀ", hasSize: true },
+      { id: 17, name: "Trà đào nhài", priceS: 20000, priceL: 25000, category: "TRÀ", hasSize: true },
+      { id: 18, name: "Trà chanh leo", priceS: 20000, priceL: 25000, category: "TRÀ", hasSize: true },
+      
+      // SODA (4 món)
+      { id: 19, name: "Soda việt quất", price: 20000, category: "SODA", hasSize: false },
+      { id: 20, name: "Soda bạc hà", price: 20000, category: "SODA", hasSize: false },
+      { id: 21, name: "Soda dâu", price: 20000, category: "SODA", hasSize: false },
+      { id: 22, name: "Soda dưa lưới", price: 20000, category: "SODA", hasSize: false },
+      
+      // SINH TỐ (3 món)
+      { id: 23, name: "Sinh tố bơ", price: 30000, category: "SINH TỐ", hasSize: false },
+      { id: 24, name: "Sinh tố xoài", price: 30000, category: "SINH TỐ", hasSize: false },
+      { id: 25, name: "Sinh tố dâu tây", price: 30000, category: "SINH TỐ", hasSize: false },
+      
+      // ĐÁ XAY (4 món)
+      { id: 26, name: "Đá xay việt quất", price: 35000, category: "ĐÁ XAY", hasSize: false },
+      { id: 27, name: "Đá xay matcha", price: 35000, category: "ĐÁ XAY", hasSize: false },
+      { id: 28, name: "Đá xay bạc hà", price: 35000, category: "ĐÁ XAY", hasSize: false },
+      { id: 29, name: "Đá xay khoai môn", price: 35000, category: "ĐÁ XAY", hasSize: false },
+      
+      // CÀ PHÊ (3 món)
+      { id: 30, name: "Cà phê bạc xỉu", price: 25000, category: "CÀ PHÊ", hasSize: false },
+      { id: 31, name: "Cà phê nâu sữa", price: 20000, category: "CÀ PHÊ", hasSize: false },
+      { id: 32, name: "Cà phê nâu nóng", price: 20000, category: "CÀ PHÊ", hasSize: false },
+      
+      // TRÀ SỮA (25 món) - Có size L
+      { id: 33, name: "Trà sữa khoai môn", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 34, name: "Trà sữa sốt xoài", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 35, name: "Trà sữa socola", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 36, name: "Trà sữa matcha", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 37, name: "Trà sữa dưa lưới", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 38, name: "Trà sữa hồng trà", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 39, name: "Trà sữa dâu", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 40, name: "Trà sữa đào", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 41, name: "Trà sữa dừa", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 42, name: "Trà sữa lá nếp", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 43, name: "Trà sữa táo xanh", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 44, name: "Trà sữa caramen", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 45, name: "Trà sữa hạt dẻ", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 46, name: "Trà sữa cacao", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 47, name: "Trà sữa việt quất", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 48, name: "Trà sữa matcha latte", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 49, name: "Trà sữa bạc hà", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true },
+      { id: 50, name: "Trà sữa khoai lang tím", priceS: 30000, priceL: 35000, category: "TRÀ SỮA", hasSize: true },
+      { id: 51, name: "Trà sữa trân châu đường đen", priceS: 30000, priceL: 35000, category: "TRÀ SỮA", hasSize: true },
+      { id: 52, name: "Trà sữa kem trứng dừa nướng", priceS: 30000, priceL: 35000, category: "TRÀ SỮA", hasSize: true },
+      { id: 53, name: "Trà sữa sốt xoài kem bông", priceS: 30000, priceL: 35000, category: "TRÀ SỮA", hasSize: true },
+      { id: 54, name: "Trà sữa xoài matcha", priceS: 30000, priceL: 35000, category: "TRÀ SỮA", hasSize: true },
+      { id: 55, name: "Trà sữa khoai môn kem dừa nướng", priceS: 30000, priceL: 35000, category: "TRÀ SỮA", hasSize: true },
+      { id: 56, name: "Trà sữa đường đen kem dừa nướng", priceS: 30000, priceL: 35000, category: "TRÀ SỮA", hasSize: true },
+      { id: 57, name: "Trà sữa khoai lang tím kem trứng", priceS: 35000, priceL: 40000, category: "TRÀ SỮA", hasSize: true },
+      
+      // SỮA CHUA (4 món)
+      { id: 58, name: "Sữa chua lắc dâu", price: 25000, category: "SỮA CHUA", hasSize: false },
+      { id: 59, name: "Sữa chua lắc xoài", price: 25000, category: "SỮA CHUA", hasSize: false },
+      { id: 60, name: "Sữa chua lắc việt quất", price: 25000, category: "SỮA CHUA", hasSize: false },
+      { id: 61, name: "Sữa chua hoa quả", price: 30000, category: "SỮA CHUA", hasSize: false },
+      
+      // NƯỚC ÉP (3 món) - Có size L
+      { id: 62, name: "Nước ép cam", priceS: 25000, priceL: 30000, category: "NƯỚC ÉP", hasSize: true },
+      { id: 63, name: "Nước ép dưa hấu", priceS: 25000, priceL: 30000, category: "NƯỚC ÉP", hasSize: true },
+      { id: 64, name: "Nước ép dứa", priceS: 25000, priceL: 30000, category: "NƯỚC ÉP", hasSize: true },
+      
+      // PIZZA (3 món)
+      { id: 65, name: "Pizza xúc xích", price: 60000, category: "PIZZA", hasSize: false },
+      { id: 66, name: "Pizza bò ngô", price: 60000, category: "PIZZA", hasSize: false },
+      { id: 67, name: "Pizza thập cẩm", price: 60000, category: "PIZZA", hasSize: false },
+      
+      // ĐỒ ĂN VẶT (18 món)
+      { id: 68, name: "Xúc xích", price: 8000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 69, name: "Lạp xưởng", price: 8000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 70, name: "Phô mai que", price: 8000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 71, name: "Hướng dương đen", price: 15000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 72, name: "Hướng dương trắng", price: 15000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 73, name: "Khoai lang kén", price: 25000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 74, name: "Khoai tây chiên", price: 25000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 75, name: "Nem chua rán", price: 30000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 76, name: "Khoai môn lệ phố", price: 30000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 77, name: "Mực vòng chiên", price: 30000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 78, name: "Gà viên chiên", price: 30000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 79, name: "Gà viên chiên sốt cay", price: 35000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 80, name: "Đùi gà KFC", price: 25000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 81, name: "Đùi gà KFC sốt cay", price: 30000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 82, name: "Cánh gà KFC", price: 25000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 83, name: "Cánh gà KFC sốt cay", price: 30000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 84, name: "Cá viên chiên", price: 25000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      { id: 85, name: "Cá viên chiên sốt cay", price: 30000, category: "ĐỒ ĂN VẶT", hasSize: false },
+      
+      // MỲ CAY (5 món)
+      { id: 86, name: "Mỳ cay xúc xích", price: 40000, category: "MỲ CAY", hasSize: false },
+      { id: 87, name: "Mỳ cay bò", price: 45000, category: "MỲ CAY", hasSize: false },
+      { id: 88, name: "Mỳ cay sườn sụn", price: 45000, category: "MỲ CAY", hasSize: false },
+      { id: 89, name: "Mỳ cay hải sản", price: 50000, category: "MỲ CAY", hasSize: false },
+      { id: 90, name: "Mỳ cay thập cẩm", price: 55000, category: "MỲ CAY", hasSize: false },
+      
+      // BÚN ĐẬU (5 món)
+      { id: 91, name: "Bún đậu đầy đủ", price: 35000, category: "BÚN ĐẬU", hasSize: false },
+      { id: 92, name: "Bún đậu thêm bún", price: 40000, category: "BÚN ĐẬU", hasSize: false },
+      { id: 93, name: "Bún đậu thêm đậu", price: 40000, category: "BÚN ĐẬU", hasSize: false },
+      { id: 94, name: "Bún đậu thêm chả cốm", price: 45000, category: "BÚN ĐẬU", hasSize: false },
+      { id: 95, name: "Bún đậu thêm dồi sụn", price: 45000, category: "BÚN ĐẬU", hasSize: false }
+    ];
 
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-let cart = [];
-let currentEditOrderIndex = -1;
-let currentEditMenuItemIndex = -1;
-let currentPublicCategory = "TẤT CẢ";
-let currentAdminCategory = "TẤT CẢ";
-let isLoggedIn = false;
-let publicMenuCompactView = false;
+    // =============================================
+    // BIẾN TOÀN CỤC
+    // =============================================
+    let orders = JSON.parse(localStorage.getItem('orders')) || [];
+    let cart = [];
+    let isLoggedIn = false;
+    let currentCategory = "TẤT CẢ";
+    let selectedSizes = {};
 
-// Khởi tạo dữ liệu
-function initializeData() {
-  const savedMenu = localStorage.getItem("menuItems");
-  if (savedMenu) {
-    menuItems = JSON.parse(savedMenu);
-  } else {
-    // Lưu menu mặc định vào localStorage
-    localStorage.setItem("menuItems", JSON.stringify(menuItems));
-  }
-  
-  // Kiểm tra trạng thái đăng nhập
-  const savedLogin = localStorage.getItem("isLoggedIn");
-  if (savedLogin === "true") {
-    isLoggedIn = true;
-    showAdminSections();
-  }
-  
-  updateAuthButtons();
-}
-
-// Lưu dữ liệu
-function saveData() {
-  localStorage.setItem("menuItems", JSON.stringify(menuItems));
-  localStorage.setItem("orders", JSON.stringify(orders));
-}
-
-// ====== AUTHENTICATION ======
-function showLoginModal() {
-  document.getElementById("loginModal").style.display = "flex";
-  document.getElementById("passwordInput").focus();
-}
-
-function closeLoginModal() {
-  document.getElementById("loginModal").style.display = "none";
-  document.getElementById("passwordInput").value = "";
-}
-
-function checkLogin() {
-  const password = document.getElementById("passwordInput").value;
-  if (password === ADMIN_PASSWORD) {
-    isLoggedIn = true;
-    localStorage.setItem("isLoggedIn", "true");
-    showAdminSections();
-    closeLoginModal();
-    showNotification("Đăng nhập thành công!");
-  } else {
-    showNotification("Sai mật khẩu!", true);
-  }
-}
-
-function logout() {
-  isLoggedIn = false;
-  localStorage.setItem("isLoggedIn", "false");
-  hideAdminSections();
-  showNotification("Đã đăng xuất");
-}
-
-function showAdminSections() {
-  document.querySelectorAll('.admin-only').forEach(el => el.classList.add('visible'));
-  document.getElementById('loginBtn').style.display = 'none';
-  document.getElementById('logoutBtn').style.display = 'block';
-  renderOrders();
-  renderStats();
-  renderMenuTable();
-  renderAdminCategoryFilter();
-}
-
-function hideAdminSections() {
-  document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('visible'));
-  document.getElementById('loginBtn').style.display = 'block';
-  document.getElementById('logoutBtn').style.display = 'none';
-}
-
-function updateAuthButtons() {
-  if (isLoggedIn) {
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('logoutBtn').style.display = 'block';
-  } else {
-    document.getElementById('loginBtn').style.display = 'block';
-    document.getElementById('logoutBtn').style.display = 'none';
-  }
-}
-
-// ====== TELEGRAM ======
-async function sendTelegramMessage(message) {
-  if (TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN_HERE" || TELEGRAM_CHAT_ID === "YOUR_CHAT_ID_HERE") {
-    console.log("Chưa cấu hình Telegram");
-    return false;
-  }
-  
-  try {
-    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: message,
-        parse_mode: "HTML"
-      })
-    });
-    return response.ok;
-  } catch (error) {
-    console.error("Lỗi gửi Telegram:", error);
-    return false;
-  }
-}
-
-// ====== NOTIFICATION ======
-function showNotification(message, isError = false) {
-  const notification = document.getElementById("notification");
-  notification.textContent = message;
-  notification.className = "notification" + (isError ? " error" : "") + " show";
-  setTimeout(() => notification.classList.remove("show"), 3000);
-}
-
-// ====== PUBLIC MENU ======
-function togglePublicMenuView() {
-  publicMenuCompactView = !publicMenuCompactView;
-  renderPublicMenu();
-}
-
-function renderPublicMenu() {
-  const container = document.getElementById("publicMenu");
-  container.innerHTML = "";
-  
-  if (publicMenuCompactView) {
-    renderCompactPublicMenu(container);
-  } else {
-    renderCategorizedPublicMenu(container);
-  }
-}
-
-function renderCategorizedPublicMenu(container) {
-  // Nhóm các món theo danh mục
-  const categories = {};
-  menuItems.forEach(item => {
-    if (!categories[item.category]) {
-      categories[item.category] = [];
+    // =============================================
+    // KHỞI TẠO
+    // =============================================
+    function init() {
+      renderCategoryFilter();
+      renderMenu();
+      renderCart();
+      
+      // Kiểm tra trạng thái đăng nhập
+      const savedLogin = localStorage.getItem('isLoggedIn');
+      if (savedLogin === 'true') {
+        isLoggedIn = true;
+        showAdminSections();
+        loadOrders();
+      }
+      updateAuthButtons();
     }
-    categories[item.category].push(item);
-  });
-  
-  // Hiển thị các món theo danh mục đã chọn
-  for (const category in categories) {
-    if (currentPublicCategory !== "TẤT CẢ" && currentPublicCategory !== category) {
-      continue;
+
+    // =============================================
+    // HIỂN THỊ MENU
+    // =============================================
+    function renderCategoryFilter() {
+      const filterDiv = document.getElementById('categoryFilter');
+      filterDiv.innerHTML = '<button class="category-btn active" onclick="filterByCategory(\'TẤT CẢ\')">TẤT CẢ</button>';
+      
+      const categories = [...new Set(menuItems.map(item => item.category))];
+      categories.sort().forEach(cat => {
+        filterDiv.innerHTML += `<button class="category-btn" onclick="filterByCategory('${cat}')">${cat}</button>`;
+      });
     }
-    
-    const categoryDiv = document.createElement("div");
-    categoryDiv.className = "menu-category";
-    categoryDiv.innerHTML = `
-      <h3>
-        <span>${category}</span>
-        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
-      </h3>
-      <div class="menu-category-content">
-        ${categories[category].map(item => `
-          <div class="menu-item">
+
+    function filterByCategory(category) {
+      currentCategory = category;
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent === category || (category === 'TẤT CẢ' && btn.textContent === 'TẤT CẢ')) {
+          btn.classList.add('active');
+        }
+      });
+      renderMenu();
+    }
+
+    function renderMenu() {
+      const menuGrid = document.getElementById('menuGrid');
+      menuGrid.innerHTML = '';
+      
+      let filtered = menuItems;
+      if (currentCategory !== 'TẤT CẢ') {
+        filtered = menuItems.filter(item => item.category === currentCategory);
+      }
+      
+      filtered.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'menu-item';
+        
+        if (item.hasSize) {
+          // Món có 2 size
+          const sizeKey = `size_${item.id}`;
+          if (!selectedSizes[sizeKey]) selectedSizes[sizeKey] = 'S';
+          
+          itemDiv.innerHTML = `
             <div class="menu-item-name">${item.name}</div>
-            <div class="menu-item-price">${item.price.toLocaleString()}đ</div>
-            <button class="add-item-btn" onclick="addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price})">
+            <div class="menu-item-price">
+              <span class="price-small">S: ${item.priceS.toLocaleString()}đ</span>
+              <span class="price-large">L: ${item.priceL.toLocaleString()}đ</span>
+            </div>
+            <div class="size-selector">
+              <button class="size-btn ${selectedSizes[sizeKey] === 'S' ? 'small-active' : ''}" onclick="selectSize(${item.id}, 'S', event)">Size S</button>
+              <button class="size-btn ${selectedSizes[sizeKey] === 'L' ? 'large-active' : ''}" onclick="selectSize(${item.id}, 'L', event)">Size L</button>
+            </div>
+            <button class="add-to-cart-btn" onclick="addToCartWithSize(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.priceS}, ${item.priceL}, '${selectedSizes[sizeKey]}')">
               <i class="fas fa-cart-plus"></i> Thêm
             </button>
+          `;
+        } else {
+          // Món 1 size
+          itemDiv.innerHTML = `
+            <div class="menu-item-name">${item.name}</div>
+            <div class="menu-item-price">
+              <span class="price-single">${item.price.toLocaleString()}đ</span>
+            </div>
+            <button class="add-to-cart-btn" onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">
+              <i class="fas fa-cart-plus"></i> Thêm
+            </button>
+          `;
+        }
+        
+        menuGrid.appendChild(itemDiv);
+      });
+    }
+
+    function selectSize(itemId, size, event) {
+      event.stopPropagation();
+      const sizeKey = `size_${itemId}`;
+      selectedSizes[sizeKey] = size;
+      renderMenu();
+    }
+
+    // =============================================
+    // GIỎ HÀNG
+    // =============================================
+    function addToCartWithSize(id, name, priceS, priceL, size) {
+      const price = size === 'S' ? priceS : priceL;
+      const itemName = `${name} (Size ${size})`;
+      
+      const existing = cart.find(item => item.id === id && item.size === size);
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({ id, name: itemName, originalName: name, price, qty: 1, size });
+      }
+      renderCart();
+      showNotification(`Đã thêm ${name} size ${size}`);
+    }
+
+    function addToCart(id, name, price) {
+      const existing = cart.find(item => item.id === id && !item.size);
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({ id, name, price, qty: 1 });
+      }
+      renderCart();
+      showNotification(`Đã thêm ${name}`);
+    }
+
+    function renderCart() {
+      const tbody = document.getElementById('cartBody');
+      tbody.innerHTML = '';
+      let total = 0;
+      
+      if (cart.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Giỏ hàng trống</td></tr>';
+        document.getElementById('subtotal').textContent = '0đ';
+        document.getElementById('cartTotal').textContent = '0đ';
+        return;
+      }
+      
+      cart.forEach((item, index) => {
+        const itemTotal = item.price * item.qty;
+        total += itemTotal;
+        
+        let sizeBadge = '';
+        if (item.size) {
+          sizeBadge = `<span class="size-badge ${item.size === 'S' ? 'size-s-badge' : 'size-l-badge'}">${item.size}</span>`;
+        }
+        
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.name} ${sizeBadge}</td>
+            <td>
+              <button onclick="updateCartQty(${index}, -1)">-</button>
+              ${item.qty}
+              <button onclick="updateCartQty(${index}, 1)">+</button>
+            </td>
+            <td>${item.price.toLocaleString()}đ</td>
+            <td>${itemTotal.toLocaleString()}đ</td>
+            <td><button onclick="removeFromCart(${index})" style="background: #dc3545;">X</button></td>
+          </tr>
+        `;
+      });
+      
+      document.getElementById('subtotal').textContent = total.toLocaleString() + 'đ';
+      document.getElementById('cartTotal').textContent = total.toLocaleString() + 'đ';
+    }
+
+    function updateCartQty(index, delta) {
+      if (cart[index].qty + delta < 1) {
+        removeFromCart(index);
+      } else {
+        cart[index].qty += delta;
+        renderCart();
+      }
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
+    // =============================================
+    // XÁC NHẬN ĐƠN HÀNG
+    // =============================================
+    function showConfirmModal() {
+      if (cart.length === 0) {
+        showNotification('Giỏ hàng trống!', true);
+        return;
+      }
+      
+      const phone = document.getElementById('customerPhone').value.trim();
+      const address = document.getElementById('customerAddress').value.trim();
+      const note = document.getElementById('orderNote').value.trim() || 'Không có';
+      
+      if (!phone) {
+        showNotification('Vui lòng nhập số điện thoại!', true);
+        document.getElementById('customerPhone').focus();
+        return;
+      }
+      
+      if (!address) {
+        showNotification('Vui lòng nhập địa chỉ!', true);
+        document.getElementById('customerAddress').focus();
+        return;
+      }
+      
+      const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
+      if (!phoneRegex.test(phone)) {
+        showNotification('Số điện thoại không hợp lệ!', true);
+        return;
+      }
+      
+      document.getElementById('confirmPhone').textContent = phone;
+      document.getElementById('confirmAddress').textContent = address;
+      document.getElementById('confirmNote').textContent = note;
+      
+      const itemsDiv = document.getElementById('confirmItems');
+      itemsDiv.innerHTML = '';
+      
+      let total = 0;
+      cart.forEach(item => {
+        const itemTotal = item.price * item.qty;
+        total += itemTotal;
+        itemsDiv.innerHTML += `
+          <div class="confirm-item">
+            <span>${item.name} x${item.qty}</span>
+            <span>${itemTotal.toLocaleString()}đ</span>
           </div>
-        `).join('')}
-      </div>
-    `;
-    
-    // Thêm sự kiện click để thu gọn/mở rộng danh mục
-    const header = categoryDiv.querySelector('h3');
-    header.onclick = (e) => {
-      e.stopPropagation();
-      categoryDiv.classList.toggle('collapsed');
-    };
-    
-    container.appendChild(categoryDiv);
-  }
-}
+        `;
+      });
+      
+      document.getElementById('confirmTotal').textContent = `Tổng cộng: ${total.toLocaleString()}đ`;
+      document.getElementById('confirmModal').style.display = 'flex';
+    }
 
-function renderCompactPublicMenu(container) {
-  // Lọc các món theo danh mục nếu cần
-  let filteredItems = menuItems;
-  if (currentPublicCategory !== "TẤT CẢ") {
-    filteredItems = menuItems.filter(item => item.category === currentPublicCategory);
-  }
-  
-  filteredItems.forEach(item => {
-    const itemDiv = document.createElement("div");
-    itemDiv.className = "compact-menu-item";
-    itemDiv.onclick = () => addToCart(item.name, item.price);
-    itemDiv.innerHTML = `
-      <span class="compact-item-name">${item.name}</span>
-      <span class="compact-item-price">${item.price.toLocaleString()}đ</span>
-      <button class="compact-add-btn" onclick="event.stopPropagation(); addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price})">
-        <i class="fas fa-plus"></i>
-      </button>
-    `;
-    container.appendChild(itemDiv);
-  });
-}
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').style.display = 'none';
+    }
 
-function renderPublicCategoryFilter() {
-  const filterDiv = document.getElementById("publicCategoryFilter");
-  filterDiv.innerHTML = "";
-  
-  const allBtn = document.createElement("button");
-  allBtn.className = `category-btn ${currentPublicCategory === "TẤT CẢ" ? "active" : ""}`;
-  allBtn.textContent = "TẤT CẢ";
-  allBtn.onclick = () => { 
-    currentPublicCategory = "TẤT CẢ"; 
-    renderPublicCategoryFilter(); 
-    renderPublicMenu(); 
-  };
-  filterDiv.appendChild(allBtn);
-  
-  const categories = [...new Set(menuItems.map(item => item.category))];
-  categories.sort().forEach(cat => {
-    const btn = document.createElement("button");
-    btn.className = `category-btn ${currentPublicCategory === cat ? "active" : ""}`;
-    btn.textContent = cat;
-    btn.onclick = () => { 
-      currentPublicCategory = cat; 
-      renderPublicCategoryFilter(); 
-      renderPublicMenu(); 
-    };
-    filterDiv.appendChild(btn);
-  });
-}
+    // =============================================
+    // TẠO ĐƠN HÀNG
+    // =============================================
+    async function createOrder() {
+      closeConfirmModal();
+      
+      const phone = document.getElementById('customerPhone').value.trim();
+      const address = document.getElementById('customerAddress').value.trim();
+      const note = document.getElementById('orderNote').value;
+      const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const now = new Date();
+      
+      const order = {
+        id: Date.now(),
+        items: cart.map(item => ({
+          name: item.name,
+          originalName: item.originalName || item.name,
+          size: item.size || 'M',
+          price: item.price,
+          qty: item.qty
+        })),
+        customer: { phone, address },
+        note,
+        total,
+        time: now.toLocaleString('vi-VN'),
+        date: now.toISOString().split('T')[0],
+        status: 'new'
+      };
+      
+      // Gửi Telegram
+      let message = `<b>☕ BII COFFEE - ĐƠN HÀNG MỚI #${order.id}</b>\n\n`;
+      message += `🕒 <b>Thời gian:</b> ${order.time}\n`;
+      message += `📞 <b>SĐT:</b> ${order.customer.phone}\n`;
+      message += `🏠 <b>Địa chỉ:</b> ${order.customer.address}\n`;
+      message += `📝 <b>Ghi chú:</b> ${note || 'Không có'}\n\n`;
+      message += `<b>CHI TIẾT MÓN:</b>\n`;
+      order.items.forEach(item => {
+        message += `${item.name} x${item.qty} - ${(item.price * item.qty).toLocaleString()}đ\n`;
+      });
+      message += `\n<b>💰 TỔNG CỘNG: ${total.toLocaleString()}đ</b>\n`;
+      message += `\n💝 <b>Cảm ơn quý khách!</b>`;
+      
+      try {
+        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message,
+            parse_mode: 'HTML'
+          })
+        });
+        
+        if (response.ok) {
+          showNotification(`Đặt hàng thành công! Mã đơn: #${order.id}`);
+        } else {
+          showNotification('Đã tạo đơn nhưng không gửi được Telegram', true);
+        }
+      } catch (error) {
+        console.error('Lỗi gửi Telegram:', error);
+        showNotification('Đã tạo đơn nhưng không gửi được Telegram', true);
+      }
+      
+      orders.push(order);
+      localStorage.setItem('orders', JSON.stringify(orders));
+      
+      cart = [];
+      document.getElementById('customerPhone').value = '';
+      document.getElementById('customerAddress').value = '';
+      document.getElementById('orderNote').value = '';
+      renderCart();
+      
+      if (isLoggedIn) {
+        loadOrders();
+        renderStats();
+      }
+    }
 
-// ====== CART ======
-function addToCart(name, price) {
-  const existing = cart.find(item => item.name === name);
-  if (existing) {
-    existing.qty++;
-  } else {
-    cart.push({ name, price, qty: 1 });
-  }
-  renderCart();
-  showNotification(`Đã thêm ${name}`);
-}
+    // =============================================
+    // ĐĂNG NHẬP / ĐĂNG XUẤT
+    // =============================================
+    function showLoginModal() {
+      document.getElementById('loginModal').style.display = 'flex';
+      document.getElementById('adminPassword').focus();
+    }
 
-function renderCart() {
-  const tbody = document.querySelector("#cartTable tbody");
-  tbody.innerHTML = "";
-  let total = 0;
-  
-  if (cart.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">
-      <i class="fas fa-shopping-cart"></i><br>Giỏ hàng trống
-    </td></tr>`;
-    document.getElementById("subtotal").textContent = "0đ";
-    document.getElementById("cartTotal").textContent = "0đ";
-    return;
-  }
-  
-  cart.forEach((item, index) => {
-    const itemTotal = item.price * item.qty;
-    total += itemTotal;
-    tbody.innerHTML += `
-      <tr>
-        <td>${item.name}</td>
-        <td>
-          <button onclick="updateCartQty(${index}, -1)" style="padding: 2px 8px;">-</button>
-          ${item.qty}
-          <button onclick="updateCartQty(${index}, 1)" style="padding: 2px 8px;">+</button>
-        </td>
-        <td>${item.price.toLocaleString()}đ</td>
-        <td>${itemTotal.toLocaleString()}đ</td>
-        <td><button onclick="removeFromCart(${index})" style="background: #dc3545; padding: 5px 8px;"><i class="fas fa-trash"></i></button></td>
-      </tr>
-    `;
-  });
-  
-  document.getElementById("subtotal").textContent = total.toLocaleString() + "đ";
-  document.getElementById("cartTotal").textContent = total.toLocaleString() + "đ";
-}
+    function closeLoginModal() {
+      document.getElementById('loginModal').style.display = 'none';
+      document.getElementById('adminPassword').value = '';
+    }
 
-function updateCartQty(index, delta) {
-  if (cart[index].qty + delta < 1) {
-    removeFromCart(index);
-  } else {
-    cart[index].qty += delta;
-    renderCart();
-  }
-}
+    function checkLogin() {
+      const password = document.getElementById('adminPassword').value;
+      if (password === ADMIN_PASSWORD) {
+        isLoggedIn = true;
+        localStorage.setItem('isLoggedIn', 'true');
+        showAdminSections();
+        closeLoginModal();
+        loadOrders();
+        renderStats();
+        showNotification('Đăng nhập thành công!');
+      } else {
+        showNotification('Sai mật khẩu!', true);
+      }
+    }
 
-function removeFromCart(index) {
-  cart.splice(index, 1);
-  renderCart();
-}
+    function logout() {
+      isLoggedIn = false;
+      localStorage.setItem('isLoggedIn', 'false');
+      hideAdminSections();
+      showNotification('Đã đăng xuất');
+    }
 
-async function createOrder() {
-  // Kiểm tra giỏ hàng
-  if (cart.length === 0) {
-    showNotification("Giỏ hàng trống!", true);
-    return;
-  }
-  
-  // Kiểm tra thông tin khách hàng
-  const phone = document.getElementById("customerPhone").value.trim();
-  const address = document.getElementById("customerAddress").value.trim();
-  const note = document.getElementById("orderNote").value;
-  
-  if (!phone) {
-    showNotification("Vui lòng nhập số điện thoại!", true);
-    document.getElementById("customerPhone").focus();
-    return;
-  }
-  
-  if (!address) {
-    showNotification("Vui lòng nhập địa chỉ!", true);
-    document.getElementById("customerAddress").focus();
-    return;
-  }
-  
-  // Validate số điện thoại (10-11 số)
-  const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
-  if (!phoneRegex.test(phone)) {
-    showNotification("Số điện thoại không hợp lệ!", true);
-    return;
-  }
-  
-  const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  const now = new Date();
-  
-  const order = {
-    id: orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1,
-    items: [...cart],
-    customer: {
-      phone: phone,
-      address: address
-    },
-    note: note,
-    total: total,
-    time: now.toLocaleString("vi-VN"),
-    date: now.toISOString().split('T')[0]
-  };
-  
-  // Tạo nội dung Telegram
-  let message = `<b>☕ BII COFFEE - ĐƠN HÀNG MỚI #${order.id}</b>\n\n`;
-  message += `🕒 <b>Thời gian:</b> ${order.time}\n`;
-  message += `📞 <b>SĐT:</b> ${order.customer.phone}\n`;
-  message += `🏠 <b>Địa chỉ:</b> ${order.customer.address}\n`;
-  message += `📝 <b>Ghi chú:</b> ${note || "Không có"}\n\n`;
-  message += `<b>🍽️ CHI TIẾT MÓN:</b>\n`;
-  
-  order.items.forEach(item => {
-    message += `${item.name} x${item.qty} - ${(item.price * item.qty).toLocaleString()}đ\n`;
-  });
-  
-  message += `\n<b>💰 TỔNG CỘNG: ${total.toLocaleString()}đ</b>\n`;
-  message += `\n💝 <b>Cảm ơn quý khách!</b>`;
-  
-  // Gửi Telegram
-  const sent = await sendTelegramMessage(message);
-  if (sent) {
-    showNotification(`Đã gửi đơn #${order.id} qua Telegram!`);
-  } else {
-    showNotification("Đã tạo đơn nhưng không gửi được Telegram", true);
-  }
-  
-  // Lưu đơn hàng
-  orders.push(order);
-  saveData();
-  
-  // Xóa giỏ hàng và form
-  cart = [];
-  document.getElementById("customerPhone").value = "";
-  document.getElementById("customerAddress").value = "Trung Mầu-Cổng phụ KCN bá hiện 2";
-  document.getElementById("orderNote").value = "";
-  renderCart();
-  
-  if (isLoggedIn) {
-    renderOrders();
-    renderStats();
-  }
-}
+    function showAdminSections() {
+      document.querySelectorAll('.admin-only').forEach(el => el.classList.add('visible'));
+      document.getElementById('loginBtn').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'block';
+      renderMenuTable();
+      renderAdminCategoryFilter();
+    }
 
-// ====== ADMIN: QUẢN LÝ MENU ======
-function renderAdminCategoryFilter() {
-  const filterDiv = document.getElementById("adminCategoryFilter");
-  if (!filterDiv) return;
-  
-  filterDiv.innerHTML = "";
-  const allBtn = document.createElement("button");
-  allBtn.className = `category-btn ${currentAdminCategory === "TẤT CẢ" ? "active" : ""}`;
-  allBtn.textContent = "TẤT CẢ";
-  allBtn.onclick = () => { currentAdminCategory = "TẤT CẢ"; renderAdminCategoryFilter(); renderMenuTable(); };
-  filterDiv.appendChild(allBtn);
-  
-  const categories = [...new Set(menuItems.map(item => item.category))];
-  categories.sort().forEach(cat => {
-    const btn = document.createElement("button");
-    btn.className = `category-btn ${currentAdminCategory === cat ? "active" : ""}`;
-    btn.textContent = cat;
-    btn.onclick = () => { currentAdminCategory = cat; renderAdminCategoryFilter(); renderMenuTable(); };
-    filterDiv.appendChild(btn);
-  });
-}
+    function hideAdminSections() {
+      document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('visible'));
+      document.getElementById('loginBtn').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'none';
+    }
 
-function renderMenuTable() {
-  const tbody = document.getElementById("menuTableBody");
-  if (!tbody) return;
-  
-  tbody.innerHTML = "";
-  let filtered = menuItems;
-  if (currentAdminCategory !== "TẤT CẢ") {
-    filtered = menuItems.filter(item => item.category === currentAdminCategory);
-  }
-  
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="empty-state">Không có món nào</td></tr>`;
-    return;
-  }
-  
-  filtered.forEach((item, index) => {
-    const originalIndex = menuItems.findIndex(m => m.id === item.id);
-    tbody.innerHTML += `
-      <tr>
-        <td>${item.name}</td>
-        <td>${item.category}</td>
-        <td>${item.price.toLocaleString()}đ</td>
-        <td>
-          <button onclick="openEditMenuItemModal(${originalIndex})" style="background: #ffc107; color: #000; padding: 5px 10px;"><i class="fas fa-edit"></i></button>
-          <button onclick="deleteMenuItem(${originalIndex})" style="background: #dc3545; padding: 5px 10px;"><i class="fas fa-trash"></i></button>
-        </td>
-      </tr>
-    `;
-  });
-}
+    function updateAuthButtons() {
+      if (isLoggedIn) {
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'block';
+      } else {
+        document.getElementById('loginBtn').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'none';
+      }
+    }
 
-function addMenuItem() {
-  const name = document.getElementById("menuName").value.trim();
-  const price = parseInt(document.getElementById("menuPrice").value);
-  const category = document.getElementById("menuCategory").value;
-  
-  if (!name || isNaN(price) || price <= 0) {
-    showNotification("Nhập đầy đủ thông tin!", true);
-    return;
-  }
-  
-  const newId = menuItems.length > 0 ? Math.max(...menuItems.map(m => m.id)) + 1 : 1;
-  menuItems.push({ id: newId, name, price, category });
-  saveData();
-  
-  // Cập nhật giao diện
-  renderPublicMenu();
-  renderPublicCategoryFilter();
-  renderMenuTable();
-  renderAdminCategoryFilter();
-  
-  document.getElementById("menuName").value = "";
-  document.getElementById("menuPrice").value = "";
-  showNotification("Đã thêm món!");
-}
+    // =============================================
+    // QUẢN LÝ MENU (ADMIN)
+    // =============================================
+    function renderAdminCategoryFilter() {
+      const filterDiv = document.getElementById('adminCategoryFilter');
+      if (!filterDiv) return;
+      
+      filterDiv.innerHTML = '<button class="category-btn active" onclick="filterAdminCategory(\'TẤT CẢ\')">TẤT CẢ</button>';
+      
+      const categories = [...new Set(menuItems.map(item => item.category))];
+      categories.sort().forEach(cat => {
+        filterDiv.innerHTML += `<button class="category-btn" onclick="filterAdminCategory('${cat}')">${cat}</button>`;
+      });
+    }
 
-function openEditMenuItemModal(index) {
-  currentEditMenuItemIndex = index;
-  const item = menuItems[index];
-  document.getElementById("editMenuItemName").value = item.name;
-  document.getElementById("editMenuItemPrice").value = item.price;
-  document.getElementById("editMenuItemCategory").value = item.category;
-  document.getElementById("editMenuItemModal").style.display = "flex";
-}
+    function filterAdminCategory(category) {
+      document.querySelectorAll('#adminCategoryFilter .category-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent === category || (category === 'TẤT CẢ' && btn.textContent === 'TẤT CẢ')) {
+          btn.classList.add('active');
+        }
+      });
+      renderMenuTable(category);
+    }
 
-function closeEditMenuItemModal() {
-  document.getElementById("editMenuItemModal").style.display = "none";
-}
+    function renderMenuTable(category = 'TẤT CẢ') {
+      const tbody = document.getElementById('menuTableBody');
+      if (!tbody) return;
+      
+      tbody.innerHTML = '';
+      let filtered = menuItems;
+      if (category !== 'TẤT CẢ') {
+        filtered = menuItems.filter(item => item.category === category);
+      }
+      
+      filtered.forEach((item, index) => {
+        const originalIndex = menuItems.findIndex(m => m.id === item.id);
+        const priceS = item.hasSize ? item.priceS : item.price;
+        const priceL = item.hasSize ? item.priceL : '';
+        
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.name}</td>
+            <td>${item.category}</td>
+            <td>${priceS.toLocaleString()}đ</td>
+            <td>${priceL ? priceL.toLocaleString() + 'đ' : '-'}</td>
+            <td>
+              <button onclick="editMenuItem(${originalIndex})" style="background: #ffc107; color: #000; padding: 5px 10px;">Sửa</button>
+              <button onclick="deleteMenuItem(${originalIndex})" style="background: #dc3545; padding: 5px 10px;">Xóa</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
 
-function saveEditedMenuItem() {
-  const name = document.getElementById("editMenuItemName").value.trim();
-  const price = parseInt(document.getElementById("editMenuItemPrice").value);
-  const category = document.getElementById("editMenuItemCategory").value;
-  
-  if (!name || isNaN(price) || price <= 0) return;
-  
-  menuItems[currentEditMenuItemIndex] = {
-    ...menuItems[currentEditMenuItemIndex],
-    name, price, category
-  };
-  
-  saveData();
-  renderPublicMenu();
-  renderPublicCategoryFilter();
-  renderMenuTable();
-  closeEditMenuItemModal();
-  showNotification("Đã cập nhật!");
-}
+    function addMenuItem() {
+      const name = document.getElementById('menuName').value.trim();
+      const priceS = parseInt(document.getElementById('menuPriceS').value);
+      const priceL = parseInt(document.getElementById('menuPriceL').value);
+      const category = document.getElementById('menuCategory').value;
+      
+      if (!name || isNaN(priceS) || priceS <= 0) {
+        showNotification('Nhập tên món và giá S!', true);
+        return;
+      }
+      
+      const newId = Math.max(...menuItems.map(m => m.id)) + 1;
+      
+      if (!isNaN(priceL) && priceL > 0) {
+        // Món có 2 size
+        menuItems.push({ id: newId, name, priceS, priceL, category, hasSize: true });
+      } else {
+        // Món 1 size
+        menuItems.push({ id: newId, name, price: priceS, category, hasSize: false });
+      }
+      
+      localStorage.setItem('menuItems', JSON.stringify(menuItems));
+      
+      // Cập nhật giao diện
+      renderCategoryFilter();
+      renderMenu();
+      renderMenuTable();
+      renderAdminCategoryFilter();
+      
+      // Xóa form
+      document.getElementById('menuName').value = '';
+      document.getElementById('menuPriceS').value = '';
+      document.getElementById('menuPriceL').value = '';
+      
+      showNotification('Đã thêm món!');
+    }
 
-function deleteMenuItem(index) {
-  if (confirm("Xóa món này?")) {
-    menuItems.splice(index, 1);
-    saveData();
-    renderPublicMenu();
-    renderPublicCategoryFilter();
-    renderMenuTable();
-    showNotification("Đã xóa!");
-  }
-}
+    function editMenuItem(index) {
+      const item = menuItems[index];
+      document.getElementById('menuName').value = item.name;
+      document.getElementById('menuPriceS').value = item.hasSize ? item.priceS : item.price;
+      document.getElementById('menuPriceL').value = item.hasSize ? item.priceL : '';
+      document.getElementById('menuCategory').value = item.category;
+      
+      // Xóa món cũ và thêm lại
+      menuItems.splice(index, 1);
+      localStorage.setItem('menuItems', JSON.stringify(menuItems));
+      
+      // Cập nhật giao diện
+      renderCategoryFilter();
+      renderMenu();
+      renderMenuTable();
+      renderAdminCategoryFilter();
+      
+      showNotification('Đã chuyển sang chế độ sửa, hãy nhập thông tin và thêm mới!');
+    }
 
-// ====== ADMIN: QUẢN LÝ ĐƠN HÀNG ======
-function renderOrders() {
-  if (!isLoggedIn) return;
-  
-  const tbody = document.querySelector("#orderTable tbody");
-  if (!tbody) return;
-  
-  const filter = document.getElementById("filterNote").value.toLowerCase();
-  const sortBy = document.getElementById("sortOrders").value;
-  
-  let filtered = orders.filter(o => 
-    o.note?.toLowerCase().includes(filter) || 
-    o.customer?.phone?.includes(filter) ||
-    o.customer?.address?.toLowerCase().includes(filter) ||
-    o.id.toString().includes(filter) ||
-    o.items.some(i => i.name.toLowerCase().includes(filter))
-  );
-  
-  // Sắp xếp
-  if (sortBy === "newest") filtered.sort((a,b) => b.id - a.id);
-  else if (sortBy === "oldest") filtered.sort((a,b) => a.id - b.id);
-  else if (sortBy === "highest") filtered.sort((a,b) => b.total - a.total);
-  
-  const totalFiltered = filtered.reduce((sum, o) => sum + o.total, 0);
-  document.getElementById("filterTotal").textContent = `Tổng đơn đã lọc: ${totalFiltered.toLocaleString()}đ`;
-  
-  tbody.innerHTML = "";
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">Không có đơn hàng</td></tr>`;
-    return;
-  }
-  
-  filtered.forEach(order => {
-    const originalIndex = orders.findIndex(o => o.id === order.id);
-    const customerInfo = order.customer ? 
-      `${order.customer.phone}<br><small>${order.customer.address.substring(0, 20)}...</small>` : 
-      "Không có";
-    const itemsShort = order.items.map(i => `${i.name} x${i.qty}`).join(", ").substring(0, 20);
-    
-    tbody.innerHTML += `
-      <tr>
-        <td>#${order.id}</td>
-        <td>${customerInfo}</td>
-        <td>${itemsShort}...</td>
-        <td>${order.total.toLocaleString()}đ</td>
-        <td>
-          <button onclick="openEditModal(${originalIndex})" style="background: #ffc107; color: #000; padding: 5px 8px;"><i class="fas fa-edit"></i></button>
-          <button onclick="viewOrderDetail(${originalIndex})" style="background: #17a2b8; padding: 5px 8px;"><i class="fas fa-eye"></i></button>
-          <button onclick="deleteOrder(${originalIndex})" style="background: #dc3545; padding: 5px 8px;"><i class="fas fa-trash"></i></button>
-        </td>
-      </tr>
-    `;
-  });
-}
+    function deleteMenuItem(index) {
+      if (confirm('Xóa món này?')) {
+        menuItems.splice(index, 1);
+        localStorage.setItem('menuItems', JSON.stringify(menuItems));
+        
+        renderCategoryFilter();
+        renderMenu();
+        renderMenuTable();
+        renderAdminCategoryFilter();
+        
+        showNotification('Đã xóa món!');
+      }
+    }
 
-function openEditModal(index) {
-  currentEditOrderIndex = index;
-  const order = orders[index];
-  
-  // Thông tin khách hàng
-  document.getElementById("editCustomerPhone").value = order.customer?.phone || "";
-  document.getElementById("editCustomerAddress").value = order.customer?.address || "";
-  
-  // Món trong đơn
-  const container = document.getElementById("editOrderItems");
-  container.innerHTML = "";
-  
-  order.items.forEach((item, i) => {
-    container.innerHTML += `
-      <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 8px;">
-        <span style="flex: 2;">${item.name}</span>
-        <input type="number" value="${item.qty}" min="1" style="width: 60px;" onchange="updateOrderItemQty(${i}, this.value)">
-        <span>${(item.price * item.qty).toLocaleString()}đ</span>
-        <button onclick="removeOrderItem(${i})" style="background: #dc3545; padding: 5px;">X</button>
-      </div>
-    `;
-  });
-  
-  document.getElementById("editOrderNote").value = order.note || "";
-  updateEditOrderTotal();
-  document.getElementById("editOrderModal").style.display = "flex";
-}
+    // =============================================
+    // QUẢN LÝ ĐƠN HÀNG (ADMIN)
+    // =============================================
+    function loadOrders() {
+      orders = JSON.parse(localStorage.getItem('orders')) || [];
+      renderOrders();
+      renderStats();
+    }
 
-function closeEditModal() {
-  document.getElementById("editOrderModal").style.display = "none";
-}
+    function renderOrders() {
+      const searchTerm = document.getElementById('searchOrders')?.value.toLowerCase() || '';
+      const statusFilter = document.getElementById('orderStatus')?.value || 'all';
+      
+      let filtered = orders;
+      
+      if (searchTerm) {
+        filtered = filtered.filter(o => 
+          o.customer?.phone?.includes(searchTerm) ||
+          o.customer?.address?.toLowerCase().includes(searchTerm) ||
+          o.items.some(i => i.name.toLowerCase().includes(searchTerm))
+        );
+      }
+      
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter(o => o.status === statusFilter);
+      }
+      
+      filtered.sort((a, b) => b.id - a.id);
+      
+      const ordersList = document.getElementById('ordersList');
+      ordersList.innerHTML = '';
+      
+      if (filtered.length === 0) {
+        ordersList.innerHTML = '<p class="empty-state">Không có đơn hàng</p>';
+        return;
+      }
+      
+      filtered.forEach(order => {
+        const statusClass = order.status === 'new' ? 'status-new' : (order.status === 'processing' ? 'status-processing' : 'status-completed');
+        const statusText = order.status === 'new' ? 'Mới' : (order.status === 'processing' ? 'Đang xử lý' : 'Hoàn thành');
+        
+        ordersList.innerHTML += `
+          <div class="order-card">
+            <div class="order-header">
+              <strong>#${order.id}</strong>
+              <span class="order-status ${statusClass}">${statusText}</span>
+            </div>
+            <div><i class="fas fa-phone"></i> ${order.customer?.phone}</div>
+            <div><i class="fas fa-map-marker-alt"></i> ${order.customer?.address}</div>
+            <div><i class="fas fa-clock"></i> ${order.time}</div>
+            <div><i class="fas fa-coffee"></i> ${order.items.map(i => `${i.name} x${i.qty}`).join(', ')}</div>
+            <div style="font-weight: bold; color: var(--primary); margin: 10px 0;">Tổng: ${order.total.toLocaleString()}đ</div>
+            <div class="order-actions">
+              <button onclick="viewOrderDetail(${order.id})" style="background: #17a2b8;">Chi tiết</button>
+              <button onclick="updateOrderStatus(${order.id}, 'processing')" style="background: #ffc107;">Đang xử lý</button>
+              <button onclick="updateOrderStatus(${order.id}, 'completed')" style="background: #28a745;">Hoàn thành</button>
+              <button onclick="deleteOrder(${order.id})" style="background: #dc3545;">Xóa</button>
+            </div>
+          </div>
+        `;
+      });
+    }
 
-function updateOrderItemQty(itemIndex, qty) {
-  qty = parseInt(qty);
-  if (qty < 1) qty = 1;
-  orders[currentEditOrderIndex].items[itemIndex].qty = qty;
-  updateEditOrderTotal();
-}
+    function renderStats() {
+      const dateInput = document.getElementById('statsDate').value;
+      let filtered = orders;
+      
+      if (dateInput) {
+        filtered = orders.filter(o => o.date === dateInput);
+      }
+      
+      const totalOrders = filtered.length;
+      const revenue = filtered.reduce((s, o) => s + o.total, 0);
+      const highest = filtered.length ? Math.max(...filtered.map(o => o.total)) : 0;
+      
+      const itemCount = {};
+      filtered.forEach(o => o.items.forEach(i => {
+        itemCount[i.originalName || i.name] = (itemCount[i.originalName || i.name] || 0) + i.qty;
+      }));
+      const topItem = Object.entries(itemCount).sort((a,b) => b[1] - a[1])[0];
+      
+      document.getElementById('totalOrders').textContent = totalOrders;
+      document.getElementById('totalRevenue').textContent = revenue.toLocaleString() + 'đ';
+      document.getElementById('highestOrder').textContent = highest.toLocaleString() + 'đ';
+      document.getElementById('bestSeller').textContent = topItem ? `${topItem[0]} (${topItem[1]})` : '-';
+      
+      const recent = filtered.slice(-5).reverse();
+      let recentHtml = '<h3>Đơn hàng gần đây</h3><table style="width:100%"><tr><th>Mã</th><th>SĐT</th><th>Tiền</th></tr>';
+      recent.forEach(o => {
+        recentHtml += `<tr><td>#${o.id}</td><td>${o.customer?.phone}</td><td>${o.total.toLocaleString()}đ</td></tr>`;
+      });
+      recentHtml += '</table>';
+      document.getElementById('recentOrders').innerHTML = recentHtml;
+    }
 
-function removeOrderItem(itemIndex) {
-  orders[currentEditOrderIndex].items.splice(itemIndex, 1);
-  if (orders[currentEditOrderIndex].items.length === 0) {
-    orders.splice(currentEditOrderIndex, 1);
-    closeEditModal();
-  } else {
-    updateEditOrderTotal();
-    openEditModal(currentEditOrderIndex);
-  }
-}
+    function showTodayStats() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('statsDate').value = today;
+      renderStats();
+    }
 
-function updateEditOrderTotal() {
-  const order = orders[currentEditOrderIndex];
-  order.total = order.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
-  document.getElementById("editOrderTotal").textContent = `Tổng: ${order.total.toLocaleString()}đ`;
-}
+    function showAllStats() {
+      document.getElementById('statsDate').value = '';
+      renderStats();
+    }
 
-function saveEditedOrder() {
-  // Cập nhật thông tin khách hàng
-  if (!orders[currentEditOrderIndex].customer) {
-    orders[currentEditOrderIndex].customer = {};
-  }
-  orders[currentEditOrderIndex].customer.phone = document.getElementById("editCustomerPhone").value;
-  orders[currentEditOrderIndex].customer.address = document.getElementById("editCustomerAddress").value;
-  orders[currentEditOrderIndex].note = document.getElementById("editOrderNote").value;
-  orders[currentEditOrderIndex].time = "Sửa: " + new Date().toLocaleString("vi-VN");
-  
-  saveData();
-  renderOrders();
-  renderStats();
-  closeEditModal();
-  showNotification("Đã cập nhật!");
-}
+    function viewOrderDetail(id) {
+      const order = orders.find(o => o.id === id);
+      if (!order) return;
+      
+      const modal = document.getElementById('orderDetailModal');
+      const content = document.getElementById('orderDetailContent');
+      
+      let itemsHtml = '';
+      order.items.forEach(item => {
+        itemsHtml += `<tr><td>${item.name}</td><td>${item.qty}</td><td>${item.price.toLocaleString()}đ</td><td>${(item.price * item.qty).toLocaleString()}đ</td></tr>`;
+      });
+      
+      content.innerHTML = `
+        <h2>Đơn hàng #${order.id}</h2>
+        <p><strong>Thời gian:</strong> ${order.time}</p>
+        <p><strong>SĐT:</strong> ${order.customer?.phone}</p>
+        <p><strong>Địa chỉ:</strong> ${order.customer?.address}</p>
+        <p><strong>Ghi chú:</strong> ${order.note || 'Không có'}</p>
+        <p><strong>Trạng thái:</strong> ${order.status}</p>
+        
+        <h3>Món đã gọi</h3>
+        <table style="width:100%">
+          <tr><th>Món</th><th>SL</th><th>Đơn giá</th><th>Thành tiền</th></tr>
+          ${itemsHtml}
+        </table>
+        
+        <p style="text-align:right; font-weight:bold; margin-top:10px;">Tổng: ${order.total.toLocaleString()}đ</p>
+        
+        <button onclick="document.getElementById('orderDetailModal').style.display='none'" style="margin-top:10px;">Đóng</button>
+      `;
+      
+      modal.style.display = 'flex';
+    }
 
-function deleteOrder(index) {
-  if (confirm("Xóa đơn hàng?")) {
-    orders.splice(index, 1);
-    saveData();
-    renderOrders();
-    renderStats();
-    showNotification("Đã xóa!");
-  }
-}
+    function closeOrderDetailModal() {
+      document.getElementById('orderDetailModal').style.display = 'none';
+    }
 
-function viewOrderDetail(index) {
-  const order = orders[index];
-  const modal = document.getElementById("orderDetailModal");
-  const content = document.getElementById("orderDetailContent");
-  
-  let itemsHtml = "";
-  order.items.forEach(item => {
-    itemsHtml += `
-      <tr>
-        <td>${item.name}</td>
-        <td>${item.qty}</td>
-        <td>${item.price.toLocaleString()}đ</td>
-        <td>${(item.price * item.qty).toLocaleString()}đ</td>
-      </tr>
-    `;
-  });
-  
-  content.innerHTML = `
-    <h3>Đơn hàng #${order.id}</h3>
-    <p><strong>Thời gian:</strong> ${order.time}</p>
-    <p><strong>SĐT:</strong> ${order.customer?.phone || "Không có"}</p>
-    <p><strong>Địa chỉ:</strong> ${order.customer?.address || "Không có"}</p>
-    <p><strong>Ghi chú:</strong> ${order.note || "Không có"}</p>
-    
-    <h3 style="margin-top: 15px;">Món đã gọi</h3>
-    <table style="width: 100%;">
-      <thead>
-        <tr>
-          <th>Món</th>
-          <th>SL</th>
-          <th>Đơn giá</th>
-          <th>Thành tiền</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${itemsHtml}
-      </tbody>
-    </table>
-    
-    <div style="text-align: right; margin-top: 15px; font-weight: bold; font-size: 1.1rem;">
-      Tổng cộng: ${order.total.toLocaleString()}đ
-    </div>
-  `;
-  
-  modal.style.display = "flex";
-}
+    function updateOrderStatus(id, status) {
+      const order = orders.find(o => o.id === id);
+      if (!order) return;
+      
+      order.status = status;
+      localStorage.setItem('orders', JSON.stringify(orders));
+      
+      loadOrders();
+      renderStats();
+      showNotification(`Đã cập nhật trạng thái đơn #${id}`);
+    }
 
-function closeOrderDetailModal() {
-  document.getElementById("orderDetailModal").style.display = "none";
-}
+    function deleteOrder(id) {
+      if (!confirm(`Xóa đơn hàng #${id}?`)) return;
+      
+      orders = orders.filter(o => o.id !== id);
+      localStorage.setItem('orders', JSON.stringify(orders));
+      
+      loadOrders();
+      renderStats();
+      showNotification(`Đã xóa đơn #${id}`);
+    }
 
-// ====== ADMIN: THỐNG KÊ ======
-function renderStats() {
-  if (!isLoggedIn) return;
-  
-  const dateInput = document.getElementById("statsDate").value;
-  let filtered = orders;
-  if (dateInput) {
-    filtered = orders.filter(o => o.date === dateInput);
-  }
-  
-  const totalOrders = filtered.length;
-  const revenue = filtered.reduce((s, o) => s + o.total, 0);
-  const highest = filtered.length ? Math.max(...filtered.map(o => o.total)) : 0;
-  
-  // Món bán chạy
-  const itemCount = {};
-  filtered.forEach(o => o.items.forEach(i => {
-    itemCount[i.name] = (itemCount[i.name] || 0) + i.qty;
-  }));
-  const topItem = Object.entries(itemCount).sort((a,b) => b[1] - a[1])[0];
-  
-  document.getElementById("totalOrders").textContent = totalOrders;
-  document.getElementById("totalRevenue").textContent = revenue.toLocaleString() + "đ";
-  document.getElementById("highestOrder").textContent = highest.toLocaleString() + "đ";
-  document.getElementById("bestSeller").textContent = topItem ? `${topItem[0]} (${topItem[1]})` : "-";
-  
-  // Chi tiết
-  const details = document.getElementById("dailyStatsDetails");
-  if (dateInput && filtered.length > 0) {
-    let html = "<h3>Chi tiết đơn hàng</h3><table style='width:100%'><tr><th>Mã</th><th>Khách</th><th>Món</th><th>Tiền</th></tr>";
-    filtered.forEach(o => {
-      html += `<tr>
-        <td>#${o.id}</td>
-        <td>${o.customer?.phone || "N/A"}</td>
-        <td>${o.items.map(i => `${i.name} x${i.qty}`).join(", ").substring(0, 20)}...</td>
-        <td>${o.total.toLocaleString()}đ</td>
-      </tr>`;
-    });
-    html += "</table>";
-    details.innerHTML = html;
-  } else {
-    details.innerHTML = "";
-  }
-}
+    // =============================================
+    // THÔNG BÁO
+    // =============================================
+    function showNotification(message, isError = false) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = 'notification' + (isError ? ' error' : '') + ' show';
+      setTimeout(() => notification.classList.remove('show'), 3000);
+    }
 
-function showTodayStats() {
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById("statsDate").value = today;
-  renderStats();
-}
-
-function showAllStats() {
-  document.getElementById("statsDate").value = "";
-  renderStats();
-}
-
-// ====== INIT ======
-initializeData();
-renderPublicCategoryFilter();
-renderPublicMenu();
-renderCart();
-
-// Set default address
-document.getElementById("customerAddress").value = "Trung Mầu-Cổng phụ KCN bá hiện 2";
-</script>
+    // =============================================
+    // KHỞI CHẠY
+    // =============================================
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>
