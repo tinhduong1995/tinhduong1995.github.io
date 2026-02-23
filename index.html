@@ -303,45 +303,21 @@
       flex-wrap: wrap;
     }
     
-    /* Telegram settings */
-    .telegram-settings {
+    /* Telegram status indicator */
+    .telegram-status-badge {
       background-color: #e8f4fd;
-      border: 1px solid var(--telegram);
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 15px;
-    }
-    
-    .telegram-settings h3 {
-      color: var(--telegram);
-      display: flex;
+      border-radius: 20px;
+      padding: 5px 12px;
+      display: inline-flex;
       align-items: center;
       gap: 5px;
+      font-size: 0.8rem;
+      color: var(--telegram);
+      margin-bottom: 10px;
     }
     
-    .telegram-status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 10px 0;
-      padding: 8px;
-      background: white;
-      border-radius: 5px;
-    }
-    
-    .status-indicator {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background-color: #ccc;
-    }
-    
-    .status-indicator.active {
-      background-color: var(--success);
-    }
-    
-    .status-indicator.inactive {
-      background-color: var(--danger);
+    .telegram-status-badge i {
+      font-size: 1rem;
     }
     
     /* Styles for the main menu */
@@ -743,13 +719,18 @@
 <body>
   <header>
     <h1><i class="fas fa-coffee"></i> Bii Coffee</h1>
-    <p>Quản lý đơn hàng - Tích hợp Telegram Bot</p>
+    <p>Quản lý đơn hàng - Tự động gửi về Telegram</p>
   </header>
 
   <div class="container">
     <!-- Order Section - Hiển thị đầu tiên trên mobile -->
     <div class="section desktop-order">
       <h2><i class="fas fa-shopping-cart"></i> Order</h2>
+      
+      <!-- Telegram status indicator -->
+      <div class="telegram-status-badge">
+        <i class="fab fa-telegram"></i> Tự động gửi đơn hàng về Telegram quán
+      </div>
       
       <!-- Menu chính để order -->
       <h3>Menu Order</h3>
@@ -780,62 +761,12 @@
       </table>
       <div class="cart-total" id="cartTotal">Tổng cộng: 0đ</div>
       <textarea id="orderNote" rows="2" placeholder="Ghi chú đơn hàng" style="width: 100%;"></textarea><br>
-      <div class="flex" style="justify-content: space-between;">
-        <button onclick="createOrder()" class="success" style="flex: 1;">
-          <i class="fas fa-check"></i> Tạo đơn
-        </button>
-        <button onclick="createOrderAndSendTelegram()" class="telegram" style="flex: 1;">
-          <i class="fab fa-telegram"></i> Tạo & Gửi Telegram
-        </button>
-      </div>
+      <button onclick="createOrder()" class="success" style="width: 100%; margin-top: 10px;">
+        <i class="fas fa-check"></i> Tạo đơn hàng (Tự động gửi Telegram)
+      </button>
     </div>
 
-    <!-- Cài đặt Telegram - Hiển thị thứ hai trên mobile -->
-    <div class="section">
-      <h2><i class="fab fa-telegram"></i> Cài đặt Telegram Bot</h2>
-      
-      <div class="telegram-settings">
-        <h3><i class="fab fa-telegram"></i> Thông tin bot</h3>
-        
-        <div class="telegram-status">
-          <span class="status-indicator" id="telegramStatus"></span>
-          <span id="telegramStatusText">Chưa kết nối</span>
-        </div>
-        
-        <div class="form-group">
-          <label>Bot Token</label>
-          <input type="text" id="botToken" placeholder="Nhập token từ BotFather" value="">
-        </div>
-        
-        <div class="form-group">
-          <label>Chat ID</label>
-          <input type="text" id="chatId" placeholder="Nhập Chat ID của bạn" value="">
-          <small style="color: #666;">Có thể lấy bằng cách gửi tin nhắn cho bot @userinfobot</small>
-        </div>
-        
-        <div class="flex">
-          <button onclick="saveTelegramConfig()" class="success">
-            <i class="fas fa-save"></i> Lưu cấu hình
-          </button>
-          <button onclick="testTelegramConnection()" class="info">
-            <i class="fas fa-paper-plane"></i> Test kết nối
-          </button>
-        </div>
-        
-        <div style="margin-top: 10px; font-size: 0.85rem; background: white; padding: 10px; border-radius: 5px;">
-          <p><strong>Hướng dẫn:</strong></p>
-          <ol style="margin-left: 20px;">
-            <li>Vào Telegram tìm @BotFather để tạo bot mới và lấy token</li>
-            <li>Vào @userinfobot để lấy Chat ID của bạn</li>
-            <li>Nhập token và Chat ID vào trên</li>
-            <li>Nhấn "Test kết nối" để kiểm tra</li>
-            <li>Sau đó dùng nút "Tạo & Gửi Telegram" khi tạo đơn</li>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <!-- Thống kê - Hiển thị thứ ba trên mobile -->
+    <!-- Thống kê - Hiển thị thứ hai trên mobile -->
     <div class="section desktop-stats">
       <h2><i class="fas fa-chart-bar"></i> Thống kê</h2>
       
@@ -870,7 +801,7 @@
       </div>
     </div>
 
-    <!-- Đơn hàng - Hiển thị thứ tư trên mobile -->
+    <!-- Đơn hàng - Hiển thị thứ ba trên mobile -->
     <div class="section desktop-orders">
       <h2><i class="fas fa-list"></i> Đơn hàng</h2>
       <div class="flex">
@@ -1062,9 +993,6 @@
           <button onclick="shareBill()" class="success">
             <i class="fas fa-share-alt"></i> Chia sẻ ngay
           </button>
-          <button onclick="sendBillToTelegram()" class="telegram">
-            <i class="fab fa-telegram"></i> Gửi Telegram
-          </button>
         </div>
 
         <!-- Nơi hiển thị ảnh bill để người dùng có thể nhấn giữ để lưu -->
@@ -1079,6 +1007,13 @@
   <div class="notification" id="notification"></div>
 
 <script>
+// =============================================
+// CẤU HÌNH TELEGRAM CỦA BẠN - THAY ĐỔI 2 DÒNG NÀY
+// =============================================
+const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; // Thay bằng Bot Token của bạn
+const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID_HERE"; // Thay bằng Chat ID của bạn
+// =============================================
+
 // Menu với tất cả các món
 let menuItems = [
   // TRÀ
@@ -1211,12 +1146,6 @@ let currentStatsDate = "all";
 let compactMenuView = false;
 let currentBillOrder = null;
 
-// Telegram configuration
-let telegramConfig = JSON.parse(localStorage.getItem("telegramConfig")) || {
-  botToken: "",
-  chatId: ""
-};
-
 // Khởi tạo dữ liệu
 function initializeData() {
   // Lấy dữ liệu từ localStorage hoặc sử dụng dữ liệu mặc định
@@ -1229,11 +1158,6 @@ function initializeData() {
   if (savedOrders) {
     orders = savedOrders;
   }
-  
-  // Load Telegram config
-  document.getElementById("botToken").value = telegramConfig.botToken || "";
-  document.getElementById("chatId").value = telegramConfig.chatId || "";
-  updateTelegramStatus();
 }
 
 function saveData() {
@@ -1241,205 +1165,38 @@ function saveData() {
   localStorage.setItem("orders", JSON.stringify(orders));
 }
 
-function saveTelegramConfig() {
-  telegramConfig.botToken = document.getElementById("botToken").value.trim();
-  telegramConfig.chatId = document.getElementById("chatId").value.trim();
-  
-  localStorage.setItem("telegramConfig", JSON.stringify(telegramConfig));
-  updateTelegramStatus();
-  showNotification("Đã lưu cấu hình Telegram!");
-}
-
-function updateTelegramStatus() {
-  const statusIndicator = document.getElementById("telegramStatus");
-  const statusText = document.getElementById("telegramStatusText");
-  
-  if (telegramConfig.botToken && telegramConfig.chatId) {
-    statusIndicator.className = "status-indicator active";
-    statusText.textContent = "Đã cấu hình";
-  } else {
-    statusIndicator.className = "status-indicator inactive";
-    statusText.textContent = "Chưa cấu hình";
-  }
-}
-
-async function testTelegramConnection() {
-  if (!telegramConfig.botToken || !telegramConfig.chatId) {
-    showNotification("Vui lòng nhập Bot Token và Chat ID!", true);
-    return;
-  }
-  
-  const testMessage = "🟢 Test kết nối từ Bii Coffee thành công!";
-  
-  try {
-    const response = await sendTelegramMessage(testMessage);
-    if (response.ok) {
-      showNotification("Kết nối Telegram thành công!");
-    } else {
-      const data = await response.json();
-      showNotification("Lỗi: " + data.description, true);
-    }
-  } catch (error) {
-    console.error("Telegram error:", error);
-    showNotification("Không thể kết nối đến Telegram!", true);
-  }
-}
-
 async function sendTelegramMessage(message) {
-  const url = `https://api.telegram.org/bot${telegramConfig.botToken}/sendMessage`;
-  
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      chat_id: telegramConfig.chatId,
-      text: message,
-      parse_mode: "HTML"
-    })
-  });
-  
-  return response;
-}
-
-async function sendTelegramPhoto(photoUrl, caption) {
-  // Note: This requires the photo to be accessible via URL
-  // For canvas images, we need to convert to blob and use multipart/form-data
-  const url = `https://api.telegram.org/bot${telegramConfig.botToken}/sendPhoto`;
-  
-  // For simplicity, we'll send as document if needed
-  const formData = new FormData();
-  formData.append("chat_id", telegramConfig.chatId);
-  formData.append("photo", photoUrl);
-  formData.append("caption", caption);
-  
-  const response = await fetch(url, {
-    method: "POST",
-    body: formData
-  });
-  
-  return response;
-}
-
-function createOrderAndSendTelegram() {
-  if (cart.length === 0) {
-    showNotification("Giỏ hàng trống!", true);
-    return;
+  // Kiểm tra nếu chưa cấu hình token
+  if (TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN_HERE" || TELEGRAM_CHAT_ID === "YOUR_CHAT_ID_HERE") {
+    console.log("Chưa cấu hình Telegram. Vui lòng thay TELEGRAM_BOT_TOKEN và TELEGRAM_CHAT_ID trong code.");
+    return false;
   }
   
-  if (!telegramConfig.botToken || !telegramConfig.chatId) {
-    if (!confirm("Bạn chưa cấu hình Telegram. Vẫn tạo đơn bình thường?")) {
-      return;
-    }
-    createOrder();
-    return;
-  }
-  
-  const note = document.getElementById("orderNote").value;
-  const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
-  const now = new Date();
-  const dateStr = now.toISOString().split('T')[0];
-  
-  const order = {
-    id: orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1,
-    items: [...cart],
-    note,
-    total,
-    time: now.toLocaleString(),
-    date: dateStr
-  };
-  
-  // Tạo nội dung tin nhắn Telegram
-  let message = `<b>☕ BII COFFEE - ĐƠN HÀNG MỚI #${order.id}</b>\n\n`;
-  message += `<b>🕒 Thời gian:</b> ${order.time}\n`;
-  message += `<b>📝 Ghi chú:</b> ${note || "Không có"}\n\n`;
-  message += `<b>🍽️ CHI TIẾT MÓN:</b>\n`;
-  
-  order.items.forEach(item => {
-    const itemTotal = item.price * item.qty;
-    message += `${item.name} x${item.qty} - ${item.price.toLocaleString()}đ = ${itemTotal.toLocaleString()}đ\n`;
-  });
-  
-  message += `\n<b>💰 TỔNG CỘNG: ${order.total.toLocaleString()}đ</b>\n`;
-  message += `\n<b>🏠 Địa chỉ:</b> Trung Mầu-Cổng phụ KCN bá hiện 2\n`;
-  message += `<b>📞 Điện thoại:</b> 0964 391 834\n`;
-  message += `<b>💝 Cảm ơn quý khách!</b>`;
-  
-  // Gửi tin nhắn Telegram
-  sendTelegramMessage(message)
-    .then(response => {
-      if (response.ok) {
-        showNotification("Đã gửi thông báo Telegram!");
-      } else {
-        showNotification("Không gửi được Telegram, nhưng đơn hàng vẫn được tạo.", true);
-      }
-    })
-    .catch(error => {
-      console.error("Telegram error:", error);
-      showNotification("Lỗi gửi Telegram, nhưng đơn hàng vẫn được tạo.", true);
-    });
-  
-  // Thêm đơn hàng vào hệ thống
-  orders.push(order);
-  saveData();
-  
-  cart = [];
-  document.getElementById("orderNote").value = "";
-  
-  renderCart();
-  renderOrders();
-  renderStats();
-  
-  showNotification(`Đã tạo đơn hàng #${order.id} thành công!`);
-}
-
-async function sendBillToTelegram() {
-  if (!currentBillOrder) {
-    showNotification("Không có đơn hàng nào!", true);
-    return;
-  }
-  
-  if (!telegramConfig.botToken || !telegramConfig.chatId) {
-    showNotification("Vui lòng cấu hình Telegram trước!", true);
-    return;
-  }
-  
-  const billElement = document.getElementById("billPreview");
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
   
   try {
-    const canvas = await html2canvas(billElement, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff'
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: "HTML"
+      })
     });
     
-    // Chuyển canvas thành blob
-    canvas.toBlob(async (blob) => {
-      // Tạo FormData để gửi ảnh
-      const formData = new FormData();
-      formData.append("chat_id", telegramConfig.chatId);
-      formData.append("photo", blob, `bill-bii-coffee-${currentBillOrder.id}.png`);
-      formData.append("caption", `📄 Hóa đơn Bii Coffee #${currentBillOrder.id}`);
-      
-      const url = `https://api.telegram.org/bot${telegramConfig.botToken}/sendPhoto`;
-      
-      const response = await fetch(url, {
-        method: "POST",
-        body: formData
-      });
-      
-      if (response.ok) {
-        showNotification("Đã gửi bill qua Telegram!");
-      } else {
-        const data = await response.json();
-        showNotification("Lỗi: " + data.description, true);
-      }
-    }, 'image/png');
+    if (response.ok) {
+      return true;
+    } else {
+      const data = await response.json();
+      console.error("Telegram error:", data);
+      return false;
+    }
   } catch (error) {
-    console.error("Error sending bill:", error);
-    showNotification("Không thể gửi bill qua Telegram!", true);
+    console.error("Error sending Telegram message:", error);
+    return false;
   }
 }
 
@@ -1790,7 +1547,7 @@ function removeFromCart(i) {
 }
 
 // ====== ORDERS ======
-function createOrder() {
+async function createOrder() {
   if (cart.length === 0) {
     showNotification("Giỏ hàng trống!", true);
     return;
@@ -1810,6 +1567,32 @@ function createOrder() {
     date: dateStr
   };
   
+  // Tạo nội dung tin nhắn Telegram
+  let message = `<b>☕ BII COFFEE - ĐƠN HÀNG MỚI #${order.id}</b>\n\n`;
+  message += `<b>🕒 Thời gian:</b> ${order.time}\n`;
+  message += `<b>📝 Ghi chú:</b> ${note || "Không có"}\n\n`;
+  message += `<b>🍽️ CHI TIẾT MÓN:</b>\n`;
+  
+  order.items.forEach(item => {
+    const itemTotal = item.price * item.qty;
+    message += `${item.name} x${item.qty} - ${item.price.toLocaleString()}đ = ${itemTotal.toLocaleString()}đ\n`;
+  });
+  
+  message += `\n<b>💰 TỔNG CỘNG: ${order.total.toLocaleString()}đ</b>\n`;
+  message += `\n<b>🏠 Địa chỉ:</b> Trung Mầu-Cổng phụ KCN bá hiện 2\n`;
+  message += `<b>📞 Điện thoại:</b> 0964 391 834\n`;
+  message += `<b>💝 Cảm ơn quý khách!</b>`;
+  
+  // Gửi tin nhắn Telegram (không await để không làm chậm quá trình tạo đơn)
+  sendTelegramMessage(message).then(success => {
+    if (success) {
+      showNotification(`Đã tạo đơn #${order.id} và gửi Telegram thành công!`);
+    } else {
+      showNotification(`Đã tạo đơn #${order.id} nhưng không gửi được Telegram (kiểm tra cấu hình)`, true);
+    }
+  });
+  
+  // Thêm đơn hàng vào hệ thống
   orders.push(order);
   saveData();
   
@@ -1819,8 +1602,6 @@ function createOrder() {
   renderCart();
   renderOrders();
   renderStats();
-  
-  showNotification(`Đã tạo đơn hàng #${order.id} thành công!`);
 }
 
 function renderOrders() {
@@ -2205,8 +1986,13 @@ renderCart();
 // Đặt ngày mặc định là hôm nay cho bộ lọc thống kê
 document.getElementById("statsDate").value = new Date().toISOString().split('T')[0];
 
-// Cập nhật trạng thái Telegram
-updateTelegramStatus();
+// Kiểm tra cấu hình Telegram
+if (TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN_HERE" || TELEGRAM_CHAT_ID === "YOUR_CHAT_ID_HERE") {
+  console.log("⚠️ Vui lòng cấu hình Telegram Bot Token và Chat ID trong code!");
+  showNotification("⚠️ Cần cấu hình Telegram trong code!", true);
+} else {
+  console.log("✅ Đã cấu hình Telegram sẵn sàng!");
+}
 </script>
 </body>
 </html>
