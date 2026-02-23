@@ -192,6 +192,9 @@
       flex-wrap: wrap;
       gap: 8px;
       margin-bottom: 12px;
+      max-height: 100px;
+      overflow-y: auto;
+      padding: 5px;
     }
     
     .category-btn {
@@ -201,6 +204,7 @@
       border-radius: 15px;
       cursor: pointer;
       font-size: 0.8rem;
+      white-space: nowrap;
     }
     
     .category-btn.active {
@@ -209,7 +213,7 @@
     }
     
     .scrollable-menu-container {
-      max-height: 300px;
+      max-height: 400px;
       overflow-y: auto;
       border: 1px solid #eee;
       border-radius: 6px;
@@ -218,6 +222,71 @@
       margin-bottom: 15px;
     }
     
+    /* Menu categories */
+    .menu-category {
+      margin-bottom: 15px;
+    }
+    
+    .menu-category h3 {
+      color: var(--primary);
+      padding-bottom: 4px;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .menu-category h3 .toggle-icon {
+      font-size: 0.7rem;
+      transition: transform 0.3s;
+    }
+    
+    .menu-category.collapsed h3 .toggle-icon {
+      transform: rotate(-90deg);
+    }
+    
+    .menu-category-content {
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      max-height: 1000px;
+    }
+    
+    .menu-category.collapsed .menu-category-content {
+      max-height: 0;
+    }
+    
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px dotted #eee;
+    }
+    
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+    
+    .menu-item-name {
+      flex-grow: 1;
+      font-size: 0.9rem;
+    }
+    
+    .menu-item-price {
+      color: var(--primary);
+      font-weight: bold;
+      margin: 0 8px;
+      font-size: 0.9rem;
+    }
+    
+    .add-item-btn {
+      padding: 4px 8px;
+      font-size: 0.7rem;
+    }
+    
+    /* Compact menu view */
     .compact-menu-item {
       display: flex;
       justify-content: space-between;
@@ -249,6 +318,19 @@
       font-size: 0.8rem;
       border-radius: 3px;
       background-color: var(--success);
+    }
+    
+    .toggle-menu-view {
+      display: block;
+      text-align: center;
+      margin: 8px 0;
+      padding: 4px;
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 0.8rem;
+      width: 100%;
     }
     
     table {
@@ -376,6 +458,11 @@
         <!-- Categories will be inserted here -->
       </div>
       
+      <!-- Nút chuyển chế độ xem menu -->
+      <button class="toggle-menu-view" onclick="togglePublicMenuView()">
+        <i class="fas fa-exchange-alt"></i> Chuyển chế độ xem menu
+      </button>
+      
       <!-- Menu -->
       <div class="scrollable-menu-container">
         <div id="publicMenu">
@@ -485,9 +572,17 @@
           <input type="number" id="menuPrice" placeholder="Giá" min="0" style="flex: 1;">
           <select id="menuCategory" style="flex: 1;">
             <option value="TRÀ">TRÀ</option>
+            <option value="SODA">SODA</option>
+            <option value="SINH TỐ">SINH TỐ</option>
+            <option value="ĐÁ XAY">ĐÁ XAY</option>
             <option value="CÀ PHÊ">CÀ PHÊ</option>
             <option value="TRÀ SỮA">TRÀ SỮA</option>
-            <option value="ĐỒ ĂN">ĐỒ ĂN</option>
+            <option value="SỮA CHUA">SỮA CHUA</option>
+            <option value="NƯỚC ÉP">NƯỚC ÉP</option>
+            <option value="PIZZA">PIZZA</option>
+            <option value="ĐỒ ĂN VẶT">ĐỒ ĂN VẶT</option>
+            <option value="MỲ CAY">MỲ CAY</option>
+            <option value="BÚN ĐẬU">BÚN ĐẬU</option>
           </select>
           <button onclick="addMenuItem()"><i class="fas fa-plus"></i> Thêm</button>
         </div>
@@ -547,9 +642,17 @@
       <input type="number" id="editMenuItemPrice" placeholder="Giá" style="margin: 10px 0;">
       <select id="editMenuItemCategory">
         <option value="TRÀ">TRÀ</option>
+        <option value="SODA">SODA</option>
+        <option value="SINH TỐ">SINH TỐ</option>
+        <option value="ĐÁ XAY">ĐÁ XAY</option>
         <option value="CÀ PHÊ">CÀ PHÊ</option>
         <option value="TRÀ SỮA">TRÀ SỮA</option>
-        <option value="ĐỒ ĂN">ĐỒ ĂN</option>
+        <option value="SỮA CHUA">SỮA CHUA</option>
+        <option value="NƯỚC ÉP">NƯỚC ÉP</option>
+        <option value="PIZZA">PIZZA</option>
+        <option value="ĐỒ ĂN VẶT">ĐỒ ĂN VẶT</option>
+        <option value="MỲ CAY">MỲ CAY</option>
+        <option value="BÚN ĐẬU">BÚN ĐẬU</option>
       </select>
       <button onclick="saveEditedMenuItem()" class="success" style="width: 100%; margin-top: 15px;">Lưu</button>
     </div>
@@ -561,17 +664,131 @@
 // =============================================
 // CẤU HÌNH TELEGRAM - THAY ĐỔI THÔNG TIN CỦA BẠN
 // =============================================
-const TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"; // Thay bằng Bot Token của bạn
-const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID_HERE"; // Thay bằng Chat ID của bạn
-const ADMIN_PASSWORD = "admin123"; // Mật khẩu đăng nhập quản lý
+const TELEGRAM_BOT_TOKEN = "8628768143:AAH7KlHFMESJNDYUQN_TkXBqSVblnM_r82o";
+const TELEGRAM_CHAT_ID = "6315315253";
+const ADMIN_PASSWORD = "admin123";
 // =============================================
 
+// Menu đầy đủ với tất cả các món từ file gốc
 let menuItems = [
+  // TRÀ
   { id: 1, name: "Trà chanh", price: 10000, category: "TRÀ" },
-  { id: 2, name: "Cà phê sữa", price: 20000, category: "CÀ PHÊ" },
-  { id: 3, name: "Trà sữa khoai môn", price: 25000, category: "TRÀ SỮA" },
-  { id: 4, name: "Bánh mì que", price: 15000, category: "ĐỒ ĂN" },
-  { id: 5, name: "Trà đào", price: 20000, category: "TRÀ" }
+  { id: 2, name: "Trà chanh nha đam", price: 15000, category: "TRÀ" },
+  { id: 3, name: "Trà quất", price: 10000, category: "TRÀ" },
+  { id: 4, name: "Trà quất nha đam", price: 15000, category: "TRÀ" },
+  { id: 5, name: "Trà dưa lưới", price: 20000, category: "TRÀ" },
+  { id: 6, name: "Trà đào", price: 20000, category: "TRÀ" },
+  { id: 7, name: "Trà đào cam xả", price: 25000, category: "TRÀ" },
+  { id: 8, name: "Trà quất lắc sữa", price: 25000, category: "TRÀ" },
+  { id: 9, name: "Trà táo xanh", price: 25000, category: "TRÀ" },
+  { id: 10, name: "Trà vải", price: 25000, category: "TRÀ" },
+  { id: 11, name: "Trà dâu", price: 25000, category: "TRÀ" },
+  { id: 12, name: "Trà hoa quả nhiệt đới", price: 25000, category: "TRÀ" },
+  { id: 13, name: "Trà chanh bạc hà", price: 20000, category: "TRÀ" },
+  { id: 14, name: "Trà chanh dâu", price: 20000, category: "TRÀ" },
+  { id: 15, name: "Trà xoài chanh leo", price: 20000, category: "TRÀ" },
+  { id: 16, name: "Trà đào chanh dây", price: 20000, category: "TRÀ" },
+  { id: 17, name: "Trà đào nhài", price: 20000, category: "TRÀ" },
+  { id: 18, name: "Trà chanh leo", price: 20000, category: "TRÀ" },
+  
+  // SODA
+  { id: 19, name: "Soda việt quất", price: 20000, category: "SODA" },
+  { id: 20, name: "Soda bạc hà", price: 20000, category: "SODA" },
+  { id: 21, name: "Soda dâu", price: 20000, category: "SODA" },
+  { id: 22, name: "Soda dưa lưới", price: 20000, category: "SODA" },
+  
+  // SINH TỐ
+  { id: 23, name: "Sinh tố bơ", price: 30000, category: "SINH TỐ" },
+  { id: 24, name: "Sinh tố xoài", price: 30000, category: "SINH TỐ" },
+  { id: 25, name: "Sinh tố dâu tây", price: 30000, category: "SINH TỐ" },
+  
+  // ĐÁ XAY
+  { id: 26, name: "Đá xay việt quất", price: 35000, category: "ĐÁ XAY" },
+  { id: 27, name: "Đá xay matcha", price: 35000, category: "ĐÁ XAY" },
+  { id: 28, name: "Đá xay bạc hà", price: 35000, category: "ĐÁ XAY" },
+  { id: 29, name: "Đá xay khoai môn", price: 35000, category: "ĐÁ XAY" },
+  
+  // CÀ PHÊ
+  { id: 30, name: "Cà phê bạc xỉu", price: 25000, category: "CÀ PHÊ" },
+  { id: 31, name: "Cà phê nâu sữa", price: 20000, category: "CÀ PHÊ" },
+  { id: 32, name: "Cà phê nâu nóng", price: 20000, category: "CÀ PHÊ" },
+  
+  // TRÀ SỮA
+  { id: 33, name: "Trà sữa khoai môn", price: 25000, category: "TRÀ SỮA" },
+  { id: 34, name: "Trà sữa sốt xoài", price: 25000, category: "TRÀ SỮA" },
+  { id: 35, name: "Trà sữa socola", price: 25000, category: "TRÀ SỮA" },
+  { id: 36, name: "Trà sữa matcha", price: 25000, category: "TRÀ SỮA" },
+  { id: 37, name: "Trà sữa dưa lưới", price: 25000, category: "TRÀ SỮA" },
+  { id: 38, name: "Trà sữa hồng trà", price: 25000, category: "TRÀ SỮA" },
+  { id: 39, name: "Trà sữa dâu", price: 25000, category: "TRÀ SỮA" },
+  { id: 40, name: "Trà sữa đào", price: 25000, category: "TRÀ SỮA" },
+  { id: 41, name: "Trà sữa dừa", price: 25000, category: "TRÀ SỮA" },
+  { id: 42, name: "Trà sữa lá nếp", price: 25000, category: "TRÀ SỮA" },
+  { id: 43, name: "Trà sữa táo xanh", price: 25000, category: "TRÀ SỮA" },
+  { id: 44, name: "Trà sữa caramen", price: 25000, category: "TRÀ SỮA" },
+  { id: 45, name: "Trà sữa hạt dẻ", price: 25000, category: "TRÀ SỮA" },
+  { id: 46, name: "Trà sữa cacao", price: 25000, category: "TRÀ SỮA" },
+  { id: 47, name: "Trà sữa việt quất", price: 25000, category: "TRÀ SỮA" },
+  { id: 48, name: "Trà sữa matcha latte", price: 25000, category: "TRÀ SỮA" },
+  { id: 49, name: "Trà sữa bạc hà", price: 25000, category: "TRÀ SỮA" },
+  { id: 50, name: "Trà sữa khoai lang tím", price: 30000, category: "TRÀ SỮA" },
+  { id: 51, name: "Trà sữa trân châu đường đen", price: 30000, category: "TRÀ SỮA" },
+  { id: 52, name: "Trà sữa kem trứng dừa nướng", price: 30000, category: "TRÀ SỮA" },
+  { id: 53, name: "Trà sữa sốt xoài kem bông", price: 30000, category: "TRÀ SỮA" },
+  { id: 54, name: "Trà sữa xoài matcha", price: 30000, category: "TRÀ SỮA" },
+  { id: 55, name: "Trà sữa khoai môn kem dừa nướng", price: 30000, category: "TRÀ SỮA" },
+  { id: 56, name: "Trà sữa đường đen kem dừa nướng", price: 30000, category: "TRÀ SỮA" },
+  { id: 57, name: "Trà sữa khoai lang tím kem trứng", price: 35000, category: "TRÀ SỮA" },
+  
+  // SỮA CHUA
+  { id: 58, name: "Sữa chua lắc dâu", price: 25000, category: "SỮA CHUA" },
+  { id: 59, name: "Sữa chua lắc xoài", price: 25000, category: "SỮA CHUA" },
+  { id: 60, name: "Sữa chua lắc việt quất", price: 25000, category: "SỮA CHUA" },
+  { id: 61, name: "Sữa chua hoa quả", price: 30000, category: "SỮA CHUA" },
+  
+  // NƯỚC ÉP
+  { id: 62, name: "Nước ép cam", price: 25000, category: "NƯỚC ÉP" },
+  { id: 63, name: "Nước ép dưa hấu", price: 25000, category: "NƯỚC ÉP" },
+  { id: 64, name: "Nước ép dứa", price: 25000, category: "NƯỚC ÉP" },
+  
+  // PIZZA
+  { id: 65, name: "Pizza xúc xích", price: 60000, category: "PIZZA" },
+  { id: 66, name: "Pizza bò ngô", price: 60000, category: "PIZZA" },
+  { id: 67, name: "Pizza thập cẩm", price: 60000, category: "PIZZA" },
+  
+  // ĐỒ ĂN VẶT
+  { id: 68, name: "Xúc xích", price: 8000, category: "ĐỒ ĂN VẶT" },
+  { id: 69, name: "Lạp xưởng", price: 8000, category: "ĐỒ ĂN VẶT" },
+  { id: 70, name: "Phô mai que", price: 8000, category: "ĐỒ ĂN VẶT" },
+  { id: 71, name: "Hướng dương đen", price: 15000, category: "ĐỒ ĂN VẶT" },
+  { id: 72, name: "Hướng dương trắng", price: 15000, category: "ĐỒ ĂN VẶT" },
+  { id: 73, name: "Khoai lang kén", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { id: 74, name: "Khoai tây chiên", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { id: 75, name: "Nem chua rán", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { id: 76, name: "Khoai môn lệ phố", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { id: 77, name: "Mực vòng chiên", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { id: 78, name: "Gà viên chiên", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { id: 79, name: "Gà viên chiên sốt cay", price: 35000, category: "ĐỒ ĂN VẶT" },
+  { id: 80, name: "Đùi gà KFC", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { id: 81, name: "Đùi gà KFC sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { id: 82, name: "Cánh gà KFC", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { id: 83, name: "Cánh gà KFC sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
+  { id: 84, name: "Cá viên chiên", price: 25000, category: "ĐỒ ĂN VẶT" },
+  { id: 85, name: "Cá viên chiên sốt cay", price: 30000, category: "ĐỒ ĂN VẶT" },
+  
+  // MỲ CAY
+  { id: 86, name: "Mỳ cay xúc xích", price: 40000, category: "MỲ CAY" },
+  { id: 87, name: "Mỳ cay bò", price: 45000, category: "MỲ CAY" },
+  { id: 88, name: "Mỳ cay sườn sụn", price: 45000, category: "MỲ CAY" },
+  { id: 89, name: "Mỳ cay hải sản", price: 50000, category: "MỲ CAY" },
+  { id: 90, name: "Mỳ cay thập cẩm", price: 55000, category: "MỲ CAY" },
+  
+  // BÚN ĐẬU
+  { id: 91, name: "Bún đậu đầy đủ", price: 35000, category: "BÚN ĐẬU" },
+  { id: 92, name: "Bún đậu thêm bún", price: 40000, category: "BÚN ĐẬU" },
+  { id: 93, name: "Bún đậu thêm đậu", price: 40000, category: "BÚN ĐẬU" },
+  { id: 94, name: "Bún đậu thêm chả cốm", price: 45000, category: "BÚN ĐẬU" },
+  { id: 95, name: "Bún đậu thêm dồi sụn", price: 45000, category: "BÚN ĐẬU" }
 ];
 
 let orders = JSON.parse(localStorage.getItem("orders")) || [];
@@ -581,11 +798,17 @@ let currentEditMenuItemIndex = -1;
 let currentPublicCategory = "TẤT CẢ";
 let currentAdminCategory = "TẤT CẢ";
 let isLoggedIn = false;
+let publicMenuCompactView = false;
 
 // Khởi tạo dữ liệu
 function initializeData() {
   const savedMenu = localStorage.getItem("menuItems");
-  if (savedMenu) menuItems = JSON.parse(savedMenu);
+  if (savedMenu) {
+    menuItems = JSON.parse(savedMenu);
+  } else {
+    // Lưu menu mặc định vào localStorage
+    localStorage.setItem("menuItems", JSON.stringify(menuItems));
+  }
   
   // Kiểm tra trạng thái đăng nhập
   const savedLogin = localStorage.getItem("isLoggedIn");
@@ -693,10 +916,71 @@ function showNotification(message, isError = false) {
 }
 
 // ====== PUBLIC MENU ======
+function togglePublicMenuView() {
+  publicMenuCompactView = !publicMenuCompactView;
+  renderPublicMenu();
+}
+
 function renderPublicMenu() {
   const container = document.getElementById("publicMenu");
   container.innerHTML = "";
   
+  if (publicMenuCompactView) {
+    renderCompactPublicMenu(container);
+  } else {
+    renderCategorizedPublicMenu(container);
+  }
+}
+
+function renderCategorizedPublicMenu(container) {
+  // Nhóm các món theo danh mục
+  const categories = {};
+  menuItems.forEach(item => {
+    if (!categories[item.category]) {
+      categories[item.category] = [];
+    }
+    categories[item.category].push(item);
+  });
+  
+  // Hiển thị các món theo danh mục đã chọn
+  for (const category in categories) {
+    if (currentPublicCategory !== "TẤT CẢ" && currentPublicCategory !== category) {
+      continue;
+    }
+    
+    const categoryDiv = document.createElement("div");
+    categoryDiv.className = "menu-category";
+    categoryDiv.innerHTML = `
+      <h3>
+        <span>${category}</span>
+        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+      </h3>
+      <div class="menu-category-content">
+        ${categories[category].map(item => `
+          <div class="menu-item">
+            <div class="menu-item-name">${item.name}</div>
+            <div class="menu-item-price">${item.price.toLocaleString()}đ</div>
+            <button class="add-item-btn" onclick="addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price})">
+              <i class="fas fa-cart-plus"></i> Thêm
+            </button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    
+    // Thêm sự kiện click để thu gọn/mở rộng danh mục
+    const header = categoryDiv.querySelector('h3');
+    header.onclick = (e) => {
+      e.stopPropagation();
+      categoryDiv.classList.toggle('collapsed');
+    };
+    
+    container.appendChild(categoryDiv);
+  }
+}
+
+function renderCompactPublicMenu(container) {
+  // Lọc các món theo danh mục nếu cần
   let filteredItems = menuItems;
   if (currentPublicCategory !== "TẤT CẢ") {
     filteredItems = menuItems.filter(item => item.category === currentPublicCategory);
@@ -710,7 +994,7 @@ function renderPublicMenu() {
       <span class="compact-item-name">${item.name}</span>
       <span class="compact-item-price">${item.price.toLocaleString()}đ</span>
       <button class="compact-add-btn" onclick="event.stopPropagation(); addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price})">
-        <i class="fas fa-plus"></i> Thêm
+        <i class="fas fa-plus"></i>
       </button>
     `;
     container.appendChild(itemDiv);
@@ -724,15 +1008,23 @@ function renderPublicCategoryFilter() {
   const allBtn = document.createElement("button");
   allBtn.className = `category-btn ${currentPublicCategory === "TẤT CẢ" ? "active" : ""}`;
   allBtn.textContent = "TẤT CẢ";
-  allBtn.onclick = () => { currentPublicCategory = "TẤT CẢ"; renderPublicCategoryFilter(); renderPublicMenu(); };
+  allBtn.onclick = () => { 
+    currentPublicCategory = "TẤT CẢ"; 
+    renderPublicCategoryFilter(); 
+    renderPublicMenu(); 
+  };
   filterDiv.appendChild(allBtn);
   
   const categories = [...new Set(menuItems.map(item => item.category))];
-  categories.forEach(cat => {
+  categories.sort().forEach(cat => {
     const btn = document.createElement("button");
     btn.className = `category-btn ${currentPublicCategory === cat ? "active" : ""}`;
     btn.textContent = cat;
-    btn.onclick = () => { currentPublicCategory = cat; renderPublicCategoryFilter(); renderPublicMenu(); };
+    btn.onclick = () => { 
+      currentPublicCategory = cat; 
+      renderPublicCategoryFilter(); 
+      renderPublicMenu(); 
+    };
     filterDiv.appendChild(btn);
   });
 }
@@ -754,6 +1046,12 @@ function renderCart() {
   tbody.innerHTML = "";
   let total = 0;
   
+  if (cart.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-state" style="text-align: center; padding: 20px;">Giỏ hàng trống</td></tr>`;
+    document.getElementById("cartTotal").textContent = "Tổng cộng: 0đ";
+    return;
+  }
+  
   cart.forEach((item, index) => {
     const itemTotal = item.price * item.qty;
     total += itemTotal;
@@ -761,9 +1059,9 @@ function renderCart() {
       <tr>
         <td>${item.name}</td>
         <td>
-          <button onclick="updateCartQty(${index}, -1)">-</button>
+          <button onclick="updateCartQty(${index}, -1)" style="padding: 2px 8px;">-</button>
           ${item.qty}
-          <button onclick="updateCartQty(${index}, 1)">+</button>
+          <button onclick="updateCartQty(${index}, 1)" style="padding: 2px 8px;">+</button>
         </td>
         <td>${item.price.toLocaleString()}đ</td>
         <td>${itemTotal.toLocaleString()}đ</td>
@@ -810,13 +1108,16 @@ async function createOrder() {
   
   // Tạo nội dung Telegram
   let message = `<b>☕ BII COFFEE - ĐƠN HÀNG MỚI #${order.id}</b>\n\n`;
-  message += `🕒 ${order.time}\n`;
+  message += `🕒 Thời gian: ${order.time}\n`;
   message += `📝 Ghi chú: ${note || "Không có"}\n\n`;
-  message += `<b>CHI TIẾT:</b>\n`;
+  message += `<b>CHI TIẾT MÓN:</b>\n`;
   order.items.forEach(item => {
     message += `${item.name} x${item.qty} - ${(item.price * item.qty).toLocaleString()}đ\n`;
   });
-  message += `\n<b>TỔNG: ${total.toLocaleString()}đ</b>`;
+  message += `\n<b>💰 TỔNG CỘNG: ${total.toLocaleString()}đ</b>\n`;
+  message += `\n🏠 Địa chỉ: Trung Mầu-Cổng phụ KCN bá hiện 2\n`;
+  message += `📞 Điện thoại: 0964 391 834\n`;
+  message += `💝 Cảm ơn quý khách!`;
   
   // Gửi Telegram
   const sent = await sendTelegramMessage(message);
@@ -854,7 +1155,7 @@ function renderAdminCategoryFilter() {
   filterDiv.appendChild(allBtn);
   
   const categories = [...new Set(menuItems.map(item => item.category))];
-  categories.forEach(cat => {
+  categories.sort().forEach(cat => {
     const btn = document.createElement("button");
     btn.className = `category-btn ${currentAdminCategory === cat ? "active" : ""}`;
     btn.textContent = cat;
@@ -871,6 +1172,11 @@ function renderMenuTable() {
   let filtered = menuItems;
   if (currentAdminCategory !== "TẤT CẢ") {
     filtered = menuItems.filter(item => item.category === currentAdminCategory);
+  }
+  
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px;">Không có món nào</td></tr>`;
+    return;
   }
   
   filtered.forEach((item, index) => {
@@ -983,13 +1289,18 @@ function renderOrders() {
   document.getElementById("filterTotal").textContent = `Tổng đơn đã lọc: ${totalFiltered.toLocaleString()}đ`;
   
   tbody.innerHTML = "";
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 20px;">Không có đơn hàng</td></tr>`;
+    return;
+  }
+  
   filtered.forEach(order => {
     const originalIndex = orders.findIndex(o => o.id === order.id);
     const itemsShort = order.items.map(i => `${i.name} x${i.qty}`).join(", ").substring(0, 30);
     tbody.innerHTML += `
       <tr>
         <td>#${order.id}</td>
-        <td>${itemsShort}...</td>
+        <td>${itemsShort}${itemsShort.length >= 30 ? '...' : ''}</td>
         <td>${order.total.toLocaleString()}đ</td>
         <td>
           <button onclick="openEditModal(${originalIndex})" style="background: #ffc107; color: #000; padding: 5px 8px;"><i class="fas fa-edit"></i></button>
@@ -1019,7 +1330,7 @@ function openEditModal(index) {
   });
   
   document.getElementById("editOrderNote").value = order.note;
-  document.getElementById("editOrderTotal").textContent = `Tổng: ${order.total.toLocaleString()}đ`;
+  updateEditOrderTotal();
   document.getElementById("editOrderModal").style.display = "flex";
 }
 
@@ -1031,7 +1342,7 @@ function updateOrderItemQty(itemIndex, qty) {
   qty = parseInt(qty);
   if (qty < 1) qty = 1;
   orders[currentEditOrderIndex].items[itemIndex].qty = qty;
-  updateOrderTotal();
+  updateEditOrderTotal();
 }
 
 function removeOrderItem(itemIndex) {
@@ -1040,12 +1351,12 @@ function removeOrderItem(itemIndex) {
     orders.splice(currentEditOrderIndex, 1);
     closeEditModal();
   } else {
-    updateOrderTotal();
+    updateEditOrderTotal();
     openEditModal(currentEditOrderIndex);
   }
 }
 
-function updateOrderTotal() {
+function updateEditOrderTotal() {
   const order = orders[currentEditOrderIndex];
   order.total = order.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
   document.getElementById("editOrderTotal").textContent = `Tổng: ${order.total.toLocaleString()}đ`;
@@ -1127,11 +1438,6 @@ initializeData();
 renderPublicCategoryFilter();
 renderPublicMenu();
 renderCart();
-
-// Kiểm tra Telegram config
-if (TELEGRAM_BOT_TOKEN === "YOUR_BOT_TOKEN_HERE") {
-  console.log("⚠️ Chưa cấu hình Telegram token!");
-}
 </script>
 </body>
 </html>
