@@ -1786,7 +1786,7 @@
       
       localStorage.setItem('toppingStatus', JSON.stringify(toppingStatus));
       updateToppingDisplay();
-      renderMenu(); // Cập nhật menu
+      renderMenu();
       showNotification(`Đã cập nhật: ${type === 'white' ? 'Trân châu trắng' : 'Trân châu đen'} ${status === 'available' ? 'Còn' : 'Hết'}`);
     }
     
@@ -1802,7 +1802,6 @@
         document.getElementById('blackToppingTime').textContent = toppingStatus.black.lastUpdate ? `Cập nhật: ${toppingStatus.black.lastUpdate}` : '';
       }
       
-      // Cập nhật cảnh báo
       updateToppingWarning();
     }
     
@@ -2059,11 +2058,8 @@
     }
     
     function addToCart(id, name, price, size, topping) {
-      let itemName = size ? `${name} (Size ${size})` : name;
-      if (topping) {
-        const toppingName = topping === 'white' ? 'Trân châu trắng' : 'Trân châu đen';
-        itemName += ` - Topping: ${toppingName}`;
-      }
+      // Tạo tên hiển thị đẹp, không bị lặp từ "Topping"
+      let displayName = size ? `${name} (Size ${size})` : name;
       
       const existingIndex = cart.findIndex(item => 
         item.id === id && 
@@ -2073,18 +2069,25 @@
       
       if (existingIndex >= 0) {
         cart[existingIndex].qty++;
-        showNotification(`Đã tăng số lượng ${name}`);
+        showNotification(`Đã tăng số lượng ${displayName}`);
       } else {
         cart.push({ 
           id, 
-          name: itemName, 
+          name: displayName,
+          displayName: displayName,
           originalName: name,
           size, 
           topping,
           price, 
           qty: 1 
         });
-        showNotification(`Đã thêm ${name}${topping ? ' với ' + (topping === 'white' ? 'trân châu trắng' : 'trân châu đen') : ''}`);
+        
+        if (topping) {
+          const toppingName = topping === 'white' ? 'Trân châu trắng' : 'Trân châu đen';
+          showNotification(`Đã thêm ${displayName} - ${toppingName}`);
+        } else {
+          showNotification(`Đã thêm ${displayName}`);
+        }
       }
       
       renderCart();
@@ -2106,14 +2109,15 @@
         const itemTotal = item.price * item.qty;
         total += itemTotal;
         
-        let toppingBadge = '';
+        let toppingDisplay = '';
         if (item.topping) {
-          toppingBadge = `<span class="topping-badge ${item.topping === 'white' ? 'topping-white' : 'topping-black'}">
+          const toppingName = item.topping === 'white' ? 'Trân châu trắng' : 'Trân châu đen';
+          toppingDisplay = `<span class="topping-badge ${item.topping === 'white' ? 'topping-white' : 'topping-black'}">
             <span class="bubble-dot ${item.topping === 'white' ? 'bubble-white' : 'bubble-black'}" style="width: 12px; height: 12px; display: inline-block; margin-right: 3px;"></span>
-            ${item.topping === 'white' ? 'Trân châu trắng' : 'Trân châu đen'}
+            ${toppingName}
           </span>`;
         } else {
-          toppingBadge = '<span class="topping-badge" style="background: #eee; color: #666;">Không topping</span>';
+          toppingDisplay = '<span class="topping-badge" style="background: #eee; color: #666;">Không topping</span>';
         }
         
         let sizeBadge = '';
@@ -2121,10 +2125,13 @@
           sizeBadge = `<span class="size-badge ${item.size === 'S' ? 'size-s-badge' : 'size-l-badge'}">${item.size}</span>`;
         }
         
+        // Hiển thị tên món không bị lặp
+        const itemName = item.originalName + (item.size ? ` (Size ${item.size})` : '');
+        
         tbody.innerHTML += `
           <tr>
-            <td>${item.originalName} ${sizeBadge}</td>
-            <td>${toppingBadge}</td>
+            <td>${itemName}</td>
+            <td>${toppingDisplay}</td>
             <td>
               <button onclick="updateCartQty(${index}, -1)">-</button>
               ${item.qty}
@@ -2197,9 +2204,20 @@
       cart.forEach(item => {
         const itemTotal = item.price * item.qty;
         total += itemTotal;
+        
+        // Tạo tên hiển thị đẹp cho confirm modal
+        let itemDisplayName = item.originalName;
+        if (item.size) {
+          itemDisplayName += ` (Size ${item.size})`;
+        }
+        if (item.topping) {
+          const toppingName = item.topping === 'white' ? 'Trân châu trắng' : 'Trân châu đen';
+          itemDisplayName += ` - ${toppingName}`;
+        }
+        
         itemsDiv.innerHTML += `
           <div class="confirm-item">
-            <span>${item.name} x${item.qty}</span>
+            <span>${itemDisplayName} x${item.qty}</span>
             <span>${itemTotal.toLocaleString()}đ</span>
           </div>
         `;
@@ -2240,8 +2258,7 @@
       const order = {
         id: Date.now(),
         items: cart.map(item => ({
-          name: item.name,
-          originalName: item.originalName,
+          name: item.originalName,
           size: item.size || null,
           topping: item.topping,
           price: item.price,
@@ -2265,8 +2282,12 @@
       
       order.items.forEach(item => {
         let itemLine = `${item.name}`;
+        if (item.size) {
+          itemLine += ` (Size ${item.size})`;
+        }
         if (item.topping) {
-          itemLine += ` (Topping: ${item.topping === 'white' ? 'Trân châu trắng' : 'Trân châu đen'})`;
+          const toppingName = item.topping === 'white' ? 'Trân châu trắng' : 'Trân châu đen';
+          itemLine += ` - ${toppingName}`;
         }
         itemLine += ` x${item.qty} - ${(item.price * item.qty).toLocaleString()}đ\n`;
         message += itemLine;
@@ -2565,7 +2586,15 @@
             <div><i class="fas fa-phone"></i> ${order.customer?.phone}</div>
             <div><i class="fas fa-map-marker-alt"></i> ${order.customer?.address}</div>
             <div><i class="fas fa-clock"></i> ${order.time}</div>
-            <div><i class="fas fa-coffee"></i> ${order.items.map(i => `${i.name} x${i.qty}`).join(', ')}</div>
+            <div><i class="fas fa-coffee"></i> ${order.items.map(i => {
+              let itemStr = i.name;
+              if (i.size) itemStr += ` (Size ${i.size})`;
+              if (i.topping) {
+                const toppingName = i.topping === 'white' ? 'Trân châu trắng' : 'Trân châu đen';
+                itemStr += ` - ${toppingName}`;
+              }
+              return `${itemStr} x${i.qty}`;
+            }).join(', ')}</div>
             <div style="font-weight: bold; color: var(--primary); margin: 10px 0;">Tổng: ${order.total.toLocaleString()}đ</div>
             <div class="order-actions">
               <button onclick="viewOrderDetail(${order.id})" style="background: #17a2b8;">Chi tiết</button>
@@ -2592,7 +2621,7 @@
       
       const itemCount = {};
       filtered.forEach(o => o.items.forEach(i => {
-        itemCount[i.originalName || i.name] = (itemCount[i.originalName || i.name] || 0) + i.qty;
+        itemCount[i.name] = (itemCount[i.name] || 0) + i.qty;
       }));
       const topItem = Object.entries(itemCount).sort((a,b) => b[1] - a[1])[0];
       
@@ -2669,7 +2698,13 @@
       
       let itemsHtml = '';
       order.items.forEach(item => {
-        itemsHtml += `<tr><td>${item.name}</td><td>${item.qty}</td><td>${item.price.toLocaleString()}đ</td><td>${(item.price * item.qty).toLocaleString()}đ</td></tr>`;
+        let itemName = item.name;
+        if (item.size) itemName += ` (Size ${item.size})`;
+        if (item.topping) {
+          const toppingName = item.topping === 'white' ? 'Trân châu trắng' : 'Trân châu đen';
+          itemName += ` - ${toppingName}`;
+        }
+        itemsHtml += `<tr><td>${itemName}</td><td>${item.qty}</td><td>${item.price.toLocaleString()}đ</td><td>${(item.price * item.qty).toLocaleString()}đ</td></tr>`;
       });
       
       content.innerHTML = `
