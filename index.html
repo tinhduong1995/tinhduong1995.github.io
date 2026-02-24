@@ -64,15 +64,18 @@
       border-radius: 20px;
       font-size: 0.9rem;
       cursor: pointer;
+      transition: all 0.3s;
     }
     
     #loginBtn:hover, #logoutBtn:hover {
       background-color: rgba(255,255,255,0.3);
+      transform: scale(1.05);
     }
     
     h1 {
       font-size: 1.8rem;
       margin-bottom: 8px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
     }
     
     /* Status Bar */
@@ -85,6 +88,7 @@
       background: rgba(255,255,255,0.2);
       border-radius: 40px;
       flex-wrap: wrap;
+      backdrop-filter: blur(5px);
     }
     
     .status-item {
@@ -96,12 +100,14 @@
       background: white;
       color: var(--dark);
       font-weight: 500;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     
     .bubble-dot {
       width: 20px;
       height: 20px;
       border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     .bubble-white {
@@ -136,6 +142,7 @@
       justify-content: center;
       align-items: center;
       padding: 15px;
+      backdrop-filter: blur(3px);
     }
     
     .topping-content {
@@ -144,6 +151,19 @@
       border-radius: 15px;
       width: 100%;
       max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
     
     .topping-header {
@@ -174,9 +194,10 @@
       transition: all 0.3s;
     }
     
-    .topping-option:hover {
+    .topping-option:hover:not(.disabled) {
       border-color: var(--accent);
       background: var(--topping-bg);
+      transform: translateX(5px);
     }
     
     .topping-option.selected {
@@ -190,16 +211,6 @@
       background: #f5f5f5;
     }
     
-    .topping-option.disabled:hover {
-      border-color: #eee;
-    }
-    
-    .topping-dot {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-    }
-    
     .topping-info {
       flex: 1;
     }
@@ -207,17 +218,20 @@
     .topping-name {
       font-weight: bold;
       font-size: 1.1rem;
+      color: var(--primary);
     }
     
     .topping-price {
       color: var(--success);
       font-weight: bold;
+      font-size: 0.9rem;
     }
     
     .topping-status-badge {
       font-size: 0.8rem;
       padding: 3px 8px;
       border-radius: 12px;
+      font-weight: bold;
     }
     
     .topping-status-available {
@@ -249,9 +263,9 @@
       padding: 10px;
       background: #fff3cd;
       border-radius: 5px;
+      border-left: 4px solid var(--warning);
     }
     
-    /* Phần còn lại giữ nguyên CSS từ trước */
     h2 {
       color: var(--primary);
       margin-bottom: 12px;
@@ -293,6 +307,7 @@
       border-radius: 5px;
       font-size: 0.95rem;
       width: 100%;
+      transition: all 0.3s;
     }
     
     input:focus, select:focus, textarea:focus {
@@ -306,23 +321,31 @@
       color: white;
       border: none;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: all 0.3s;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 5px;
       width: auto;
+      font-weight: 500;
     }
     
-    button:hover {
+    button:hover:not(:disabled) {
       background-color: var(--secondary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
     
     button.success {
       background-color: var(--success);
     }
     
-    button.success:hover {
+    button.success:hover:not(:disabled) {
       background-color: #218838;
     }
     
@@ -331,7 +354,7 @@
       color: var(--dark);
     }
     
-    button.warning:hover {
+    button.warning:hover:not(:disabled) {
       background-color: #e0a800;
     }
     
@@ -339,7 +362,7 @@
       background-color: var(--danger);
     }
     
-    button.danger:hover {
+    button.danger:hover:not(:disabled) {
       background-color: #c82333;
     }
     
@@ -359,6 +382,11 @@
       border: 1px solid #ddd;
       border-radius: 4px;
       cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .size-btn:hover:not(:disabled) {
+      background-color: #e0e0e0;
     }
     
     .size-btn.small-active {
@@ -371,6 +399,11 @@
       background-color: var(--size-l);
       color: white;
       border-color: var(--size-l);
+    }
+    
+    .size-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
     }
     
     /* Customer info form */
@@ -468,6 +501,7 @@
       justify-content: center;
       align-items: center;
       padding: 15px;
+      backdrop-filter: blur(3px);
     }
     
     .modal-content {
@@ -478,6 +512,7 @@
       max-width: 500px;
       max-height: 80vh;
       overflow-y: auto;
+      animation: slideUp 0.3s ease;
     }
     
     .modal-header {
@@ -490,6 +525,7 @@
     .close {
       font-size: 1.5rem;
       cursor: pointer;
+      transition: color 0.3s;
     }
     
     .close:hover {
@@ -557,7 +593,7 @@
     
     .category-btn {
       padding: 8px 15px;
-      background-color: #16c01e;
+      background-color: #f0f0f0;
       border: none;
       border-radius: 20px;
       cursor: pointer;
@@ -569,6 +605,7 @@
     .category-btn:hover {
       background-color: var(--secondary);
       color: white;
+      transform: scale(1.05);
     }
     
     .category-btn.active {
@@ -597,7 +634,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      transition: transform 0.2s;
+      transition: all 0.3s;
       position: relative;
     }
     
@@ -617,6 +654,13 @@
       border-radius: 12px;
       font-size: 0.7rem;
       font-weight: bold;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
     
     .menu-item:hover {
@@ -660,7 +704,7 @@
       margin-top: 5px;
     }
     
-    .add-to-cart-btn:hover {
+    .add-to-cart-btn:hover:not(:disabled) {
       background: #218838;
     }
     
@@ -719,6 +763,7 @@
     .cart-table button {
       padding: 2px 8px;
       font-size: 0.8rem;
+      min-width: 30px;
     }
     
     .size-badge {
@@ -773,6 +818,12 @@
       border-radius: 8px;
       text-align: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: transform 0.3s;
+    }
+    
+    .stat-box:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     
     .stat-value {
@@ -836,9 +887,19 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
       transform: translateX(100%);
       transition: transform 0.3s ease;
-      z-index: 1000;
+      z-index: 3000;
       max-width: 80%;
       font-size: 0.95rem;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+      }
+      to {
+        transform: translateX(0);
+      }
     }
     
     .notification.show {
@@ -875,6 +936,12 @@
       border-radius: 8px;
       padding: 15px;
       margin-bottom: 10px;
+      transition: transform 0.3s;
+    }
+    
+    .order-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     
     .order-header {
@@ -926,6 +993,14 @@
       .stats-container {
         grid-template-columns: 1fr 1fr;
       }
+      
+      .cart-table {
+        font-size: 0.8rem;
+      }
+      
+      .cart-table button {
+        padding: 2px 4px;
+      }
     }
   </style>
 </head>
@@ -969,7 +1044,7 @@
       <table class="cart-table" id="cartTable">
         <thead>
           <tr>
-            <th>Món (Size)</th>
+            <th>Món</th>
             <th>Topping</th>
             <th>SL</th>
             <th>Đơn giá</th>
@@ -1022,7 +1097,7 @@
           <span>Tổng cộng:</span>
           <span id="cartTotal">0đ</span>
         </p>
-        <div id="toppingWarning" class="topping-warning" style="display: none; color: var(--warning); margin-top: 10px;"></div>
+        <div id="toppingWarning" style="color: var(--warning); margin-top: 10px; font-style: italic; display: none;"></div>
       </div>
       
       <!-- Submit Button -->
@@ -1201,7 +1276,7 @@
     <div class="topping-content">
       <div class="topping-header">
         <h3><i class="fas fa-candy-cane"></i> Chọn topping cho trà sữa</h3>
-        <p id="selectedMilkTeaInfo" style="color: var(--primary); margin-top: 5px;"></p>
+        <p id="selectedMilkTeaInfo" style="color: var(--primary); margin-top: 5px; font-weight: 500;"></p>
       </div>
       
       <div class="topping-options">
@@ -1210,7 +1285,7 @@
           <div class="topping-dot bubble-white" style="border: 2px solid #ddd;"></div>
           <div class="topping-info">
             <div class="topping-name">Trân châu trắng</div>
-            <div class="topping-price">+0đ</div>
+            <div class="topping-price">Miễn phí</div>
           </div>
           <div id="whiteToppingBadge" class="topping-status-badge topping-status-available">Còn</div>
         </div>
@@ -1220,14 +1295,14 @@
           <div class="topping-dot bubble-black"></div>
           <div class="topping-info">
             <div class="topping-name">Trân châu đen</div>
-            <div class="topping-price">+0đ</div>
+            <div class="topping-price">Miễn phí</div>
           </div>
           <div id="blackToppingBadge" class="topping-status-badge topping-status-available">Còn</div>
         </div>
       </div>
       
       <div id="noToppingNote" class="no-topping-note" style="display: none;">
-        ⚠️ Cả 2 loại topping đều đã hết. Bạn có thể đặt trà sữa không topping.
+        ⚠️ Cả 2 loại topping đều đã hết. Bạn vẫn có thể đặt trà sữa không topping.
       </div>
       
       <div class="topping-actions">
@@ -1309,7 +1384,7 @@
     // DỮ LIỆU MENU (ĐẦY ĐỦ 95 MÓN)
     // =============================================
     let menuItems = [
-      // TRÀ (18 món) - Có size L
+      // TRÀ (18 món)
       { id: 1, name: "Trà chanh", priceS: 10000, priceL: 15000, category: "TRÀ", hasSize: true },
       { id: 2, name: "Trà chanh nha đam", priceS: 15000, priceL: 20000, category: "TRÀ", hasSize: true },
       { id: 3, name: "Trà quất", priceS: 10000, priceL: 15000, category: "TRÀ", hasSize: true },
@@ -1351,7 +1426,7 @@
       { id: 31, name: "Cà phê nâu sữa", price: 20000, category: "CÀ PHÊ", hasSize: false },
       { id: 32, name: "Cà phê nâu nóng", price: 20000, category: "CÀ PHÊ", hasSize: false },
       
-      // TRÀ SỮA (25 món) - Có size L
+      // TRÀ SỮA (25 món) - Có size L và có topping
       { id: 33, name: "Trà sữa khoai môn", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true, hasTopping: true },
       { id: 34, name: "Trà sữa sốt xoài", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true, hasTopping: true },
       { id: 35, name: "Trà sữa socola", priceS: 25000, priceL: 30000, category: "TRÀ SỮA", hasSize: true, hasTopping: true },
@@ -1384,7 +1459,7 @@
       { id: 60, name: "Sữa chua lắc việt quất", price: 25000, category: "SỮA CHUA", hasSize: false },
       { id: 61, name: "Sữa chua hoa quả", price: 30000, category: "SỮA CHUA", hasSize: false },
       
-      // NƯỚC ÉP (3 món) - Có size L
+      // NƯỚC ÉP (3 món)
       { id: 62, name: "Nước ép cam", priceS: 25000, priceL: 30000, category: "NƯỚC ÉP", hasSize: true },
       { id: 63, name: "Nước ép dưa hấu", priceS: 25000, priceL: 30000, category: "NƯỚC ÉP", hasSize: true },
       { id: 64, name: "Nước ép dứa", priceS: 25000, priceL: 30000, category: "NƯỚC ÉP", hasSize: true },
@@ -1648,6 +1723,43 @@
       
       return null;
     }
+    
+    function findMenuItem(searchName) {
+      const normalizedSearch = removeDiacritics(searchName.toLowerCase());
+      
+      let bestMatch = null;
+      let bestScore = 0;
+      
+      menuItems.forEach(item => {
+        const normalizedItem = removeDiacritics(item.name.toLowerCase());
+        
+        let score = 0;
+        if (normalizedItem.includes(normalizedSearch)) {
+          score = normalizedSearch.length / normalizedItem.length;
+        }
+        if (normalizedSearch.includes(normalizedItem)) {
+          const newScore = normalizedItem.length / normalizedSearch.length;
+          if (newScore > score) score = newScore;
+        }
+        
+        if (score > bestScore && score > 0.4) {
+          bestScore = score;
+          bestMatch = item;
+        }
+      });
+      
+      return bestMatch;
+    }
+    
+    function removeDiacritics(str) {
+      const accents = 'àáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđ';
+      const without = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyyd';
+      
+      return str.split('').map(char => {
+        const index = accents.indexOf(char);
+        return index !== -1 ? without[index] : char;
+      }).join('');
+    }
 
     // =============================================
     // QUẢN LÝ TOPPING VÀ TỒN KHO
@@ -1660,6 +1772,7 @@
       
       renderMenu();
       if (isLoggedIn) renderStockTable();
+      showNotification(`Đã cập nhật: ${menuItems.find(i => i.id === itemId).name} ${status === 'available' ? 'Còn' : 'Hết'}`);
     }
     
     function updateToppingStatus(type, status) {
@@ -1673,7 +1786,8 @@
       
       localStorage.setItem('toppingStatus', JSON.stringify(toppingStatus));
       updateToppingDisplay();
-      renderMenu(); // Cập nhật menu để disable nút thêm nếu cả 2 hết
+      renderMenu(); // Cập nhật menu
+      showNotification(`Đã cập nhật: ${type === 'white' ? 'Trân châu trắng' : 'Trân châu đen'} ${status === 'available' ? 'Còn' : 'Hết'}`);
     }
     
     function updateToppingDisplay() {
@@ -1687,6 +1801,23 @@
         document.getElementById('whiteToppingTime').textContent = toppingStatus.white.lastUpdate ? `Cập nhật: ${toppingStatus.white.lastUpdate}` : '';
         document.getElementById('blackToppingTime').textContent = toppingStatus.black.lastUpdate ? `Cập nhật: ${toppingStatus.black.lastUpdate}` : '';
       }
+      
+      // Cập nhật cảnh báo
+      updateToppingWarning();
+    }
+    
+    function updateToppingWarning() {
+      const outOfStockToppings = [];
+      if (toppingStatus.white.status === 'out') outOfStockToppings.push('Trân châu trắng');
+      if (toppingStatus.black.status === 'out') outOfStockToppings.push('Trân châu đen');
+      
+      const warningDiv = document.getElementById('toppingWarning');
+      if (outOfStockToppings.length > 0) {
+        warningDiv.textContent = `⚠️ Lưu ý: ${outOfStockToppings.join(', ')} đã hết. Khách đặt trà sữa sẽ không có topping này.`;
+        warningDiv.style.display = 'block';
+      } else {
+        warningDiv.style.display = 'none';
+      }
     }
     
     function checkToppingAvailability() {
@@ -1695,11 +1826,6 @@
         black: toppingStatus.black.status === 'available',
         bothOut: toppingStatus.white.status === 'out' && toppingStatus.black.status === 'out'
       };
-    }
-    
-    function canOrderMilkTea() {
-      const { bothOut } = checkToppingAvailability();
-      return !bothOut; // Chỉ chặn khi cả 2 loại đều hết
     }
 
     // =============================================
@@ -1740,8 +1866,6 @@
       filtered.forEach(item => {
         const stock = stockStatus[item.id] || { status: 'available' };
         const isOutOfStock = stock.status === 'out';
-        
-        // Kiểm tra nếu là trà sữa và cả 2 topping đều hết thì disable
         const isMilkTea = item.category === 'TRÀ SỮA';
         const disableMilkTea = isMilkTea && bothOut;
         
@@ -1798,29 +1922,24 @@
     // XỬ LÝ THÊM VÀO GIỎ (CÓ CHỌN TOPPING)
     // =============================================
     function handleAddToCart(id, name, priceS, priceL, hasSize, hasTopping) {
-      // Kiểm tra món còn không
       const stock = stockStatus[id];
       if (stock && stock.status === 'out') {
         showNotification('Món này đã hết!', true);
         return;
       }
       
-      // Nếu là trà sữa, mở modal chọn topping
       if (hasTopping) {
         const size = hasSize ? selectedSizes[`size_${id}`] || 'S' : null;
         const basePrice = hasSize ? (size === 'S' ? priceS : priceL) : priceS;
         
-        // Lưu thông tin tạm
         pendingMilkTea = {
           id, name, size, basePrice,
           originalName: name,
           displayName: hasSize ? `${name} (Size ${size})` : name
         };
         
-        // Hiển thị modal chọn topping
         showToppingModal();
       } else {
-        // Món thường, thêm trực tiếp
         if (hasSize) {
           const size = selectedSizes[`size_${id}`] || 'S';
           const price = size === 'S' ? priceS : priceL;
@@ -1836,7 +1955,6 @@
       
       document.getElementById('selectedMilkTeaInfo').textContent = pendingMilkTea.displayName;
       
-      // Cập nhật trạng thái topping
       const whiteAvailable = toppingStatus.white.status === 'available';
       const blackAvailable = toppingStatus.black.status === 'available';
       
@@ -1846,12 +1964,10 @@
       const blackBadge = document.getElementById('blackToppingBadge');
       const noToppingNote = document.getElementById('noToppingNote');
       
-      // Reset selection
       selectedTopping = null;
       whiteOption.classList.remove('selected');
       blackOption.classList.remove('selected');
       
-      // Cập nhật trạng thái
       if (whiteAvailable) {
         whiteOption.classList.remove('disabled');
         whiteBadge.textContent = 'Còn';
@@ -1872,10 +1988,8 @@
         blackBadge.className = 'topping-status-badge topping-status-out';
       }
       
-      // Hiển thị note nếu cả 2 đều hết
       if (!whiteAvailable && !blackAvailable) {
         noToppingNote.style.display = 'block';
-        document.getElementById('confirmToppingBtn').disabled = false;
       } else {
         noToppingNote.style.display = 'none';
       }
@@ -1917,7 +2031,6 @@
       const whiteAvailable = toppingStatus.white.status === 'available';
       const blackAvailable = toppingStatus.black.status === 'available';
       
-      // Nếu cả 2 đều hết, vẫn cho phép thêm (không topping)
       if (!whiteAvailable && !blackAvailable) {
         addToCart(
           pendingMilkTea.id,
@@ -1927,12 +2040,11 @@
           null
         );
         closeToppingModal();
+        showNotification('Đã thêm trà sữa không topping');
         return;
       }
       
-      // Nếu có topping được chọn
       if (selectedTopping) {
-        const toppingName = selectedTopping === 'white' ? 'Trân châu trắng' : 'Trân châu đen';
         addToCart(
           pendingMilkTea.id,
           pendingMilkTea.name,
@@ -1961,6 +2073,7 @@
       
       if (existingIndex >= 0) {
         cart[existingIndex].qty++;
+        showNotification(`Đã tăng số lượng ${name}`);
       } else {
         cart.push({ 
           id, 
@@ -1971,10 +2084,10 @@
           price, 
           qty: 1 
         });
+        showNotification(`Đã thêm ${name}${topping ? ' với ' + (topping === 'white' ? 'trân châu trắng' : 'trân châu đen') : ''}`);
       }
       
       renderCart();
-      showNotification(`Đã thêm ${name}${topping ? ' với ' + (topping === 'white' ? 'trân châu trắng' : 'trân châu đen') : ''}`);
     }
 
     function renderCart() {
@@ -1986,7 +2099,6 @@
         tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Giỏ hàng trống</td></tr>';
         document.getElementById('subtotal').textContent = '0đ';
         document.getElementById('cartTotal').textContent = '0đ';
-        document.getElementById('toppingWarning').style.display = 'none';
         return;
       }
       
@@ -2000,6 +2112,8 @@
             <span class="bubble-dot ${item.topping === 'white' ? 'bubble-white' : 'bubble-black'}" style="width: 12px; height: 12px; display: inline-block; margin-right: 3px;"></span>
             ${item.topping === 'white' ? 'Trân châu trắng' : 'Trân châu đen'}
           </span>`;
+        } else {
+          toppingBadge = '<span class="topping-badge" style="background: #eee; color: #666;">Không topping</span>';
         }
         
         let sizeBadge = '';
@@ -2010,7 +2124,7 @@
         tbody.innerHTML += `
           <tr>
             <td>${item.originalName} ${sizeBadge}</td>
-            <td>${toppingBadge || 'Không topping'}</td>
+            <td>${toppingBadge}</td>
             <td>
               <button onclick="updateCartQty(${index}, -1)">-</button>
               ${item.qty}
@@ -2018,26 +2132,14 @@
             </td>
             <td>${item.price.toLocaleString()}đ</td>
             <td>${itemTotal.toLocaleString()}đ</td>
-            <td><button onclick="removeFromCart(${index})" style="background: #dc3545;">X</button></td>
+            <td><button onclick="removeFromCart(${index})" class="danger" style="background: #dc3545;">X</button></td>
           </tr>
         `;
       });
       
       document.getElementById('subtotal').textContent = total.toLocaleString() + 'đ';
       document.getElementById('cartTotal').textContent = total.toLocaleString() + 'đ';
-      
-      // Kiểm tra và hiển thị cảnh báo nếu có topping hết
-      const outOfStockToppings = [];
-      if (toppingStatus.white.status === 'out') outOfStockToppings.push('Trân châu trắng');
-      if (toppingStatus.black.status === 'out') outOfStockToppings.push('Trân châu đen');
-      
-      const warningDiv = document.getElementById('toppingWarning');
-      if (outOfStockToppings.length > 0) {
-        warningDiv.textContent = `⚠️ Lưu ý: ${outOfStockToppings.join(', ')} đã hết. Khách đặt trà sữa sẽ không có topping này.`;
-        warningDiv.style.display = 'block';
-      } else {
-        warningDiv.style.display = 'none';
-      }
+      updateToppingWarning();
     }
 
     function updateCartQty(index, delta) {
@@ -2052,6 +2154,7 @@
     function removeFromCart(index) {
       cart.splice(index, 1);
       renderCart();
+      showNotification('Đã xóa món khỏi giỏ hàng');
     }
 
     // =============================================
@@ -2068,10 +2171,12 @@
       
       if (!phone) {
         showNotification('Vui lòng nhập số điện thoại!', true);
+        document.getElementById('customerPhone').focus();
         return;
       }
       if (!address) {
         showNotification('Vui lòng nhập địa chỉ!', true);
+        document.getElementById('customerAddress').focus();
         return;
       }
       
@@ -2102,7 +2207,6 @@
       
       document.getElementById('confirmTotal').textContent = `Tổng cộng: ${total.toLocaleString()}đ`;
       
-      // Cảnh báo topping
       const outOfStockToppings = [];
       if (toppingStatus.white.status === 'out') outOfStockToppings.push('Trân châu trắng');
       if (toppingStatus.black.status === 'out') outOfStockToppings.push('Trân châu đen');
@@ -2170,7 +2274,6 @@
       
       message += `\n<b>💰 TỔNG CỘNG: ${total.toLocaleString()}đ</b>\n`;
       
-      // Thêm thông báo topping hết
       const outOfStockToppings = [];
       if (toppingStatus.white.status === 'out') outOfStockToppings.push('Trân châu trắng');
       if (toppingStatus.black.status === 'out') outOfStockToppings.push('Trân châu đen');
@@ -2220,13 +2323,413 @@
     }
 
     // =============================================
-    // CÁC HÀM CÒN LẠI (GIỮ NGUYÊN)
+    // ĐĂNG NHẬP / ĐĂNG XUẤT
     // =============================================
-    // (Giữ nguyên các hàm admin, login, stats, stock table, v.v.)
-    
+    function showLoginModal() {
+      document.getElementById('loginModal').style.display = 'flex';
+      document.getElementById('adminPassword').focus();
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').style.display = 'none';
+      document.getElementById('adminPassword').value = '';
+    }
+
+    function checkLogin() {
+      const password = document.getElementById('adminPassword').value;
+      if (password === ADMIN_PASSWORD) {
+        isLoggedIn = true;
+        localStorage.setItem('isLoggedIn', 'true');
+        showAdminSections();
+        closeLoginModal();
+        loadOrders();
+        renderStats();
+        updateToppingDisplay();
+        renderStockTable();
+        showNotification('Đăng nhập thành công!');
+      } else {
+        showNotification('Sai mật khẩu!', true);
+      }
+    }
+
+    function logout() {
+      isLoggedIn = false;
+      localStorage.setItem('isLoggedIn', 'false');
+      hideAdminSections();
+      showNotification('Đã đăng xuất');
+    }
+
+    function showAdminSections() {
+      document.querySelectorAll('.admin-only').forEach(el => el.classList.add('visible'));
+      document.getElementById('loginBtn').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'block';
+      renderMenuTable();
+      renderAdminCategoryFilter();
+      renderStockTable();
+      updateToppingDisplay();
+    }
+
+    function hideAdminSections() {
+      document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('visible'));
+      document.getElementById('loginBtn').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'none';
+    }
+
+    function updateAuthButtons() {
+      if (isLoggedIn) {
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'block';
+      } else {
+        document.getElementById('loginBtn').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'none';
+      }
+    }
+
     // =============================================
-    // THÔNG BÁO
+    // QUẢN LÝ MENU (ADMIN)
     // =============================================
+    function renderAdminCategoryFilter() {
+      const filterDiv = document.getElementById('adminCategoryFilter');
+      if (!filterDiv) return;
+      
+      filterDiv.innerHTML = '<button class="category-btn active" onclick="filterAdminCategory(\'TẤT CẢ\')">TẤT CẢ</button>';
+      
+      const categories = [...new Set(menuItems.map(item => item.category))];
+      categories.sort().forEach(cat => {
+        filterDiv.innerHTML += `<button class="category-btn" onclick="filterAdminCategory('${cat}')">${cat}</button>`;
+      });
+    }
+
+    function filterAdminCategory(category) {
+      document.querySelectorAll('#adminCategoryFilter .category-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent === category || (category === 'TẤT CẢ' && btn.textContent === 'TẤT CẢ')) {
+          btn.classList.add('active');
+        }
+      });
+      renderMenuTable(category);
+    }
+
+    function renderMenuTable(category = 'TẤT CẢ') {
+      const tbody = document.getElementById('menuTableBody');
+      if (!tbody) return;
+      
+      tbody.innerHTML = '';
+      let filtered = menuItems;
+      if (category !== 'TẤT CẢ') {
+        filtered = menuItems.filter(item => item.category === category);
+      }
+      
+      filtered.forEach((item, index) => {
+        const originalIndex = menuItems.findIndex(m => m.id === item.id);
+        const priceS = item.hasSize ? item.priceS : item.price;
+        const priceL = item.hasSize ? item.priceL : '';
+        
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.name}</td>
+            <td>${item.category}</td>
+            <td>${priceS.toLocaleString()}đ</td>
+            <td>${priceL ? priceL.toLocaleString() + 'đ' : '-'}</td>
+            <td>
+              <button onclick="editMenuItem(${originalIndex})" style="background: #ffc107; color: #000; padding: 5px 10px;">Sửa</button>
+              <button onclick="deleteMenuItem(${originalIndex})" style="background: #dc3545; padding: 5px 10px;">Xóa</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function addMenuItem() {
+      const name = document.getElementById('menuName').value.trim();
+      const priceS = parseInt(document.getElementById('menuPriceS').value);
+      const priceL = parseInt(document.getElementById('menuPriceL').value);
+      const category = document.getElementById('menuCategory').value;
+      
+      if (!name || isNaN(priceS) || priceS <= 0) {
+        showNotification('Nhập tên món và giá S!', true);
+        return;
+      }
+      
+      const newId = Math.max(...menuItems.map(m => m.id)) + 1;
+      const hasTopping = category === 'TRÀ SỮA';
+      
+      if (!isNaN(priceL) && priceL > 0) {
+        menuItems.push({ id: newId, name, priceS, priceL, category, hasSize: true, hasTopping });
+      } else {
+        menuItems.push({ id: newId, name, price: priceS, category, hasSize: false, hasTopping });
+      }
+      
+      stockStatus[newId] = { status: 'available', lastUpdate: null };
+      localStorage.setItem('stockStatus', JSON.stringify(stockStatus));
+      localStorage.setItem('menuItems', JSON.stringify(menuItems));
+      
+      renderCategoryFilter();
+      renderMenu();
+      renderMenuTable();
+      renderAdminCategoryFilter();
+      renderStockTable();
+      
+      document.getElementById('menuName').value = '';
+      document.getElementById('menuPriceS').value = '';
+      document.getElementById('menuPriceL').value = '';
+      
+      showNotification('Đã thêm món!');
+    }
+
+    function editMenuItem(index) {
+      const item = menuItems[index];
+      document.getElementById('menuName').value = item.name;
+      document.getElementById('menuPriceS').value = item.hasSize ? item.priceS : item.price;
+      document.getElementById('menuPriceL').value = item.hasSize ? item.priceL : '';
+      document.getElementById('menuCategory').value = item.category;
+      
+      menuItems.splice(index, 1);
+      localStorage.setItem('menuItems', JSON.stringify(menuItems));
+      
+      renderCategoryFilter();
+      renderMenu();
+      renderMenuTable();
+      renderAdminCategoryFilter();
+      renderStockTable();
+      
+      showNotification('Đã chuyển sang chế độ sửa, hãy nhập thông tin và thêm mới!');
+    }
+
+    function deleteMenuItem(index) {
+      if (confirm('Xóa món này?')) {
+        const item = menuItems[index];
+        delete stockStatus[item.id];
+        localStorage.setItem('stockStatus', JSON.stringify(stockStatus));
+        
+        menuItems.splice(index, 1);
+        localStorage.setItem('menuItems', JSON.stringify(menuItems));
+        
+        renderCategoryFilter();
+        renderMenu();
+        renderMenuTable();
+        renderAdminCategoryFilter();
+        renderStockTable();
+        
+        showNotification('Đã xóa món!');
+      }
+    }
+
+    // =============================================
+    // QUẢN LÝ ĐƠN HÀNG (ADMIN)
+    // =============================================
+    function loadOrders() {
+      orders = JSON.parse(localStorage.getItem('orders')) || [];
+      renderOrders();
+      renderStats();
+    }
+
+    function renderOrders() {
+      const searchTerm = document.getElementById('searchOrders')?.value.toLowerCase() || '';
+      const statusFilter = document.getElementById('orderStatus')?.value || 'all';
+      
+      let filtered = orders;
+      
+      if (searchTerm) {
+        filtered = filtered.filter(o => 
+          o.customer?.phone?.includes(searchTerm) ||
+          o.customer?.address?.toLowerCase().includes(searchTerm) ||
+          o.items.some(i => i.name.toLowerCase().includes(searchTerm))
+        );
+      }
+      
+      if (statusFilter !== 'all') {
+        filtered = filtered.filter(o => o.status === statusFilter);
+      }
+      
+      filtered.sort((a, b) => b.id - a.id);
+      
+      const ordersList = document.getElementById('ordersList');
+      ordersList.innerHTML = '';
+      
+      if (filtered.length === 0) {
+        ordersList.innerHTML = '<p class="empty-state">Không có đơn hàng</p>';
+        return;
+      }
+      
+      filtered.forEach(order => {
+        const statusClass = order.status === 'new' ? 'status-new' : (order.status === 'processing' ? 'status-processing' : 'status-completed');
+        const statusText = order.status === 'new' ? 'Mới' : (order.status === 'processing' ? 'Đang xử lý' : 'Hoàn thành');
+        
+        ordersList.innerHTML += `
+          <div class="order-card">
+            <div class="order-header">
+              <strong>#${order.id}</strong>
+              <span class="order-status ${statusClass}">${statusText}</span>
+            </div>
+            <div><i class="fas fa-phone"></i> ${order.customer?.phone}</div>
+            <div><i class="fas fa-map-marker-alt"></i> ${order.customer?.address}</div>
+            <div><i class="fas fa-clock"></i> ${order.time}</div>
+            <div><i class="fas fa-coffee"></i> ${order.items.map(i => `${i.name} x${i.qty}`).join(', ')}</div>
+            <div style="font-weight: bold; color: var(--primary); margin: 10px 0;">Tổng: ${order.total.toLocaleString()}đ</div>
+            <div class="order-actions">
+              <button onclick="viewOrderDetail(${order.id})" style="background: #17a2b8;">Chi tiết</button>
+              <button onclick="updateOrderStatus(${order.id}, 'processing')" style="background: #ffc107;">Đang xử lý</button>
+              <button onclick="updateOrderStatus(${order.id}, 'completed')" style="background: #28a745;">Hoàn thành</button>
+              <button onclick="deleteOrder(${order.id})" style="background: #dc3545;">Xóa</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderStats() {
+      const dateInput = document.getElementById('statsDate').value;
+      let filtered = orders;
+      
+      if (dateInput) {
+        filtered = orders.filter(o => o.date === dateInput);
+      }
+      
+      const totalOrders = filtered.length;
+      const revenue = filtered.reduce((s, o) => s + o.total, 0);
+      const highest = filtered.length ? Math.max(...filtered.map(o => o.total)) : 0;
+      
+      const itemCount = {};
+      filtered.forEach(o => o.items.forEach(i => {
+        itemCount[i.originalName || i.name] = (itemCount[i.originalName || i.name] || 0) + i.qty;
+      }));
+      const topItem = Object.entries(itemCount).sort((a,b) => b[1] - a[1])[0];
+      
+      document.getElementById('totalOrders').textContent = totalOrders;
+      document.getElementById('totalRevenue').textContent = revenue.toLocaleString() + 'đ';
+      document.getElementById('highestOrder').textContent = highest.toLocaleString() + 'đ';
+      document.getElementById('bestSeller').textContent = topItem ? `${topItem[0]} (${topItem[1]})` : '-';
+      
+      const recent = filtered.slice(-5).reverse();
+      let recentHtml = '<h3>Đơn hàng gần đây</h3><table style="width:100%"><tr><th>Mã</th><th>SĐT</th><th>Tiền</th></tr>';
+      recent.forEach(o => {
+        recentHtml += `<tr><td>#${o.id}</td><td>${o.customer?.phone}</td><td>${o.total.toLocaleString()}đ</td></tr>`;
+      });
+      recentHtml += '</table>';
+      document.getElementById('recentOrders').innerHTML = recentHtml;
+    }
+
+    function showTodayStats() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('statsDate').value = today;
+      renderStats();
+    }
+
+    function showAllStats() {
+      document.getElementById('statsDate').value = '';
+      renderStats();
+    }
+
+    function renderStockTable() {
+      const tbody = document.getElementById('stockTableBody');
+      if (!tbody) return;
+      
+      tbody.innerHTML = '';
+      
+      const sortedItems = [...menuItems].sort((a, b) => {
+        if (a.category !== b.category) return a.category.localeCompare(b.category);
+        return a.name.localeCompare(b.name);
+      });
+      
+      sortedItems.forEach(item => {
+        const stock = stockStatus[item.id] || { status: 'available', lastUpdate: null };
+        const statusText = stock.status === 'available' ? 'Còn' : 'Hết';
+        const statusClass = stock.status === 'available' ? 'stock-in' : 'stock-out';
+        
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.name}</td>
+            <td>${item.category}</td>
+            <td><span class="stock-status ${statusClass}">${statusText}</span></td>
+            <td>${stock.lastUpdate || 'Chưa cập nhật'}</td>
+            <td>
+              <button class="stock-toggle" onclick="toggleItemStock(${item.id})" style="background: ${stock.status === 'available' ? 'var(--danger)' : 'var(--success)'};">
+                <i class="fas ${stock.status === 'available' ? 'fa-times' : 'fa-check'}"></i>
+                ${stock.status === 'available' ? 'Đánh dấu hết' : 'Đánh dấu còn'}
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function toggleItemStock(itemId) {
+      const currentStatus = stockStatus[itemId]?.status || 'available';
+      const newStatus = currentStatus === 'available' ? 'out' : 'available';
+      updateItemStock(itemId, newStatus);
+    }
+
+    function viewOrderDetail(id) {
+      const order = orders.find(o => o.id === id);
+      if (!order) return;
+      
+      const modal = document.getElementById('orderDetailModal');
+      const content = document.getElementById('orderDetailContent');
+      
+      let itemsHtml = '';
+      order.items.forEach(item => {
+        itemsHtml += `<tr><td>${item.name}</td><td>${item.qty}</td><td>${item.price.toLocaleString()}đ</td><td>${(item.price * item.qty).toLocaleString()}đ</td></tr>`;
+      });
+      
+      content.innerHTML = `
+        <h2>Đơn hàng #${order.id}</h2>
+        <p><strong>Thời gian:</strong> ${order.time}</p>
+        <p><strong>SĐT:</strong> ${order.customer?.phone}</p>
+        <p><strong>Địa chỉ:</strong> ${order.customer?.address}</p>
+        <p><strong>Ghi chú:</strong> ${order.note || 'Không có'}</p>
+        <p><strong>Trạng thái:</strong> ${order.status}</p>
+        
+        <h3>Món đã gọi</h3>
+        <table style="width:100%">
+          <tr><th>Món</th><th>SL</th><th>Đơn giá</th><th>Thành tiền</th></tr>
+          ${itemsHtml}
+        </table>
+        
+        <p style="text-align:right; font-weight:bold; margin-top:10px;">Tổng: ${order.total.toLocaleString()}đ</p>
+        
+        <button onclick="document.getElementById('orderDetailModal').style.display='none'" style="margin-top:10px;">Đóng</button>
+      `;
+      
+      modal.style.display = 'flex';
+    }
+
+    function closeOrderDetailModal() {
+      document.getElementById('orderDetailModal').style.display = 'none';
+    }
+
+    function updateOrderStatus(id, status) {
+      const order = orders.find(o => o.id === id);
+      if (!order) return;
+      
+      order.status = status;
+      localStorage.setItem('orders', JSON.stringify(orders));
+      
+      loadOrders();
+      renderStats();
+      showNotification(`Đã cập nhật trạng thái đơn #${id}`);
+    }
+
+    function deleteOrder(id) {
+      if (!confirm(`Xóa đơn hàng #${id}?`)) return;
+      
+      orders = orders.filter(o => o.id !== id);
+      localStorage.setItem('orders', JSON.stringify(orders));
+      
+      loadOrders();
+      renderStats();
+      showNotification(`Đã xóa đơn #${id}`);
+    }
+
+    function closeWarningModal() {
+      document.getElementById('warningModal').style.display = 'none';
+    }
+
+    function showWarning(message) {
+      document.getElementById('warningMessage').textContent = message;
+      document.getElementById('warningModal').style.display = 'flex';
+    }
+
     function showNotification(message, isError = false) {
       const notification = document.getElementById('notification');
       notification.textContent = message;
