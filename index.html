@@ -1305,8 +1305,8 @@
       
       // Gửi Telegram
       let message = `<b>☕ BII COFFEE - ĐƠN HÀNG MỚI #${order.id}</b>\n\n`;
-      message += `🕒 <b>Thời gian:</b> ${order.time}\n`;
-      message += `📞 <b>SĐT:</b> ${order.customer.phone}\n`;
+      message += `🕒 <b>Thời gian đặt hàng:</b> ${order.time}\n`;
+      message += `📞 <b>SĐT ship:</b> ${order.customer.phone}\n`;
       message += `🏠 <b>Địa chỉ ship hàng:</b> ${order.customer.address}\n`;
       message += `📝 <b>Ghi chú:</b> ${note || 'Không có'}\n\n`;
       message += `<b>CHI TIẾT MÓN:</b>\n`;
