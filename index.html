@@ -20,6 +20,8 @@
       --size-l: #ff9800;
       --bubble-white: #f5f5f5;
       --bubble-black: #333;
+      --out-of-stock: #dc3545;
+      --in-stock: #28a745;
     }
     
     * {
@@ -74,11 +76,11 @@
       margin-bottom: 8px;
     }
     
-    /* Topping status bar */
-    .topping-status {
+    /* Status Bar */
+    .status-bar {
       display: flex;
       justify-content: center;
-      gap: 20px;
+      gap: 15px;
       margin-top: 10px;
       padding: 10px;
       background: rgba(255,255,255,0.2);
@@ -203,6 +205,14 @@
     
     button.warning:hover {
       background-color: #e0a800;
+    }
+    
+    button.danger {
+      background-color: var(--danger);
+    }
+    
+    button.danger:hover {
+      background-color: #c82333;
     }
     
     /* Size selector */
@@ -460,6 +470,25 @@
       flex-direction: column;
       gap: 8px;
       transition: transform 0.2s;
+      position: relative;
+    }
+    
+    .menu-item.out-of-stock {
+      opacity: 0.6;
+      background: #f8f8f8;
+      border: 1px dashed var(--danger);
+    }
+    
+    .out-of-stock-badge {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: var(--danger);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: bold;
     }
     
     .menu-item:hover {
@@ -505,6 +534,11 @@
     
     .add-to-cart-btn:hover {
       background: #218838;
+    }
+    
+    .add-to-cart-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
     }
     
     /* Cart table */
@@ -591,6 +625,48 @@
       font-weight: bold;
       color: var(--primary);
       margin-top: 5px;
+    }
+    
+    /* Stock management */
+    .stock-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    
+    .stock-table th {
+      background: var(--primary);
+      color: white;
+      padding: 10px;
+      text-align: left;
+    }
+    
+    .stock-table td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .stock-status {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+    
+    .stock-in {
+      background: var(--success);
+      color: white;
+    }
+    
+    .stock-out {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .stock-toggle {
+      padding: 5px 10px;
+      font-size: 0.8rem;
     }
     
     /* Notification */
@@ -703,8 +779,8 @@
     <h1><i class="fas fa-coffee"></i> Bii Coffee</h1>
     <p>Quán quen - Giá quen - Vị quen</p>
     
-    <!-- Topping Status Bar -->
-    <div class="topping-status" id="toppingStatus">
+    <!-- Status Bar -->
+    <div class="status-bar" id="statusBar">
       <div class="status-item">
         <span class="bubble-dot bubble-white"></span>
         <span>Trân châu trắng:</span>
@@ -904,30 +980,51 @@
       </div>
     </div>
     
-    <!-- ADMIN TOPPING CONTROL -->
-    <div id="toppingSection" class="section admin-only">
+    <!-- ADMIN STOCK MANAGEMENT -->
+    <div id="stockSection" class="section admin-only">
       <h2>
-        <i class="fas fa-cookie-bite"></i> Quản lý topping 
+        <i class="fas fa-boxes"></i> Quản lý tồn kho 
         <span class="admin-badge">Admin</span>
       </h2>
       
-      <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
-        <div style="flex: 1; min-width: 200px; text-align: center;">
-          <div style="font-weight: bold; margin-bottom: 10px;">Trân châu trắng</div>
-          <div style="display: flex; gap: 10px; justify-content: center;">
-            <button onclick="updateToppingStatus('white', 'available')" style="background: var(--success);">Còn</button>
-            <button onclick="updateToppingStatus('white', 'out')" style="background: var(--danger);">Hết</button>
+      <div style="margin-bottom: 15px;">
+        <h3>Trạng thái topping</h3>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+          <div style="flex: 1; min-width: 200px; text-align: center; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+            <div style="font-weight: bold; margin-bottom: 10px;">Trân châu trắng</div>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 10px;">
+              <button onclick="updateToppingStatus('white', 'available')" style="background: var(--success);">Còn</button>
+              <button onclick="updateToppingStatus('white', 'out')" style="background: var(--danger);">Hết</button>
+            </div>
+            <div id="whiteToppingTime" style="font-size: 0.8rem; color: #666;"></div>
           </div>
-          <div id="whiteToppingTime" style="margin-top: 10px; font-size: 0.9rem; color: #666;"></div>
+          
+          <div style="flex: 1; min-width: 200px; text-align: center; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+            <div style="font-weight: bold; margin-bottom: 10px;">Trân châu đen</div>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 10px;">
+              <button onclick="updateToppingStatus('black', 'available')" style="background: var(--success);">Còn</button>
+              <button onclick="updateToppingStatus('black', 'out')" style="background: var(--danger);">Hết</button>
+            </div>
+            <div id="blackToppingTime" style="font-size: 0.8rem; color: #666;"></div>
+          </div>
         </div>
         
-        <div style="flex: 1; min-width: 200px; text-align: center;">
-          <div style="font-weight: bold; margin-bottom: 10px;">Trân châu đen</div>
-          <div style="display: flex; gap: 10px; justify-content: center;">
-            <button onclick="updateToppingStatus('black', 'available')" style="background: var(--success);">Còn</button>
-            <button onclick="updateToppingStatus('black', 'out')" style="background: var(--danger);">Hết</button>
-          </div>
-          <div id="blackToppingTime" style="margin-top: 10px; font-size: 0.9rem; color: #666;"></div>
+        <h3>Quản lý món hết (theo dõi từ Telegram)</h3>
+        <p><small><i class="fas fa-info-circle"></i> Gửi lệnh đến Telegram: <strong>hết [tên món]</strong> hoặc <strong>còn [tên món]</strong> (ví dụ: "hết Trà sữa khoai môn", "còn Pizza xúc xích")</small></p>
+        
+        <div style="max-height: 400px; overflow-y: auto;">
+          <table class="stock-table">
+            <thead>
+              <tr>
+                <th>Món</th>
+                <th>Danh mục</th>
+                <th>Trạng thái</th>
+                <th>Cập nhật lần cuối</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="stockTableBody"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -1142,7 +1239,10 @@
     let currentCategory = "TẤT CẢ";
     let selectedSizes = {};
     
-    // Topping status
+    // Stock status
+    let stockStatus = JSON.parse(localStorage.getItem('stockStatus')) || {};
+    
+    // Topping status (đặc biệt)
     let toppingStatus = JSON.parse(localStorage.getItem('toppingStatus')) || {
       white: { status: 'available', lastUpdate: null },
       black: { status: 'available', lastUpdate: null }
@@ -1152,10 +1252,22 @@
     // KHỞI TẠO
     // =============================================
     function init() {
+      // Khởi tạo stock status cho tất cả món
+      menuItems.forEach(item => {
+        if (!stockStatus[item.id]) {
+          stockStatus[item.id] = {
+            status: 'available',
+            lastUpdate: null
+          };
+        }
+      });
+      localStorage.setItem('stockStatus', JSON.stringify(stockStatus));
+      
       renderCategoryFilter();
       renderMenu();
       renderCart();
       updateToppingDisplay();
+      renderStockTable();
       startTelegramPolling();
       
       // Kiểm tra trạng thái đăng nhập
@@ -1199,21 +1311,154 @@
     function processTelegramCommand(text) {
       const command = text.toLowerCase().trim();
       
-      // Xử lý lệnh hết trân châu
+      // Xử lý lệnh hết/còn topping
       if (command.includes('hết trân châu trắng') || command.includes('hết trắng')) {
         updateToppingStatus('white', 'out', true);
+        return;
       } else if (command.includes('còn trân châu trắng') || command.includes('có trắng')) {
         updateToppingStatus('white', 'available', true);
+        return;
       } else if (command.includes('hết trân châu đen') || command.includes('hết đen')) {
         updateToppingStatus('black', 'out', true);
+        return;
       } else if (command.includes('còn trân châu đen') || command.includes('có đen')) {
         updateToppingStatus('black', 'available', true);
+        return;
       }
+      
+      // Xử lý lệnh hết/còn món trong menu
+      // Format: "hết [tên món]" hoặc "còn [tên món]"
+      let isAvailable = null;
+      let itemName = '';
+      
+      if (command.startsWith('hết ')) {
+        isAvailable = false;
+        itemName = command.substring(4).trim();
+      } else if (command.startsWith('còn ')) {
+        isAvailable = true;
+        itemName = command.substring(4).trim();
+      } else if (command.startsWith('có ')) {
+        isAvailable = true;
+        itemName = command.substring(3).trim();
+      }
+      
+      if (isAvailable !== null && itemName) {
+        // Tìm món gần đúng trong menu
+        const matchedItem = findMenuItem(itemName);
+        if (matchedItem) {
+          updateItemStock(matchedItem.id, isAvailable ? 'available' : 'out', true);
+        }
+      }
+    }
+    
+    function findMenuItem(searchName) {
+      // Tìm kiếm gần đúng (không phân biệt hoa thường, bỏ dấu)
+      const normalizedSearch = removeDiacritics(searchName.toLowerCase());
+      
+      let bestMatch = null;
+      let bestScore = 0;
+      
+      menuItems.forEach(item => {
+        const normalizedItem = removeDiacritics(item.name.toLowerCase());
+        
+        // Kiểm tra nếu tên món chứa từ khóa tìm kiếm
+        if (normalizedItem.includes(normalizedSearch)) {
+          const score = normalizedSearch.length / normalizedItem.length;
+          if (score > bestScore) {
+            bestScore = score;
+            bestMatch = item;
+          }
+        }
+        
+        // Kiểm tra nếu từ khóa tìm kiếm chứa tên món
+        if (normalizedSearch.includes(normalizedItem)) {
+          const score = normalizedItem.length / normalizedSearch.length;
+          if (score > bestScore) {
+            bestScore = score;
+            bestMatch = item;
+          }
+        }
+      });
+      
+      return bestMatch;
+    }
+    
+    // Hàm bỏ dấu tiếng Việt
+    function removeDiacritics(str) {
+      const accents = 'àáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđ';
+      const without = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyyd';
+      
+      return str.split('').map(char => {
+        const index = accents.indexOf(char);
+        return index !== -1 ? without[index] : char;
+      }).join('');
     }
 
     // =============================================
-    // QUẢN LÝ TRẠNG THÁI TOPPING
+    // QUẢN LÝ TỒN KHO
     // =============================================
+    function updateItemStock(itemId, status, fromTelegram = false) {
+      if (!stockStatus[itemId]) {
+        stockStatus[itemId] = {};
+      }
+      
+      stockStatus[itemId].status = status;
+      stockStatus[itemId].lastUpdate = new Date().toLocaleString('vi-VN');
+      
+      localStorage.setItem('stockStatus', JSON.stringify(stockStatus));
+      
+      // Cập nhật giao diện
+      renderMenu();
+      if (isLoggedIn) {
+        renderStockTable();
+      }
+      
+      const item = menuItems.find(i => i.id === itemId);
+      if (fromTelegram && item) {
+        showNotification(`Đã cập nhật từ Telegram: ${item.name} ${status === 'available' ? 'Còn' : 'Hết'}`);
+      }
+    }
+    
+    function toggleItemStock(itemId) {
+      const currentStatus = stockStatus[itemId]?.status || 'available';
+      const newStatus = currentStatus === 'available' ? 'out' : 'available';
+      updateItemStock(itemId, newStatus);
+    }
+    
+    function renderStockTable() {
+      const tbody = document.getElementById('stockTableBody');
+      if (!tbody) return;
+      
+      tbody.innerHTML = '';
+      
+      // Sắp xếp theo danh mục và tên
+      const sortedItems = [...menuItems].sort((a, b) => {
+        if (a.category !== b.category) return a.category.localeCompare(b.category);
+        return a.name.localeCompare(b.name);
+      });
+      
+      sortedItems.forEach(item => {
+        const stock = stockStatus[item.id] || { status: 'available', lastUpdate: null };
+        const statusText = stock.status === 'available' ? 'Còn' : 'Hết';
+        const statusClass = stock.status === 'available' ? 'stock-in' : 'stock-out';
+        
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.name}</td>
+            <td>${item.category}</td>
+            <td><span class="stock-status ${statusClass}">${statusText}</span></td>
+            <td>${stock.lastUpdate || 'Chưa cập nhật'}</td>
+            <td>
+              <button class="stock-toggle" onclick="toggleItemStock(${item.id})" style="background: ${stock.status === 'available' ? 'var(--danger)' : 'var(--success)'};">
+                <i class="fas ${stock.status === 'available' ? 'fa-times' : 'fa-check'}"></i>
+                ${stock.status === 'available' ? 'Đánh dấu hết' : 'Đánh dấu còn'}
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+    
     function updateToppingStatus(type, status, fromTelegram = false) {
       if (type === 'white') {
         toppingStatus.white.status = status;
@@ -1227,7 +1472,7 @@
       updateToppingDisplay();
       
       if (fromTelegram) {
-        showNotification(`Đã cập nhật trạng thái từ Telegram: ${type === 'white' ? 'Trân châu trắng' : 'Trân châu đen'} ${status === 'available' ? 'Còn' : 'Hết'}`);
+        showNotification(`Đã cập nhật từ Telegram: ${type === 'white' ? 'Trân châu trắng' : 'Trân châu đen'} ${status === 'available' ? 'Còn' : 'Hết'}`);
       }
     }
     
@@ -1257,7 +1502,15 @@
     function checkOutOfStockItems() {
       const outOfStockItems = [];
       
-      // Kiểm tra nếu có món trà sữa mà topping hết
+      // Kiểm tra từng món trong giỏ hàng
+      cart.forEach(item => {
+        const stock = stockStatus[item.id];
+        if (stock && stock.status === 'out') {
+          outOfStockItems.push(item.name);
+        }
+      });
+      
+      // Kiểm tra topping cho trà sữa
       const hasMilkTea = cart.some(item => 
         item.originalName && item.originalName.toLowerCase().includes('trà sữa')
       );
@@ -1271,7 +1524,7 @@
         }
       }
       
-      return outOfStockItems;
+      return [...new Set(outOfStockItems)]; // Loại bỏ trùng lặp
     }
 
     // =============================================
@@ -1308,36 +1561,43 @@
       }
       
       filtered.forEach(item => {
+        const stock = stockStatus[item.id] || { status: 'available' };
+        const isOutOfStock = stock.status === 'out';
+        
         const itemDiv = document.createElement('div');
-        itemDiv.className = 'menu-item';
+        itemDiv.className = 'menu-item' + (isOutOfStock ? ' out-of-stock' : '');
+        
+        if (isOutOfStock) {
+          itemDiv.innerHTML += '<div class="out-of-stock-badge"><i class="fas fa-times-circle"></i> Hết</div>';
+        }
         
         if (item.hasSize) {
           // Món có 2 size
           const sizeKey = `size_${item.id}`;
           if (!selectedSizes[sizeKey]) selectedSizes[sizeKey] = 'S';
           
-          itemDiv.innerHTML = `
+          itemDiv.innerHTML += `
             <div class="menu-item-name">${item.name}</div>
             <div class="menu-item-price">
               <span class="price-small">S: ${item.priceS.toLocaleString()}đ</span>
               <span class="price-large">L: ${item.priceL.toLocaleString()}đ</span>
             </div>
             <div class="size-selector">
-              <button class="size-btn ${selectedSizes[sizeKey] === 'S' ? 'small-active' : ''}" onclick="selectSize(${item.id}, 'S', event)">Size S</button>
-              <button class="size-btn ${selectedSizes[sizeKey] === 'L' ? 'large-active' : ''}" onclick="selectSize(${item.id}, 'L', event)">Size L</button>
+              <button class="size-btn ${selectedSizes[sizeKey] === 'S' ? 'small-active' : ''}" onclick="selectSize(${item.id}, 'S', event)" ${isOutOfStock ? 'disabled' : ''}>Size S</button>
+              <button class="size-btn ${selectedSizes[sizeKey] === 'L' ? 'large-active' : ''}" onclick="selectSize(${item.id}, 'L', event)" ${isOutOfStock ? 'disabled' : ''}>Size L</button>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCartWithSize(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.priceS}, ${item.priceL}, '${selectedSizes[sizeKey]}')">
+            <button class="add-to-cart-btn" onclick="addToCartWithSize(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.priceS}, ${item.priceL}, '${selectedSizes[sizeKey]}')" ${isOutOfStock ? 'disabled' : ''}>
               <i class="fas fa-cart-plus"></i> Thêm
             </button>
           `;
         } else {
           // Món 1 size
-          itemDiv.innerHTML = `
+          itemDiv.innerHTML += `
             <div class="menu-item-name">${item.name}</div>
             <div class="menu-item-price">
               <span class="price-single">${item.price.toLocaleString()}đ</span>
             </div>
-            <button class="add-to-cart-btn" onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">
+            <button class="add-to-cart-btn" onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})" ${isOutOfStock ? 'disabled' : ''}>
               <i class="fas fa-cart-plus"></i> Thêm
             </button>
           `;
@@ -1358,6 +1618,13 @@
     // GIỎ HÀNG
     // =============================================
     function addToCartWithSize(id, name, priceS, priceL, size) {
+      // Kiểm tra món còn không
+      const stock = stockStatus[id];
+      if (stock && stock.status === 'out') {
+        showNotification('Món này đã hết!', true);
+        return;
+      }
+      
       const price = size === 'S' ? priceS : priceL;
       const itemName = `${name} (Size ${size})`;
       
@@ -1372,6 +1639,13 @@
     }
 
     function addToCart(id, name, price) {
+      // Kiểm tra món còn không
+      const stock = stockStatus[id];
+      if (stock && stock.status === 'out') {
+        showNotification('Món này đã hết!', true);
+        return;
+      }
+      
       const existing = cart.find(item => item.id === id && !item.size);
       if (existing) {
         existing.qty++;
@@ -1448,7 +1722,7 @@
       // Kiểm tra món hết
       const outOfStock = checkOutOfStockItems();
       if (outOfStock.length > 0) {
-        const message = `Xin lỗi, hiện tại quán đã hết: ${outOfStock.join(', ')}. Vui lòng chọn món khác hoặc đợi thêm.`;
+        const message = `Xin lỗi, hiện tại quán đã hết:\n- ${outOfStock.join('\n- ')}\n\nVui lòng xóa các món này khỏi giỏ hàng.`;
         document.getElementById('outOfStockMessage').textContent = message;
         document.getElementById('outOfStockModal').style.display = 'flex';
         return;
@@ -1516,7 +1790,7 @@
       // Kiểm tra lại lần cuối trước khi tạo đơn
       const outOfStock = checkOutOfStockItems();
       if (outOfStock.length > 0) {
-        const message = `Xin lỗi, hiện tại quán đã hết: ${outOfStock.join(', ')}. Đơn hàng không thể gửi.`;
+        const message = `Xin lỗi, hiện tại quán đã hết:\n- ${outOfStock.join('\n- ')}\n\nĐơn hàng không thể gửi.`;
         document.getElementById('outOfStockMessage').textContent = message;
         document.getElementById('outOfStockModal').style.display = 'flex';
         return;
@@ -1557,11 +1831,23 @@
       });
       message += `\n<b>💰 TỔNG CỘNG: ${total.toLocaleString()}đ</b>\n`;
       
-      // Thêm thông báo topping nếu hết
-      if (toppingStatus.white.status === 'out' || toppingStatus.black.status === 'out') {
-        message += `\n⚠️ <b>LƯU Ý:</b> `;
-        if (toppingStatus.white.status === 'out') message += `Trân châu trắng đã hết. `;
-        if (toppingStatus.black.status === 'out') message += `Trân châu đen đã hết. `;
+      // Thêm thông báo các món đang hết
+      const outOfStockItems = [];
+      if (toppingStatus.white.status === 'out') outOfStockItems.push('Trân châu trắng');
+      if (toppingStatus.black.status === 'out') outOfStockItems.push('Trân châu đen');
+      
+      menuItems.forEach(item => {
+        const stock = stockStatus[item.id];
+        if (stock && stock.status === 'out') {
+          outOfStockItems.push(item.name);
+        }
+      });
+      
+      if (outOfStockItems.length > 0) {
+        message += `\n⚠️ <b>CÁC MÓN ĐANG HẾT:</b>\n`;
+        outOfStockItems.forEach(item => {
+          message += `- ${item}\n`;
+        });
       }
       
       message += `\n💝 <b>Cảm ơn quý khách!</b>`;
@@ -1625,6 +1911,7 @@
         loadOrders();
         renderStats();
         updateToppingDisplay();
+        renderStockTable();
         showNotification('Đăng nhập thành công!');
       } else {
         showNotification('Sai mật khẩu!', true);
@@ -1644,6 +1931,7 @@
       document.getElementById('logoutBtn').style.display = 'block';
       renderMenuTable();
       renderAdminCategoryFilter();
+      renderStockTable();
       updateToppingDisplay();
     }
 
@@ -1739,6 +2027,12 @@
         menuItems.push({ id: newId, name, price: priceS, category, hasSize: false });
       }
       
+      // Khởi tạo stock status cho món mới
+      stockStatus[newId] = {
+        status: 'available',
+        lastUpdate: null
+      };
+      localStorage.setItem('stockStatus', JSON.stringify(stockStatus));
       localStorage.setItem('menuItems', JSON.stringify(menuItems));
       
       // Cập nhật giao diện
@@ -1746,6 +2040,7 @@
       renderMenu();
       renderMenuTable();
       renderAdminCategoryFilter();
+      renderStockTable();
       
       // Xóa form
       document.getElementById('menuName').value = '';
@@ -1771,12 +2066,17 @@
       renderMenu();
       renderMenuTable();
       renderAdminCategoryFilter();
+      renderStockTable();
       
       showNotification('Đã chuyển sang chế độ sửa, hãy nhập thông tin và thêm mới!');
     }
 
     function deleteMenuItem(index) {
       if (confirm('Xóa món này?')) {
+        const item = menuItems[index];
+        delete stockStatus[item.id];
+        localStorage.setItem('stockStatus', JSON.stringify(stockStatus));
+        
         menuItems.splice(index, 1);
         localStorage.setItem('menuItems', JSON.stringify(menuItems));
         
@@ -1784,6 +2084,7 @@
         renderMenu();
         renderMenuTable();
         renderAdminCategoryFilter();
+        renderStockTable();
         
         showNotification('Đã xóa món!');
       }
