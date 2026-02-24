@@ -1252,6 +1252,8 @@
     // KHỞI TẠO
     // =============================================
     function init() {
+      console.log('Khởi tạo hệ thống...');
+      
       // Khởi tạo stock status cho tất cả món
       menuItems.forEach(item => {
         if (!stockStatus[item.id]) {
@@ -1278,56 +1280,172 @@
         loadOrders();
       }
       updateAuthButtons();
+      
+      // Gửi tin nhắn khởi động đến Telegram
+      sendTelegramMessage('🟢 Hệ thống Bii Coffee đã khởi động và sẵn sàng nhận lệnh!');
+    }
+
+    // =============================================
+    // GỬI TIN NHẮN TELEGRAM
+    // =============================================
+    async function sendTelegramMessage(message, parseMode = 'HTML') {
+      try {
+        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message,
+            parse_mode: parseMode
+          })
+        });
+        
+        if (response.ok) {
+          console.log('Đã gửi tin nhắn Telegram:', message);
+          return true;
+        } else {
+          console.error('Lỗi gửi Telegram:', await response.text());
+          return false;
+        }
+      } catch (error) {
+        console.error('Lỗi kết nối Telegram:', error);
+        return false;
+      }
     }
 
     // =============================================
     // TELEGRAM POLLING - LẮNG NGHE LỆNH HẾT MÓN
     // =============================================
     let lastUpdateId = 0;
+    let isProcessing = false;
     
     function startTelegramPolling() {
-      // Poll mỗi 10 giây để kiểm tra tin nhắn mới từ Telegram
-      setInterval(checkTelegramMessages, 10000);
+      console.log('Bắt đầu polling Telegram...');
+      // Poll mỗi 5 giây để kiểm tra tin nhắn mới từ Telegram
+      setInterval(checkTelegramMessages, 5000);
     }
     
     async function checkTelegramMessages() {
+      if (isProcessing) return; // Tránh xử lý cùng lúc
+      
       try {
+        isProcessing = true;
         const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=5`);
         const data = await response.json();
         
-        if (data.ok && data.result.length > 0) {
-          data.result.forEach(update => {
+        if (data.ok && data.result && data.result.length > 0) {
+          console.log('Nhận được tin nhắn mới từ Telegram:', data.result.length, 'tin nhắn');
+          
+          for (const update of data.result) {
             if (update.message && update.message.text) {
-              processTelegramCommand(update.message.text);
+              const chatId = update.message.chat.id;
+              const messageText = update.message.text;
+              const messageId = update.message.message_id;
+              
+              console.log('Xử lý tin nhắn:', messageText);
+              
+              // Xử lý lệnh
+              const responseMessage = await processTelegramCommand(messageText, chatId);
+              
+              // Gửi phản hồi
+              if (responseMessage) {
+                await sendTelegramMessage(responseMessage);
+              }
+              
               lastUpdateId = update.update_id;
             }
-          });
+          }
         }
       } catch (error) {
         console.error('Lỗi polling Telegram:', error);
+      } finally {
+        isProcessing = false;
       }
     }
     
-    function processTelegramCommand(text) {
+    async function processTelegramCommand(text, chatId) {
       const command = text.toLowerCase().trim();
+      let response = '';
+      
+      // Hiển thị danh sách lệnh
+      if (command === '/help' || command === 'help' || command === 'menu') {
+        response = '📋 <b>DANH SÁCH LỆNH</b>\n\n' +
+                  '🥤 <b>LỆNH TOPPING:</b>\n' +
+                  '- "hết trân châu trắng" hoặc "hết trắng"\n' +
+                  '- "còn trân châu trắng" hoặc "có trắng"\n' +
+                  '- "hết trân châu đen" hoặc "hết đen"\n' +
+                  '- "còn trân châu đen" hoặc "có đen"\n\n' +
+                  '🍜 <b>LỆNH MÓN:</b>\n' +
+                  '- "hết [tên món]" (ví dụ: "hết Trà sữa khoai môn")\n' +
+                  '- "còn [tên món]" hoặc "có [tên món]" (ví dụ: "còn Pizza")\n\n' +
+                  '📊 <b>LỆNH KHÁC:</b>\n' +
+                  '- "danh sách hết" - Xem các món đang hết\n' +
+                  '- "trạng thái" - Xem trạng thái topping\n' +
+                  '- "help" - Hiển thị danh sách lệnh';
+        
+        return response;
+      }
+      
+      // Xem danh sách món hết
+      if (command === 'danh sách hết' || command === 'mon het' || command === 'hết') {
+        const outOfStockItems = [];
+        
+        // Kiểm tra topping
+        if (toppingStatus.white.status === 'out') outOfStockItems.push('Trân châu trắng');
+        if (toppingStatus.black.status === 'out') outOfStockItems.push('Trân châu đen');
+        
+        // Kiểm tra món
+        menuItems.forEach(item => {
+          const stock = stockStatus[item.id];
+          if (stock && stock.status === 'out') {
+            outOfStockItems.push(item.name);
+          }
+        });
+        
+        if (outOfStockItems.length === 0) {
+          response = '✅ Hiện tại tất cả các món đều còn!';
+        } else {
+          response = '📋 <b>DANH SÁCH MÓN ĐANG HẾT:</b>\n\n';
+          outOfStockItems.forEach(item => {
+            response += `❌ ${item}\n`;
+          });
+        }
+        
+        return response;
+      }
+      
+      // Xem trạng thái topping
+      if (command === 'trạng thái' || command === 'status') {
+        response = '🥤 <b>TRẠNG THÁI TOPPING:</b>\n\n' +
+                  `Trân châu trắng: ${toppingStatus.white.status === 'available' ? '✅ Còn' : '❌ Hết'}\n` +
+                  `Trân châu đen: ${toppingStatus.black.status === 'available' ? '✅ Còn' : '❌ Hết'}\n\n` +
+                  `Cập nhật lần cuối:\n` +
+                  `Trắng: ${toppingStatus.white.lastUpdate || 'Chưa cập nhật'}\n` +
+                  `Đen: ${toppingStatus.black.lastUpdate || 'Chưa cập nhật'}`;
+        
+        return response;
+      }
       
       // Xử lý lệnh hết/còn topping
       if (command.includes('hết trân châu trắng') || command.includes('hết trắng')) {
         updateToppingStatus('white', 'out', true);
-        return;
+        response = '✅ Đã cập nhật: <b>Trân châu trắng HẾT</b>';
+        return response;
       } else if (command.includes('còn trân châu trắng') || command.includes('có trắng')) {
         updateToppingStatus('white', 'available', true);
-        return;
+        response = '✅ Đã cập nhật: <b>Trân châu trắng CÒN</b>';
+        return response;
       } else if (command.includes('hết trân châu đen') || command.includes('hết đen')) {
         updateToppingStatus('black', 'out', true);
-        return;
+        response = '✅ Đã cập nhật: <b>Trân châu đen HẾT</b>';
+        return response;
       } else if (command.includes('còn trân châu đen') || command.includes('có đen')) {
         updateToppingStatus('black', 'available', true);
-        return;
+        response = '✅ Đã cập nhật: <b>Trân châu đen CÒN</b>';
+        return response;
       }
       
       // Xử lý lệnh hết/còn món trong menu
-      // Format: "hết [tên món]" hoặc "còn [tên món]"
       let isAvailable = null;
       let itemName = '';
       
@@ -1343,17 +1461,29 @@
       }
       
       if (isAvailable !== null && itemName) {
+        console.log('Tìm món:', itemName);
+        
         // Tìm món gần đúng trong menu
         const matchedItem = findMenuItem(itemName);
+        
         if (matchedItem) {
           updateItemStock(matchedItem.id, isAvailable ? 'available' : 'out', true);
+          response = `✅ Đã cập nhật: <b>${matchedItem.name}</b> ${isAvailable ? 'CÒN' : 'HẾT'}`;
+        } else {
+          response = `❌ Không tìm thấy món: "${itemName}". Vui lòng kiểm tra lại tên món.`;
         }
+        
+        return response;
       }
+      
+      // Nếu không phải lệnh hợp lệ
+      return null;
     }
     
     function findMenuItem(searchName) {
       // Tìm kiếm gần đúng (không phân biệt hoa thường, bỏ dấu)
       const normalizedSearch = removeDiacritics(searchName.toLowerCase());
+      console.log('Tìm kiếm với từ khóa:', normalizedSearch);
       
       let bestMatch = null;
       let bestScore = 0;
@@ -1361,32 +1491,75 @@
       menuItems.forEach(item => {
         const normalizedItem = removeDiacritics(item.name.toLowerCase());
         
+        // Tính điểm tương đồng
+        let score = 0;
+        
         // Kiểm tra nếu tên món chứa từ khóa tìm kiếm
         if (normalizedItem.includes(normalizedSearch)) {
-          const score = normalizedSearch.length / normalizedItem.length;
-          if (score > bestScore) {
-            bestScore = score;
-            bestMatch = item;
-          }
+          score = normalizedSearch.length / normalizedItem.length;
         }
         
         // Kiểm tra nếu từ khóa tìm kiếm chứa tên món
         if (normalizedSearch.includes(normalizedItem)) {
-          const score = normalizedItem.length / normalizedSearch.length;
-          if (score > bestScore) {
-            bestScore = score;
-            bestMatch = item;
-          }
+          const newScore = normalizedItem.length / normalizedSearch.length;
+          if (newScore > score) score = newScore;
+        }
+        
+        // Kiểm tra độ tương đồng Levenshtein đơn giản
+        if (score === 0) {
+          const distance = levenshteinDistance(normalizedSearch, normalizedItem);
+          const maxLength = Math.max(normalizedSearch.length, normalizedItem.length);
+          score = 1 - (distance / maxLength);
+        }
+        
+        if (score > bestScore && score > 0.5) { // Ngưỡng tương đồng 50%
+          bestScore = score;
+          bestMatch = item;
         }
       });
       
+      if (bestMatch) {
+        console.log('Tìm thấy món:', bestMatch.name, 'với độ tương đồng:', bestScore);
+      } else {
+        console.log('Không tìm thấy món phù hợp');
+      }
+      
       return bestMatch;
+    }
+    
+    // Hàm tính khoảng cách Levenshtein
+    function levenshteinDistance(a, b) {
+      const matrix = [];
+      
+      for (let i = 0; i <= b.length; i++) {
+        matrix[i] = [i];
+      }
+      
+      for (let j = 0; j <= a.length; j++) {
+        matrix[0][j] = j;
+      }
+      
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          if (b.charAt(i-1) === a.charAt(j-1)) {
+            matrix[i][j] = matrix[i-1][j-1];
+          } else {
+            matrix[i][j] = Math.min(
+              matrix[i-1][j-1] + 1,
+              matrix[i][j-1] + 1,
+              matrix[i-1][j] + 1
+            );
+          }
+        }
+      }
+      
+      return matrix[b.length][a.length];
     }
     
     // Hàm bỏ dấu tiếng Việt
     function removeDiacritics(str) {
       const accents = 'àáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđ';
-      const without = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyyd';
+      const without = 'aaaaaaaaaaaaaaaaaeeeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyyd';
       
       return str.split('').map(char => {
         const index = accents.indexOf(char);
@@ -1489,10 +1662,10 @@
       
       // Cập nhật thời gian trong admin
       if (isLoggedIn) {
-        document.getElementById('whiteToppingTime').textContent = 
-          toppingStatus.white.lastUpdate ? `Cập nhật: ${toppingStatus.white.lastUpdate}` : '';
-        document.getElementById('blackToppingTime').textContent = 
-          toppingStatus.black.lastUpdate ? `Cập nhật: ${toppingStatus.black.lastUpdate}` : '';
+        const whiteTime = document.getElementById('whiteToppingTime');
+        const blackTime = document.getElementById('blackToppingTime');
+        if (whiteTime) whiteTime.textContent = toppingStatus.white.lastUpdate ? `Cập nhật: ${toppingStatus.white.lastUpdate}` : '';
+        if (blackTime) blackTime.textContent = toppingStatus.black.lastUpdate ? `Cập nhật: ${toppingStatus.black.lastUpdate}` : '';
       }
     }
 
