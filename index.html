@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>Bii Coffee - Đặt hàng</title>
+  <title>Bii Coffee (Hoa Ciu's) - Đặt hàng</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
@@ -1705,7 +1705,7 @@
       if (toppingStatus.black.status === 'out') outOfStockToppings.push('Trân châu đen');
       
       if (outOfStockToppings.length > 0) {
-        warningDiv.textContent = `⚠️ Lưu ý: ${outOfStockToppings.join(', ')} đã hết. Khách có thể đặt trà sữa nhưng sẽ không có topping này.`;
+        warningDiv.textContent = `⚠️ Lưu ý: ${outOfStockToppings.join(', ')} đã hết. Quý khách có thể đặt trà sữa nhưng sẽ không có topping này, xin lỗi vì sự bất tiện này.`;
         warningDiv.style.display = 'block';
       } else {
         warningDiv.style.display = 'none';
