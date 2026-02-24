@@ -729,6 +729,7 @@
       background: #f8f9fa;
       padding: 15px;
       border-radius: 8px;
+      align-items: center;
     }
     
     .stock-btn {
@@ -744,6 +745,42 @@
       margin: 10px 0;
     }
     
+    .out-of-stock-item {
+      color: var(--danger);
+      padding: 3px 0;
+    }
+    
+    /* Telegram instructions */
+    .telegram-instructions {
+      background: #f8f9fa;
+      border: 1px dashed var(--telegram);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .telegram-instructions h4 {
+      color: var(--telegram);
+      margin-bottom: 10px;
+    }
+    
+    .telegram-instructions ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    
+    .telegram-instructions li {
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+    
+    .telegram-instructions code {
+      background: #e9ecef;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--danger);
+    }
+    
     /* Responsive */
     @media (max-width: 768px) {
       .menu-grid {
@@ -752,6 +789,14 @@
       
       .stats-container {
         grid-template-columns: 1fr 1fr;
+      }
+      
+      .stock-controls {
+        flex-direction: column;
+      }
+      
+      .stock-btn {
+        width: 100%;
       }
     }
   </style>
@@ -856,6 +901,7 @@
         <input type="date" id="statsDate" style="flex: 1;">
         <button onclick="showTodayStats()">Hôm nay</button>
         <button onclick="showAllStats()">Tất cả</button>
+        <button onclick="loadOrders()"><i class="fas fa-sync-alt"></i> Làm mới</button>
       </div>
       
       <div class="stats-container">
@@ -895,7 +941,6 @@
           <option value="processing">Đang xử lý</option>
           <option value="completed">Hoàn thành</option>
         </select>
-        <button onclick="loadOrders()"><i class="fas fa-sync-alt"></i> Làm mới</button>
       </div>
       
       <div id="ordersList" style="max-height: 500px; overflow-y: auto;"></div>
@@ -904,10 +949,33 @@
     <!-- ADMIN MENU SECTION -->
     <div id="menuSection" class="section admin-only">
       <h2>
-        <i class="fas fa-utensils"></i> Quản lý menu 
+        <i class="fas fa-utensils"></i> Quản lý menu & Kho hàng
         <span class="admin-badge">Admin</span>
       </h2>
       
+      <!-- Hướng dẫn sử dụng Telegram -->
+      <div class="telegram-instructions">
+        <h4><i class="fab fa-telegram"></i> Hướng dẫn báo hết món qua Telegram:</h4>
+        <ul>
+          <li><code>hết món Trà sữa khoai môn</code> - Báo món hết</li>
+          <li><code>còn món Trà sữa khoai môn</code> - Báo món còn lại</li>
+          <li><code>hết Trà chanh</code> - Cách viết ngắn</li>
+          <li><code>có lại Cà phê sữa</code> - Cách viết khác</li>
+        </ul>
+        <p><i class="fas fa-info-circle"></i> Hệ thống sẽ tự động cập nhật và thông báo cho khách hàng</p>
+      </div>
+      
+      <!-- QUẢN LÝ KHO HÀNG -->
+      <div class="stock-controls">
+        <input type="text" id="outOfStockItem" placeholder="Nhập tên món cần cập nhật (VD: Trà sữa khoai môn)" style="flex: 3;">
+        <button onclick="markOutOfStock()" class="danger stock-btn"><i class="fas fa-times-circle"></i> Báo hết</button>
+        <button onclick="markInStock()" class="success stock-btn"><i class="fas fa-check-circle"></i> Báo còn</button>
+      </div>
+      
+      <!-- Danh sách món hết -->
+      <div id="outOfStockList" class="stock-info"></div>
+      
+      <!-- Form thêm món mới -->
       <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
         <h3>Thêm món mới</h3>
         <div class="flex">
@@ -932,16 +1000,6 @@
         </div>
         <small><i class="fas fa-info-circle"></i> Nếu món chỉ có 1 size, nhập giá vào ô S và để trống ô L</small>
       </div>
-      
-      <!-- QUẢN LÝ KHO HÀNG -->
-      <div class="stock-controls">
-        <input type="text" id="outOfStockItem" placeholder="Nhập tên món hết (VD: Trà sữa khoai môn)" style="flex: 3;">
-        <button onclick="markOutOfStock()" class="danger" style="flex: 1;"><i class="fas fa-times-circle"></i> Báo hết</button>
-        <button onclick="markInStock()" class="success" style="flex: 1;"><i class="fas fa-check-circle"></i> Báo còn</button>
-      </div>
-      
-      <!-- Danh sách món hết -->
-      <div id="outOfStockList" class="stock-info"></div>
       
       <div class="category-filter" id="adminCategoryFilter"></div>
       
@@ -1016,7 +1074,7 @@
         <i class="fas fa-frown" style="font-size: 4rem; color: var(--danger); margin: 20px 0;"></i>
         <h3>Đơn hàng của bạn có món đã hết!</h3>
         <div id="outOfStockListModal" style="margin: 20px 0; text-align: left;"></div>
-        <p style="color: #666;">Vui lòng xóa các món trên khỏi giỏ hàng để tiếp tục.</p>
+        <p style="color: #666;">Các món trên đã được xóa khỏi giỏ hàng. Vui lòng kiểm tra lại!</p>
       </div>
       
       <button onclick="closeOutOfStockModal()" class="danger" style="width: 100%; margin-top: 20px;">
@@ -1244,7 +1302,7 @@
             }
             
             // Xử lý tin nhắn báo còn món
-            if (messageText.toLowerCase().includes('còn món') || messageText.toLowerCase().includes('có lại')) {
+            if (messageText.toLowerCase().includes('còn món') || messageText.toLowerCase().includes('có lại') || messageText.toLowerCase().includes('còn ')) {
               const itemName = messageText.replace(/còn món|có lại|còn/gi, '').trim();
               await markItemInStock(itemName);
             }
@@ -1301,6 +1359,25 @@
         
         await sendTelegramMessage(`✅ Đã cập nhật: ${menuItem.name} đã có hàng trở lại!`);
         showNotification(`Đã cập nhật: ${menuItem.name} còn hàng`);
+      } else {
+        await sendTelegramMessage(`❌ Không tìm thấy món "${itemName}" trong menu!`);
+      }
+    }
+
+    // Hàm gửi tin nhắn Telegram
+    async function sendTelegramMessage(message) {
+      try {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: message,
+            parse_mode: 'HTML'
+          })
+        });
+      } catch (error) {
+        console.error('Lỗi gửi Telegram:', error);
       }
     }
 
@@ -1337,7 +1414,7 @@
       });
       
       if (cart.length < originalLength) {
-        showNotification(`🔄 Đã xóa món hết khỏi giỏ hàng`, 'warning');
+        showNotification('🔄 Đã xóa món hết khỏi giỏ hàng', 'warning');
         renderCart();
       }
     }
@@ -1354,26 +1431,9 @@
       
       let html = '<div style="color: #dc3545; font-weight: bold;">📋 DANH SÁCH MÓN ĐÃ HẾT:</div>';
       outOfStockItems.forEach(item => {
-        html += `<div style="margin-left: 10px;">❌ ${item}</div>`;
+        html += `<div class="out-of-stock-item">❌ ${item}</div>`;
       });
       container.innerHTML = html;
-    }
-
-    // Gửi tin nhắn Telegram
-    async function sendTelegramMessage(message) {
-      try {
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: message,
-            parse_mode: 'HTML'
-          })
-        });
-      } catch (error) {
-        console.error('Lỗi gửi Telegram:', error);
-      }
     }
 
     // =============================================
@@ -1603,10 +1663,14 @@
         document.getElementById('outOfStockModal').style.display = 'flex';
         
         // Xóa món hết khỏi giỏ
-        outOfStockInCart.forEach(item => {
-          const index = cart.findIndex(c => (c.originalName || c.name).includes(item.name));
-          if (index !== -1) removeFromCart(index);
+        cart = cart.filter(item => {
+          let itemOriginalName = item.originalName || item.name;
+          if (itemOriginalName.includes('(Size')) {
+            itemOriginalName = itemOriginalName.split('(Size')[0].trim();
+          }
+          return !outOfStockItems.includes(itemOriginalName);
         });
+        renderCart();
         return;
       }
       
@@ -1852,6 +1916,22 @@
     async function markItemInStockFromAdmin(itemName) {
       await markItemInStock(itemName);
       renderMenuTable();
+    }
+
+    function markOutOfStock() {
+      const itemName = document.getElementById('outOfStockItem').value.trim();
+      if (itemName) {
+        markItemOutOfStock(itemName);
+        document.getElementById('outOfStockItem').value = '';
+      }
+    }
+
+    function markInStock() {
+      const itemName = document.getElementById('outOfStockItem').value.trim();
+      if (itemName) {
+        markItemInStock(itemName);
+        document.getElementById('outOfStockItem').value = '';
+      }
     }
 
     function addMenuItem() {
