@@ -1791,9 +1791,6 @@ async function markItemAsInStock(itemName) {
         localStorage.setItem('outOfStockItems', JSON.stringify(outOfStockItems));
         renderMenu();
         await sendTelegramReply(`✅ Đã cập nhật: ${found.name} CÒN hàng`);
-    } else {
-        await sendTelegramReply(`❌ Không tìm thấy món: ${itemName}`);
-    }
 }
 
 // Gửi phản hồi Telegram
